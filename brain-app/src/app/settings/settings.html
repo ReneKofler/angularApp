@@ -1,0 +1,83 @@
+<main class="settings-page">
+  <header>
+    <a routerLink="/" aria-label="Back to dashboard">←</a>
+    <div>
+      <p>Preferences</p>
+      <h1>Make BrainApp yours</h1>
+    </div>
+  </header>
+  @if (settings.loading()) {
+    <div class="state" role="status">Loading your settings…</div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <section>
+        <div>
+          <h2>Profile</h2>
+          <p>How you appear inside your private workspace.</p>
+        </div>
+        <label>Display name<input formControlName="displayName" placeholder="Your name" /></label>
+      </section>
+      <section>
+        <div>
+          <h2>Appearance</h2>
+          <p>Choose a theme or follow your device.</p>
+        </div>
+        <label
+          >Theme<select formControlName="theme" (change)="previewTheme()">
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select></label
+        >
+      </section>
+      <section>
+        <div>
+          <h2>Body preferences</h2>
+          <p>Control personal measurement visibility.</p>
+        </div>
+        <div class="fields">
+          <label class="toggle"
+            ><input type="checkbox" formControlName="bodyVisible" /> Show body data on
+            dashboard</label
+          ><label
+            >Height in cm<input
+              type="number"
+              formControlName="heightCm"
+              min="50"
+              max="260"
+              placeholder="175"
+          /></label>
+        </div>
+      </section>
+      <section>
+        <div>
+          <h2>Notifications</h2>
+          <p>Prepare this device for reminders.</p>
+        </div>
+        <div>
+          <p class="status">Permission: {{ notificationStatus() }}</p>
+          <button
+            type="button"
+            class="secondary"
+            (click)="enableNotifications()"
+            [disabled]="notificationStatus() === 'unsupported'"
+          >
+            Enable notifications
+          </button>
+        </div>
+      </section>
+      @if (settings.error()) {
+        <div class="error" role="alert">{{ settings.error() }}</div>
+      }
+      @if (saved()) {
+        <div class="success" role="status">Settings saved.</div>
+      }
+      <footer>
+        <a routerLink="/">Cancel</a
+        ><button type="submit" [disabled]="settings.saving()">
+          {{ settings.saving() ? 'Saving…' : 'Save changes' }}
+        </button>
+      </footer>
+    </form>
+  }
+</main>
