@@ -40,6 +40,8 @@ Chrome; CI installs pinned Playwright Chromium. Set `E2E_SUPABASE_URL`,
 `E2E_SUPABASE_ANON_KEY`, `E2E_EMAIL`, and `E2E_PASSWORD` to enable the real
 sign-in journey with a dedicated test account. Without them, public, routing,
 responsive, accessibility, and theme tests still run while authentication is
-skipped. Use `npm run e2e:ui` or `npm run e2e:debug` for investigation.
+skipped. Authenticated coverage restores sessions, persists and restores the
+test account's theme setting, and verifies logout. Use `npm run e2e:ui` or
+`npm run e2e:debug` for investigation.
 
 Production builds include the Angular service worker and web app manifest.
