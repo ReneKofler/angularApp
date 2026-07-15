@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { UserSettingsService } from './user-settings.service';
+import { AuthService } from '../core/auth.service';
 
 @Component({
   selector: 'app-settings',
@@ -12,6 +13,7 @@ import { UserSettingsService } from './user-settings.service';
 })
 export class Settings implements OnInit {
   readonly settings = inject(UserSettingsService);
+  readonly auth = inject(AuthService);
   readonly saved = signal(false);
   readonly notificationStatus = signal<NotificationPermission | 'unsupported'>(
     'Notification' in globalThis ? Notification.permission : 'unsupported',

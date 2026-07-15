@@ -32,6 +32,26 @@ explains what configuration is missing.
 ```powershell
 npm test -- --watch=false
 npm run build
+npm run e2e
 ```
+
+Playwright runs desktop and mobile Chrome projects. Local runs use installed
+Chrome; CI installs pinned Playwright Chromium. For authenticated local tests,
+copy `.env.e2e.example` to `.env.e2e` and provide a dedicated test account:
+
+```text
+E2E_EMAIL=test-account@example.com
+E2E_PASSWORD=test-account-password
+```
+
+The ignored `.env.e2e` file is loaded on Windows and Linux. If it is absent,
+Playwright falls back to an ignored `.env` file in the `brain-app` directory.
+Optional
+`E2E_SUPABASE_URL` and `E2E_SUPABASE_ANON_KEY` values can override the local
+Angular configuration. CI environment variables take precedence. Without test
+credentials, public, routing, responsive, accessibility, and theme tests still
+run while authentication is skipped. Authenticated coverage restores sessions,
+persists and restores the test account's theme setting, and verifies logout.
+Use `npm run e2e:ui` or `npm run e2e:debug` for investigation.
 
 Production builds include the Angular service worker and web app manifest.

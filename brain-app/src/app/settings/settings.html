@@ -6,6 +6,7 @@
       <h1>Make BrainApp yours</h1>
     </div>
   </header>
+  <button class="sign-out" type="button" (click)="auth.signOut()">Sign out</button>
   @if (settings.loading()) {
     <div class="state" role="status">Loading your settings…</div>
   } @else {
