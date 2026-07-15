@@ -1,13 +1,19 @@
-# YouTrack Local Docker Setup
+# YouTrack Local Docker + MCP Setup
 
-This workspace contains a minimal Docker Compose configuration to run JetBrains YouTrack locally.
+This repository provides a minimal local setup for JetBrains YouTrack running in Docker plus a Python MCP server for querying the instance.
 
-## Run YouTrack
+## Prerequisites
+
+- Docker Desktop or Docker Engine
+- Python 3.11+ installed and available as `python` or `py`
+- Git (already initialized for this repository)
+
+## Start YouTrack locally
 
 1. Open a terminal in this repository.
 2. Start the container:
 
-```bash
+```powershell
 docker compose up -d
 ```
 
@@ -17,61 +23,75 @@ docker compose up -d
 http://localhost:8080
 ```
 
-## Stop YouTrack
+4. Stop the service when you are done:
 
-```bash
+```powershell
 docker compose down
 ```
 
-## Data Persistence
+## Persistent data
 
 The compose file creates two named volumes for persisted data and logs:
 
 - `youtrack_data`
 - `youtrack_logs`
 
-## Notes
+## Configure local MCP integration
 
-- The image used is `jetbrains/youtrack:2026.2.17548`.
-- If you already have a service bound to port `8080`, change the port mapping in `docker-compose.yml`.
+1. Copy `.env.example` to `.env`.
+2. Open `.env` and set the following values:
 
-## Local MCP integration
+```text
+YOUTRACK_BASE_URL=http://localhost:8080
+YOUTRACK_TOKEN=<your-youtrack-api-token>
+```
 
-This repository also includes a minimal MCP server for querying the running YouTrack instance.
+3. Optional: if your local instance is not on `localhost:8080`, update `YOUTRACK_BASE_URL` accordingly.
 
-1. Create a Python virtual environment and install dependencies:
+> Do not commit `.env`. This repository already ignores `.env` and `.venv`.
+
+## Install and run the MCP server
+
+From the repository root:
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-2. Copy `.env.example` to `.env` and update `YOUTRACK_BASE_URL` or add `YOUTRACK_TOKEN` if needed.
-
-3. Start the MCP server:
-
-```powershell
 python youtrack_mcp_server.py
 ```
 
-### Or use the helper script
+### Use the helper script instead
 
 ```powershell
 .\start-youtrack-mcp.ps1
 ```
 
-Additional options:
+Available options:
 
-```powershell
-.\start-youtrack-mcp.ps1 -SkipInstall
-.\start-youtrack-mcp.ps1 -NoRun
-```
+- `-SkipInstall` — skip virtual environment creation and dependency install
+- `-NoRun` — perform setup only and do not start the MCP server
 
-4. To connect from Claude for Desktop, use the sample config in `claude_desktop_config.sample.json` and replace the path with your local file path.
+## MCP tools included
 
-### Provided MCP tools
+The local MCP server exposes the following tools for querying YouTrack:
 
-- `search_issues(query, max_results=10)` — search YouTrack issues by query text
+- `search_issues(query, max_results=10)` — search issues by text
 - `get_issue(issue_id)` — fetch issue details by readable ID
+- `create_issue(project_short_name, summary, description)` — create a new YouTrack issue
 - `list_projects()` — list available YouTrack projects
+
+## Usage notes
+
+- `YOUTRACK_TOKEN` must be a valid YouTrack API token, not the wizard setup token.
+- The MCP server communicates with YouTrack using the base URL from `.env`.
+- If you change ports in `docker-compose.yml`, update `YOUTRACK_BASE_URL` accordingly.
+
+## Project files
+
+- `docker-compose.yml` — runs a local YouTrack container with persistent volumes
+- `youtrack_mcp_server.py` — Python MCP tool implementation for YouTrack
+- `start-youtrack-mcp.ps1` — helper script to create a venv, install dependencies, and launch the MCP server
+- `requirements.txt` — Python dependencies for the MCP server
+- `.env.example` — example YouTrack configuration for local use
+
