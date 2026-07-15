@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "youtrack": {
+      "command": "python",
+      "args": ["C:\\code\\youtrack\\youtrack_mcp_server.py"]
+    }
+  }
+}
