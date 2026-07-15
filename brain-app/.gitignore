@@ -37,6 +37,7 @@ yarn-error.log
 /playwright-report
 /test-results
 /.env.e2e
+/.env
 /libpeerconnection.log
 testem.log
 /typings

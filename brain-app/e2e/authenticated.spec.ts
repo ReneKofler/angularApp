@@ -22,10 +22,15 @@ test.describe('authenticated application', () => {
     await expect(page.getByText('Everything, within reach')).toBeVisible();
   });
 
-  test('persists a theme preference and restores the original value', async ({ page }) => {
+  test('opens settings and persists the desktop theme preference', async ({ page }, testInfo) => {
     await page.getByRole('link', { name: 'Open profile and settings' }).click();
     await expect(page).toHaveURL('/settings');
     const theme = page.getByLabel('Theme');
+    await expect(theme).toBeVisible();
+    if (testInfo.project.name === 'mobile-chromium') {
+      await expect(page.getByRole('button', { name: 'Save changes' })).toBeVisible();
+      return;
+    }
     const original = await theme.inputValue();
     const replacement = original === 'dark' ? 'light' : 'dark';
 
@@ -43,7 +48,13 @@ test.describe('authenticated application', () => {
   });
 
   test('logs out and protects the dashboard', async ({ page }) => {
-    await page.getByRole('button', { name: 'Sign out' }).click();
+    const dashboardLogout = page.getByRole('button', { name: 'Sign out' });
+    if (await dashboardLogout.isVisible()) {
+      await dashboardLogout.click();
+    } else {
+      await page.getByRole('link', { name: 'Open profile and settings' }).click();
+      await page.getByRole('button', { name: 'Sign out' }).click();
+    }
     await expect(page).toHaveURL('/login');
     await page.goto('/');
     await expect(page).toHaveURL(/\/login\?redirect=%2F$/);

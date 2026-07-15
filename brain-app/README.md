@@ -44,7 +44,9 @@ E2E_EMAIL=test-account@example.com
 E2E_PASSWORD=test-account-password
 ```
 
-The ignored `.env.e2e` file is loaded on Windows and Linux. Optional
+The ignored `.env.e2e` file is loaded on Windows and Linux. If it is absent,
+Playwright falls back to an ignored `.env` file in the `brain-app` directory.
+Optional
 `E2E_SUPABASE_URL` and `E2E_SUPABASE_ANON_KEY` values can override the local
 Angular configuration. CI environment variables take precedence. Without test
 credentials, public, routing, responsive, accessibility, and theme tests still

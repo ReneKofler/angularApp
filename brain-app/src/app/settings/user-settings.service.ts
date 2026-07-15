@@ -36,19 +36,19 @@ export class UserSettingsService {
     this.loading.set(true);
     this.error.set('');
     try {
-      const [profileResult, settingsResult] = await Promise.all([
-        this.client.from('profiles').select('*').eq('id', userId).maybeSingle(),
-        this.client.from('user_settings').select('*').eq('user_id', userId).maybeSingle(),
-      ]);
-      const error = profileResult.error ?? settingsResult.error;
-      if (error) throw error;
-      const profile = profileResult.data as Record<string, unknown> | null;
+      const settingsResult = await this.client
+        .from('user_settings')
+        .select('preferences,body_fat_visible,body_height_cm')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (settingsResult.error) throw settingsResult.error;
       const settings = settingsResult.data as Record<string, unknown> | null;
+      const preferences = (settings?.['preferences'] ?? {}) as Record<string, unknown>;
       const next: UserPreferences = {
-        displayName: String(profile?.['display_name'] ?? ''),
-        theme: this.asTheme(settings?.['theme']),
-        bodyVisible: settings?.['body_visible'] !== false,
-        heightCm: this.asHeight(settings?.['height_cm']),
+        displayName: String(preferences['displayName'] ?? ''),
+        theme: this.asTheme(preferences['theme']),
+        bodyVisible: settings?.['body_fat_visible'] !== false,
+        heightCm: this.asHeight(settings?.['body_height_cm']),
       };
       this.preferences.set(next);
       this.applyTheme(next.theme);
@@ -65,22 +65,27 @@ export class UserSettingsService {
     this.saving.set(true);
     this.error.set('');
     try {
-      const [profileResult, settingsResult] = await Promise.all([
-        this.client
-          .from('profiles')
-          .upsert({ id: userId, display_name: preferences.displayName }, { onConflict: 'id' }),
-        this.client.from('user_settings').upsert(
-          {
-            user_id: userId,
+      const existing = (
+        await this.client
+          .from('user_settings')
+          .select('preferences')
+          .eq('user_id', userId)
+          .maybeSingle()
+      ).data as { preferences?: Record<string, unknown> } | null;
+      const settingsResult = await this.client.from('user_settings').upsert(
+        {
+          user_id: userId,
+          preferences: {
+            ...(existing?.preferences ?? {}),
+            displayName: preferences.displayName,
             theme: preferences.theme,
-            body_visible: preferences.bodyVisible,
-            height_cm: preferences.heightCm,
           },
-          { onConflict: 'user_id' },
-        ),
-      ]);
-      const error = profileResult.error ?? settingsResult.error;
-      if (error) throw error;
+          body_fat_visible: preferences.bodyVisible,
+          body_height_cm: preferences.heightCm,
+        },
+        { onConflict: 'user_id' },
+      );
+      if (settingsResult.error) throw settingsResult.error;
       this.preferences.set(preferences);
       this.applyTheme(preferences.theme);
       return true;
@@ -102,11 +107,10 @@ export class UserSettingsService {
     const { error } = await this.client.from('push_subscriptions').upsert(
       {
         user_id: userId,
-        endpoint: serialized.endpoint,
-        p256dh: serialized.keys?.['p256dh'],
-        auth: serialized.keys?.['auth'],
+        email: this.auth.session()?.user.email,
+        subscription: serialized,
       },
-      { onConflict: 'user_id,endpoint' },
+      { onConflict: 'user_id' },
     );
     if (error) this.error.set(error.message);
   }
@@ -132,6 +136,10 @@ export class UserSettingsService {
   }
 
   private message(error: unknown, fallback: string): string {
-    return error instanceof Error ? error.message : fallback;
+    if (error instanceof Error) return error.message;
+    if (error && typeof error === 'object' && 'message' in error) {
+      return String(error.message);
+    }
+    return fallback;
   }
 }
