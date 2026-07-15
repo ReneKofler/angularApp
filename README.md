@@ -1,116 +1,81 @@
-# YouTrack Local Docker + MCP Setup
+# Local YouTrack
 
-This repository provides a minimal local setup for JetBrains YouTrack running in Docker plus a Python MCP server for querying the instance.
+This repository runs YouTrack 2026.2 locally with Docker. YouTrack provides its
+own remote MCP server, so no custom MCP implementation is needed.
 
 ## Prerequisites
 
 - Docker Desktop or Docker Engine
-- Python 3.11+ installed and available as `python` or `py`
-- Git (already initialized for this repository)
+- Python 3.11+ only when using the backup/restore script
 
-## Start YouTrack locally
+## Run YouTrack
 
-1. Open a terminal in this repository.
-2. Start the container:
+Start the service:
 
 ```powershell
 docker compose up -d
 ```
 
-3. Open YouTrack in your browser:
-
-```text
-http://localhost:8080
-```
-
-4. Stop the service when you are done:
+Open <http://localhost:8080> and complete the YouTrack setup. Stop the service
+without deleting its data with:
 
 ```powershell
 docker compose down
 ```
 
-## Persistent data
+The `youtrack_data` and `youtrack_logs` Docker volumes persist data and logs.
 
-The compose file creates two named volumes for persisted data and logs:
+## Connect Codex to YouTrack
 
-- `youtrack_data`
-- `youtrack_logs`
-
-## Configure local MCP integration
-
-1. Copy `.env.example` to `.env`.
-2. Open `.env` and set the following values:
+YouTrack 2026.2 exposes a built-in MCP endpoint at:
 
 ```text
-YOUTRACK_BASE_URL=http://localhost:8080
-YOUTRACK_TOKEN=<your-youtrack-api-token>
+http://localhost:8080/mcp
 ```
 
-3. Optional: if your local instance is not on `localhost:8080`, update `YOUTRACK_BASE_URL` accordingly.
+In Codex, open **Settings > MCP servers**, add a **Streamable HTTP** server with
+that URL, and complete authentication. Restart the Codex extension after saving
+the connection.
 
-> Do not commit `.env`. This repository already ignores `.env` and `.venv`.
-
-## Install and run the MCP server
-
-From the repository root:
-
-```powershell
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-python youtrack_mcp_server.py
-```
-
-### Use the helper script instead
-
-```powershell
-.\start-youtrack-mcp.ps1
-```
-
-Available options:
-
-- `-SkipInstall` — skip virtual environment creation and dependency install
-- `-NoRun` — perform setup only and do not start the MCP server
-
-## MCP tools included
-
-The local MCP server exposes the following tools for querying YouTrack:
-
-- `search_issues(query, max_results=10)` — search issues by text
-- `get_issue(issue_id)` — fetch issue details by readable ID
-- `create_issue(project_short_name, summary, description)` — create a new YouTrack issue
-- `list_projects()` — list available YouTrack projects
-
-## Usage notes
-
-- `YOUTRACK_TOKEN` must be a valid YouTrack API token, not the wizard setup token.
-- The MCP server communicates with YouTrack using the base URL from `.env`.
-- If you change ports in `docker-compose.yml`, update `YOUTRACK_BASE_URL` accordingly.
+For authentication details and the tools exposed by YouTrack, see the
+[YouTrack remote MCP documentation](https://www.jetbrains.com/help/youtrack/cloud/model-context-protocol-server.html).
 
 ## Back up and restore tickets
 
-Export all tickets and relationships from the `DEMO` project:
+The optional backup script uses the YouTrack REST API. Create its environment:
 
 ```powershell
-.venv\Scripts\python.exe youtrack_ticket_backup.py export
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+Copy-Item .env.example .env
 ```
 
-The version-controlled backup is written to
-`backups/youtrack-demo-tickets.json`. After setting up a fresh YouTrack instance
-and creating a `DEMO` project with the standard fields, restore it with:
+Set a permanent YouTrack token in `.env`:
+
+```text
+YOUTRACK_BASE_URL=http://localhost:8080
+YOUTRACK_TOKEN=<your-youtrack-token>
+```
+
+Export the `DEMO` project:
 
 ```powershell
-.venv\Scripts\python.exe youtrack_ticket_backup.py import
+.\.venv\Scripts\python.exe .\youtrack_ticket_backup.py export
 ```
 
-The import is repeatable: tickets with matching summaries and existing links are
-skipped. To restore into another project, pass `--project PROJECT_SHORT_NAME`.
+Restore it into a fresh `DEMO` project:
+
+```powershell
+.\.venv\Scripts\python.exe .\youtrack_ticket_backup.py import
+```
+
+Use `--project PROJECT_SHORT_NAME` to target another project. Imports are
+repeatable: matching ticket summaries and existing links are skipped.
 
 ## Project files
 
-- `docker-compose.yml` — runs a local YouTrack container with persistent volumes
-- `youtrack_mcp_server.py` — Python MCP tool implementation for YouTrack
-- `start-youtrack-mcp.ps1` — helper script to create a venv, install dependencies, and launch the MCP server
-- `requirements.txt` — Python dependencies for the MCP server
-- `.env.example` — example YouTrack configuration for local use
-
+- `docker-compose.yml` runs YouTrack with persistent Docker volumes.
+- `youtrack_ticket_backup.py` exports and restores issues through the REST API.
+- `backups/youtrack-demo-tickets.json` is the version-controlled ticket backup.
+- `.env.example` documents configuration for the backup script.
+- `requirements.txt` contains the backup script's Python dependency.
