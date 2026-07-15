@@ -119,6 +119,7 @@ export class UserSettingsService {
           : 'light'
         : theme;
     this.document.documentElement.dataset['theme'] = resolved;
+    localStorage.setItem('brainapp-theme', theme);
   }
 
   private asTheme(value: unknown): ThemePreference {
