@@ -14,6 +14,9 @@
       <p class="eyebrow">Welcome back</p>
       <h2>Sign in to BrainApp</h2>
       <p class="muted">Continue where you left off.</p>
+      @if (expired) {
+        <div class="notice" role="status">Your session expired. Please sign in again.</div>
+      }
       @if (!auth.configured()) {
         <div class="notice">
           Supabase is not configured yet. Add the URL and anon key to the environment files.

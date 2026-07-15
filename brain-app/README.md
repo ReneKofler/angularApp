@@ -21,9 +21,11 @@ Set `supabaseUrl` and `supabaseAnonKey` in the environment files under
 to browser configuration. Never add a service-role key or another privileged
 secret.
 
-Authentication behavior will be completed under `DEMO-47`. With no Supabase
-configuration, the current foundation remains accessible as a UI preview and
-the login screen explains what configuration is missing.
+Authentication is implemented under `DEMO-47`: email/password sign-in, persisted
+session restoration, protected and guest-only routes, safe return URLs, token
+expiry handling, and logout. Public signup is intentionally not exposed. With no
+Supabase configuration, protected routes redirect to login and the screen
+explains what configuration is missing.
 
 ## Verification
 
