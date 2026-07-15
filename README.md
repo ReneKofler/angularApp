@@ -87,6 +87,25 @@ The local MCP server exposes the following tools for querying YouTrack:
 - The MCP server communicates with YouTrack using the base URL from `.env`.
 - If you change ports in `docker-compose.yml`, update `YOUTRACK_BASE_URL` accordingly.
 
+## Back up and restore tickets
+
+Export all tickets and relationships from the `DEMO` project:
+
+```powershell
+.venv\Scripts\python.exe youtrack_ticket_backup.py export
+```
+
+The version-controlled backup is written to
+`backups/youtrack-demo-tickets.json`. After setting up a fresh YouTrack instance
+and creating a `DEMO` project with the standard fields, restore it with:
+
+```powershell
+.venv\Scripts\python.exe youtrack_ticket_backup.py import
+```
+
+The import is repeatable: tickets with matching summaries and existing links are
+skipped. To restore into another project, pass `--project PROJECT_SHORT_NAME`.
+
 ## Project files
 
 - `docker-compose.yml` — runs a local YouTrack container with persistent volumes

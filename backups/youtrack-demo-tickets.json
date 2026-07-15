@@ -1,0 +1,370 @@
+{
+  "formatVersion": 1,
+  "project": "DEMO",
+  "issues": [
+    {
+      "key": "DEMO-44",
+      "summary": "Rebuild BrainAppWeb as an Angular application",
+      "description": "Goal: build an Angular application that reproduces the authenticated BrainApp at https://brainappweb.vercel.app/ using the supplied Supabase project and credentials.\n\nDefinition of done:\n- All child feature tickets are complete and linked to this epic.\n- Responsive desktop/mobile behavior and dark mode match the original closely.\n- Existing user data remains compatible; no destructive schema migration is introduced.\n- Authentication, row-level ownership, CRUD behavior, loading/error/empty states, and deployment are verified.\n- Secrets are never committed; browser code receives only the Supabase URL and anon key.",
+      "fields": {
+        "Priority": "Critical",
+        "Type": "Epic",
+        "State": "To do"
+      },
+      "links": [
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-45"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-46"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-47"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-48"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-49"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-50"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-51"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-52"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-53"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-54"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-55"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-56"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-57"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-58"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-59"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-60"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-61"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-62"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-63"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-64"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-65"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-66"
+        }
+      ]
+    },
+    {
+      "key": "DEMO-45",
+      "summary": "Document authenticated UX, routes, and parity checklist",
+      "description": "Sign in to the original app with the configured test account and document its navigation, pages, dialogs, forms, validation, responsive behavior, dark mode, empty/loading/error states, and key user journeys. Map each screen to its Supabase tables.\n\nAcceptance criteria:\n- A route/screen inventory and parity checklist exist in the repository.\n- Unknown behaviors and destructive operations are explicitly recorded.\n- Screenshots or visual references cover desktop and mobile layouts without exposing private data.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-46",
+      "summary": "Scaffold the Angular app, architecture, and design system",
+      "description": "Create Angular routing, typed environments, Supabase client, shared responsive shell, forms, icons, notifications, themes, loading/error/empty states, and PWA metadata. Acceptance: dev and production builds pass and no privileged secret reaches browser code.",
+      "fields": {
+        "Priority": "Critical",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-47",
+      "summary": "Implement Supabase authentication and protected routing",
+      "description": "Reproduce email/password login, session restore, auth guards, expiration handling, logout, and no-public-signup behavior. Acceptance: valid/invalid login, refresh, expiry, redirects, loading and error states match the original.",
+      "fields": {
+        "Priority": "Critical",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-48",
+      "summary": "Build the application shell, dashboard, and user settings",
+      "description": "Recreate navigation, dashboard widgets/configuration, profiles, preferences, body visibility/height, theme, and push-subscription UI using profiles, user_settings and push_subscriptions. Acceptance: settings persist and all modules remain usable on mobile.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-49",
+      "summary": "Implement notes, lists, reminders, and priorities",
+      "description": "Recreate notes and note_lists CRUD, content modes, tags, done state, list assignment, ordering, reminders, priorities, search/filter and confirmations. Acceptance: all behavior persists per user and handles empty lists and deletes.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-50",
+      "summary": "Implement habits, daily checks, and streaks",
+      "description": "Recreate habits, habit_checks and habit_streaks with colors, date ranges, ordering/collapse, daily checks, streaks, sport metrics and workout/training-plan links. Acceptance: checks and streaks remain correct across dates.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-51",
+      "summary": "Implement sports workouts and custom sport types",
+      "description": "Recreate workouts, workout_stats, custom_sport_types and personal_records with conditional distance, duration, pace, heart-rate, elevation, reps and stationary fields. Acceptance: CRUD, units, validation, statistics and records work for every sport configuration.",
+      "fields": {
+        "Priority": "Critical",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-52",
+      "summary": "Implement CrossFit workout library and result tracking",
+      "description": "Recreate workouts_library and CrossFit logging: AMRAP, time caps, rounds, intervals, reps, DNF, missing reps, hero/girl/open/partner flags and favourites. Acceptance: library items populate logs and all result variants render correctly.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-53",
+      "summary": "Implement exercises, equipment, and training plans",
+      "description": "Recreate exercises, equipment and training_plans with capability flags, associations, ordered plan exercises, duration and workout logging. Acceptance: CRUD works, capability flags drive forms, and plans integrate with workouts and habits.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-54",
+      "summary": "Implement Greasing the Groove tracking",
+      "description": "Recreate greasing_the_groove_days and exercises: start a day, choose exercises, accumulate reps and link the sport workout. Acceptance: daily totals persist, duplicates are prevented, and linked workout data stays consistent.",
+      "fields": {
+        "Priority": "Normal",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-55",
+      "summary": "Implement nutrition diary and nutrition goals",
+      "description": "Recreate diet_meals, diet_settings and history with date navigation, meal CRUD, calories, protein, fat, carbs, fiber, salt and goal progress. Acceptance: totals/rounding are correct and goal changes preserve history.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-56",
+      "summary": "Implement recipes and meal-prep features",
+      "description": "Recreate recipes with ingredients, preparation, nutrition, servings, prep time, rating, image, tips, meal-prep and favourite states. Acceptance: CRUD, details, search/filter and favourites work with fallbacks for optional images/fields.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-57",
+      "summary": "Implement body measurements, goals, history, and milestones",
+      "description": "Recreate measurements, goals, goal history, milestones, charting and visibility preferences. Acceptance: CRUD and progress calculations handle sparse values, goal changes create history, and privacy preferences are honored.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-58",
+      "summary": "Implement grocery lists and sharing",
+      "description": "Recreate grocery_lists, items and shares with multiple lists, completion, sharing/unsharing by user/email, owner and recipient views. Acceptance: permission boundaries hold and list/item/share CRUD and timestamps work.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-59",
+      "summary": "Implement journal entries and calendar navigation",
+      "description": "Recreate dated journal_entries CRUD, calendar/date navigation and content presentation. Acceptance: multiline entries, locale formatting, empty days, save feedback and delete confirmation match the original.",
+      "fields": {
+        "Priority": "Normal",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-60",
+      "summary": "Implement configurable rankings and consumed history",
+      "description": "Recreate ranking categories, rankings and consumed dates with configurable fields/views, ratings, status, metadata, media, episodes, nutrition and history. Acceptance: category settings control UI and CRUD/filter/sort/progress all work.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-61",
+      "summary": "Implement flashcard categories and study cards",
+      "description": "Recreate flashcard_categories and flashcards with category/card CRUD, titles, front/back content, filters and study reveal flow. Acceptance: deletion dependencies, empty categories, keyboard/mobile use and per-user scope work.",
+      "fields": {
+        "Priority": "Normal",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-62",
+      "summary": "Implement stretching routines and exercise media",
+      "description": "Recreate stretching routines and ordered exercises with emoji, duration timer, notes and image URLs. Acceptance: CRUD/reordering, guided timing, next/previous controls, interruption and broken images are handled.",
+      "fields": {
+        "Priority": "Normal",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-63",
+      "summary": "Implement line-dance catalogue and step sheets",
+      "description": "Recreate linedance dances and ordered steps with YouTube URL, count, walls, difficulty, notes and foot annotations. Acceptance: CRUD, safe links, ordering and labels stay correct after edits/deletes.",
+      "fields": {
+        "Priority": "Normal",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-64",
+      "summary": "Implement flag-football formations, routes, and playbook",
+      "description": "Recreate formations, route segments/aliases, plays, assignments and ordered playbook with flipping and numbering. Acceptance: CRUD and visual coordinates persist, flipping is deterministic, and invalid references/dependencies are handled.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-65",
+      "summary": "Add automated parity, security, and accessibility tests",
+      "description": "Add unit, integration, E2E, visual parity and accessibility tests for auth and core CRUD. Acceptance: CI runs lint, types, tests and build; cross-user access is denied; fixtures/screenshots/logs contain no credentials or private data.",
+      "fields": {
+        "Priority": "Critical",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-66",
+      "summary": "Configure PWA behavior and production deployment",
+      "description": "Configure production hosting, environment injection, SPA refresh routing, manifest/icons, installability, caching/updates and documentation. Acceptance: deployment smoke tests pass and only Supabase URL/anon key enter browser bundles.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "To do"
+      },
+      "links": []
+    }
+  ]
+}
