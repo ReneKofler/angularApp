@@ -4,14 +4,16 @@ import { AuthService } from './auth.service';
 
 export const authGuard: CanActivateFn = async (_route, state) => {
   const auth = inject(AuthService);
+  const router = inject(Router);
   await auth.initialized;
   return auth.configured() && auth.authenticated()
     ? true
-    : inject(Router).createUrlTree(['/login'], { queryParams: { redirect: state.url } });
+    : router.createUrlTree(['/login'], { queryParams: { redirect: state.url } });
 };
 
 export const guestGuard: CanActivateFn = async () => {
   const auth = inject(AuthService);
+  const router = inject(Router);
   await auth.initialized;
-  return auth.authenticated() ? inject(Router).createUrlTree(['/']) : true;
+  return auth.authenticated() ? router.createUrlTree(['/']) : true;
 };
