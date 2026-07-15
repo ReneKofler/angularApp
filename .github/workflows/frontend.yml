@@ -9,6 +9,7 @@ on:
 
 jobs:
   verify:
+    environment: e2e
     runs-on: ubuntu-latest
     defaults:
       run:
