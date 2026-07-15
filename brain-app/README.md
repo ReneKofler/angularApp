@@ -32,6 +32,14 @@ explains what configuration is missing.
 ```powershell
 npm test -- --watch=false
 npm run build
+npm run e2e
 ```
+
+Playwright runs desktop and mobile Chrome projects. Local runs use installed
+Chrome; CI installs pinned Playwright Chromium. Set `E2E_SUPABASE_URL`,
+`E2E_SUPABASE_ANON_KEY`, `E2E_EMAIL`, and `E2E_PASSWORD` to enable the real
+sign-in journey with a dedicated test account. Without them, public, routing,
+responsive, accessibility, and theme tests still run while authentication is
+skipped. Use `npm run e2e:ui` or `npm run e2e:debug` for investigation.
 
 Production builds include the Angular service worker and web app manifest.
