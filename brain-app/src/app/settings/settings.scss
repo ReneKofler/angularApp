@@ -103,12 +103,12 @@ select {
   background: var(--surface);
 }
 .error {
-  background: #ffe5e1;
-  color: #8a2922;
+  background: var(--danger-bg);
+  color: var(--danger-text);
 }
 .success {
-  background: #dff3e9;
-  color: #245c48;
+  background: var(--success-bg);
+  color: var(--success-text);
 }
 footer {
   display: flex;
@@ -123,8 +123,8 @@ footer a {
 button {
   border: 0;
   border-radius: 0.65rem;
-  background: #205a48;
-  color: white;
+  background: var(--accent);
+  color: var(--accent-text);
   padding: 0.8rem 1.1rem;
   font-weight: 750;
   cursor: pointer;

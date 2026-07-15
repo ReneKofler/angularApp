@@ -1,8 +1,8 @@
 :host {
   display: block;
   min-height: 100dvh;
-  background: #f3f2ec;
-  color: #213d34;
+  background: var(--page);
+  color: var(--text);
 }
 .app-shell {
   display: grid;
@@ -14,7 +14,7 @@ aside {
   top: 0;
   height: 100dvh;
   padding: 2rem 1rem;
-  background: #153b30;
+  background: #172033;
   color: #dbe5e0;
   display: flex;
   flex-direction: column;
@@ -90,8 +90,8 @@ header p {
   height: 2.8rem;
   border-radius: 50%;
   border: 0;
-  background: #d3a06d;
-  color: #163a30;
+  background: var(--accent);
+  color: var(--accent-text);
   font-weight: 800;
   text-decoration: none;
 }
@@ -99,7 +99,7 @@ header p {
   margin: 2.5rem 0 3.5rem;
   padding: clamp(1.5rem, 3vw, 2.5rem);
   border-radius: 1.2rem;
-  background: linear-gradient(125deg, #1f5947, #34725e);
+  background: linear-gradient(125deg, #1e3a8a, #2563eb);
   color: white;
   display: flex;
   justify-content: space-between;
@@ -147,8 +147,8 @@ header p {
   gap: 1rem;
 }
 .modules article {
-  background: #fff;
-  border: 1px solid #e0e2dc;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 0.9rem;
   padding: 1.2rem;
   display: flex;
@@ -178,7 +178,7 @@ header p {
 }
 .modules p {
   margin: 0;
-  color: #7c8883;
+  color: var(--muted);
   font-size: 0.78rem;
 }
 .arrow {
@@ -198,7 +198,7 @@ header p {
     width: 100%;
     height: auto;
     padding: 0.5rem;
-    background: #153b30;
+    background: #172033;
   }
   .brand,
   .logout,
