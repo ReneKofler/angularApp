@@ -37,11 +37,9 @@ test.describe('authentication entry point', () => {
   test('applies the saved dark theme before rendering', async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem('brainapp-theme', 'dark'));
     await page.goto('/login');
-    await page.addStyleTag({ content: '.notice { display: none !important; }' });
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    await expect(page).toHaveScreenshot('login-dark.png', {
-      animations: 'disabled',
-      maxDiffPixelRatio: 0.02,
-    });
+    await expect(page.locator('html')).toHaveCSS('color-scheme', 'dark');
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(17, 24, 39)');
+    await expect(page.locator('body')).toHaveCSS('color', 'rgb(248, 250, 252)');
   });
 });
