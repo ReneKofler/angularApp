@@ -84,6 +84,8 @@ header p {
   font-weight: 800;
 }
 .avatar {
+  display: grid;
+  place-items: center;
   width: 2.8rem;
   height: 2.8rem;
   border-radius: 50%;
@@ -91,6 +93,7 @@ header p {
   background: #d3a06d;
   color: #163a30;
   font-weight: 800;
+  text-decoration: none;
 }
 .focus {
   margin: 2.5rem 0 3.5rem;

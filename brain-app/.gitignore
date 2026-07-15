@@ -39,6 +39,9 @@ testem.log
 /typings
 __screenshots__/
 
+# Local browser configuration (example files remain trackable)
+/src/environments/*.local.ts
+
 # System files
 .DS_Store
 Thumbs.db

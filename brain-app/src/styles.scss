@@ -12,6 +12,22 @@ html {
     'Segoe UI',
     sans-serif;
   background: #f3f2ec;
+  --page: #f3f2ec;
+  --surface: #fff;
+  --input: #fff;
+  --text: #213d34;
+  --muted: #74817c;
+  --border: #dde0da;
+}
+html[data-theme='dark'] {
+  background: #101d19;
+  --page: #101d19;
+  --surface: #182923;
+  --input: #10201b;
+  --text: #edf4f0;
+  --muted: #a6b6af;
+  --border: #30463e;
+  color-scheme: dark;
 }
 body {
   margin: 0;
