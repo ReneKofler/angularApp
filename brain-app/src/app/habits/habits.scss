@@ -1,0 +1,262 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--bg, #f3f2ec);
+  color: var(--ink, #27332f);
+}
+.page {
+  max-width: 1000px;
+  margin: auto;
+  padding: 2rem;
+}
+header,
+.habit-row,
+.editor-head,
+.editor-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+a {
+  color: inherit;
+}
+h1 {
+  font:
+    clamp(2.4rem, 6vw, 4.5rem)/1 Georgia,
+    serif;
+  margin: 0.2rem 0;
+}
+h2,
+p {
+  margin-top: 0;
+}
+.eyebrow {
+  margin: 0;
+  color: #45806a;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  border: 0;
+  border-radius: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  background: transparent;
+  cursor: pointer;
+}
+.primary {
+  background: #315f50;
+  color: #fff;
+}
+button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+input,
+select,
+textarea {
+  border: 1px solid #bdc6bf;
+  border-radius: 0.6rem;
+  background: #fffefa;
+  padding: 0.68rem;
+}
+.date-nav {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+}
+.date-nav label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+}
+main {
+  display: grid;
+  gap: 0.8rem;
+}
+article {
+  --accent: #45806a;
+  background: #fffefa;
+  border: 1px solid #d8ddd7;
+  border-left: 6px solid var(--accent);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+article.complete {
+  background: color-mix(in srgb, var(--accent) 10%, #fffefa);
+}
+.habit-row {
+  justify-content: flex-start;
+}
+.habit-title {
+  flex: 1;
+}
+.habit-title h2 {
+  margin: 0;
+}
+.check {
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  font-weight: 800;
+}
+.complete .check {
+  background: var(--accent);
+  color: white;
+}
+.stats,
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  color: #69756f;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+.controls {
+  display: flex;
+}
+.controls button {
+  padding: 0.4rem;
+}
+.details {
+  padding: 0.9rem 0 0 3.2rem;
+}
+.links span {
+  background: #edf1ec;
+  padding: 0.3rem 0.55rem;
+  border-radius: 2rem;
+}
+.metric {
+  display: grid;
+  grid-template-columns: 1fr 130px;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+}
+.danger {
+  color: #a13d35;
+}
+.error {
+  background: #f8ded9;
+  color: #792f29;
+  padding: 0.8rem 1rem;
+  border-radius: 0.65rem;
+  margin-top: 1rem;
+}
+.empty {
+  text-align: center;
+  padding: 5rem 1rem;
+  color: #68746e;
+}
+.empty > span {
+  font-size: 3rem;
+}
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: #17241e99;
+}
+.editor {
+  width: min(650px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  background: #fffefa;
+  border-radius: 1rem;
+  padding: 1.4rem;
+}
+.editor label {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 1rem;
+  font-weight: 650;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1rem;
+}
+.editor-actions {
+  justify-content: flex-end;
+  margin-top: 1.2rem;
+}
+small {
+  font-weight: 400;
+  color: #6d7772;
+}
+@media (max-width: 650px) {
+  .page {
+    padding: 1rem;
+  }
+  .date-nav {
+    flex-wrap: wrap;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .details {
+    padding-left: 0;
+  }
+  .stats {
+    display: grid;
+    gap: 0.2rem;
+  }
+  .controls {
+    flex-direction: column;
+  }
+  .metric {
+    grid-template-columns: 1fr;
+  }
+  .editor {
+    padding: 1rem;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  :host {
+    --bg: #17201d;
+    --ink: #e8eee9;
+  }
+  article,
+  .editor,
+  input,
+  select,
+  textarea {
+    background: #232d29;
+    border-color: #41504a;
+  }
+  article.complete {
+    background: #25362f;
+  }
+  .links span {
+    background: #31403a;
+  }
+  .stats,
+  .links,
+  .empty,
+  small {
+    color: #aebbb4;
+  }
+}

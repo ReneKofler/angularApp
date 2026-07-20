@@ -4,7 +4,7 @@
     <nav aria-label="Main navigation">
       <a class="active" href="#"><span>⌂</span> Dashboard</a>
       @for (module of modules; track module.name) {
-        <a href="#"
+        <a [routerLink]="module.route ?? null" [href]="module.route ? null : '#'"
           ><span>{{ module.icon }}</span> {{ module.name }}</a
         >
       }

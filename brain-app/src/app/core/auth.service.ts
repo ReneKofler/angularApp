@@ -16,6 +16,10 @@ export class AuthService {
   readonly configured = computed(() => this.client !== null);
   readonly authenticated = computed(() => this.session() !== null);
 
+  get supabase(): SupabaseClient | null {
+    return this.client;
+  }
+
   constructor() {
     if (!this.client) {
       this.loading.set(false);
