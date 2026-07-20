@@ -1,0 +1,35 @@
+:host { display:block; min-height:100vh; background:var(--bg,#f3f2ec); color:var(--ink,#27332f) }
+.notes-shell { max-width:1440px; margin:auto; padding:2rem }
+header,.note-top,.actions,.editor-heading,.editor-actions { display:flex; align-items:center; justify-content:space-between; gap:1rem }
+h1 { margin:.15rem 0 0; font-family:Georgia,serif; font-size:clamp(2.2rem,5vw,4rem) } h2,p { margin-top:0 }
+.eyebrow { color:#45806a; margin:0; text-transform:uppercase; font-size:.75rem; letter-spacing:.14em; font-weight:700 }
+.back { color:inherit } button,input,select,textarea { font:inherit }
+button { cursor:pointer; border:0; border-radius:.65rem; padding:.65rem .9rem; background:transparent; color:inherit }
+.primary { background:#315f50; color:white }.primary:disabled { opacity:.6; cursor:wait }
+.workspace { display:grid; grid-template-columns:230px 1fr; gap:2rem; margin-top:2rem }
+aside { border-right:1px solid #cbd1c9; padding-right:1rem }
+aside>button,.list-row>button:first-child { width:100%; text-align:left; display:flex; justify-content:space-between }
+aside button.active { background:#dce9e1; color:#245244; font-weight:700 }
+.list-row { display:grid; grid-template-columns:1fr auto auto; align-items:center }.icon { padding:.4rem; font-size:1.1rem }.danger { color:#a13d35 }
+.new-list { display:flex; gap:.35rem; margin-top:1rem }.new-list input { min-width:0; width:100% }
+.filters { display:grid; grid-template-columns:minmax(220px,1fr) auto auto; gap:.7rem; margin-bottom:1.2rem }
+input,select,textarea { border:1px solid #bbc5bd; border-radius:.65rem; padding:.72rem; background:#fffefa; color:inherit }
+input:focus,select:focus,textarea:focus { outline:2px solid #6b9b88; outline-offset:1px }
+.note-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:1rem }
+article { background:#fffefa; border:1px solid #d9d9d0; border-top:4px solid #839389; border-radius:1rem; padding:1.1rem }
+article[data-priority=high] { border-top-color:#b65748 } article[data-priority=low] { border-top-color:#7890aa }
+article.completed { opacity:.68 } article.completed h2,article.completed .content { text-decoration:line-through }
+.note-top { justify-content:flex-start; align-items:flex-start }.note-top h2 { margin-bottom:.3rem; word-break:break-word }
+.check { flex:0 0 1.7rem; width:1.7rem; height:1.7rem; padding:0; border:2px solid #718078; border-radius:50% }.completed .check { background:#45806a; color:white }
+.priority { text-transform:uppercase; font-size:.66rem; letter-spacing:.1em; color:#68746e }.content { white-space:pre-wrap; overflow-wrap:anywhere; color:#4e5b55 }
+.tags,.meta { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.8rem }.tags span { background:#edf1eb; padding:.25rem .5rem; border-radius:2rem; font-size:.78rem }
+.meta { color:#69766f; font-size:.8rem }.actions { justify-content:flex-end; border-top:1px solid #ecece5; margin-top:1rem; padding-top:.5rem }
+.empty { text-align:center; padding:5rem 1rem; color:#64716b }.empty>span { font-size:2.6rem }
+.message { padding:.8rem 1rem; border-radius:.65rem; margin-top:1rem }.error { background:#f8ded9; color:#792f29 }
+.modal-backdrop { position:fixed; inset:0; z-index:20; display:grid; place-items:center; padding:1rem; background:#17241e99 }
+.editor { width:min(650px,100%); max-height:calc(100vh - 2rem); overflow:auto; background:#fffefa; border-radius:1rem; padding:1.4rem }
+.editor label { display:grid; gap:.35rem; margin-top:1rem; font-weight:650 }.editor textarea { resize:vertical }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:0 1rem }.done-field { grid-template-columns:auto 1fr!important; justify-content:start; align-items:center }
+.editor-actions { justify-content:flex-end; margin-top:1.3rem } small { font-weight:400; color:#68746e }
+@media(max-width:720px){.notes-shell{padding:1rem}header{align-items:flex-end}.workspace{grid-template-columns:1fr}aside{border:0;border-bottom:1px solid #cbd1c9;padding:0 0 1rem}.filters,.form-grid{grid-template-columns:1fr}.note-grid{grid-template-columns:1fr}}
+@media(prefers-color-scheme:dark){:host{--bg:#17201d;--ink:#e8eee9}article,.editor,input,select,textarea{background:#232d29;border-color:#41504a}aside button.active,.tags span{background:#294238;color:#bfe5d2}.content,.empty,small,.meta,.priority{color:#aebbb4}}
