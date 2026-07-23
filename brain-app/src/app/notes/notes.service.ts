@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { AuthService } from '../core/auth.service';
 
-export type NoteMode = 'text' | 'checklist';
-export type NotePriority = 'low' | 'normal' | 'high';
+export type NoteMode = 'text' | 'tasks';
+export type NotePriority = 'low' | 'medium' | 'high';
 export interface NoteList { id: string; user_id: string; name: string; position: number; created_at?: string; }
 export interface Note {
   id: string; user_id: string; title: string; content: string; tags: string[]; done: boolean;
