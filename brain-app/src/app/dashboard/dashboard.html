@@ -1,50 +1,32 @@
-<div class="app-shell">
-  <aside>
-    <div class="brand">B<span>•</span></div>
-    <nav aria-label="Main navigation">
-      <a class="active" href="#"><span>⌂</span> Dashboard</a>
-      @for (module of modules; track module.name) {
-        <a [routerLink]="module.route ?? null" [href]="module.route ? null : '#'"
-          ><span>{{ module.icon }}</span> {{ module.name }}</a
-        >
-      }
-    </nav>
-    <button class="logout" (click)="auth.signOut()">↪ <span>Sign out</span></button>
-  </aside>
+<div class="dashboard">
+  <header>
+    <div class="identity">
+      <span class="logo">🧠</span>
+      <div><strong>BrainApp</strong><small>{{ auth.session()?.user?.email }}</small></div>
+    </div>
+    <div class="account-actions">
+      <span class="version">ⓘ v3.12.0</span>
+      <button type="button" aria-label="Profile">◎</button>
+      <button type="button" aria-label="Settings">⚙</button>
+      <button class="logout" type="button" (click)="auth.signOut()">Abmelden</button>
+    </div>
+  </header>
   <main>
-    <header>
-      <div>
-        <p class="eyebrow">Wednesday, July 15</p>
-        <h1>Good afternoon.</h1>
-        <p>Here’s the shape of your day.</p>
-      </div>
-      <button class="avatar" aria-label="Open profile">RK</button>
-    </header>
-    <section class="focus">
-      <div>
-        <p class="eyebrow">Today’s focus</p>
-        <h2>Keep the momentum going</h2>
-        <p>Three habits are waiting for you. One small action is enough to start.</p>
-      </div>
-      <div class="progress"><strong>3</strong><span>of 5 complete</span></div>
-    </section>
-    <section class="heading">
-      <div>
-        <p class="eyebrow">Your space</p>
-        <h2>Everything, within reach</h2>
-      </div>
-      <button>Customize</button>
-    </section>
-    <section class="modules">
+    <section class="modules" aria-label="BrainApp modules">
       @for (module of modules; track module.name) {
-        <article>
-          <span class="icon" [style.background]="module.accent">{{ module.icon }}</span>
-          <div>
-            <h3>{{ module.name }}</h3>
-            <p>{{ module.description }}</p>
-          </div>
-          <span class="arrow">→</span>
-        </article>
+        @if (module.route) {
+          <a class="module" [routerLink]="module.route" [style.background]="module.color">
+            <span class="icon">{{ module.icon }}</span>
+            <strong>{{ module.name }}</strong>
+            <span>{{ module.description }}</span>
+          </a>
+        } @else {
+          <article class="module unavailable" [style.--theme-color]="module.color" [attr.aria-label]="module.name + ' – noch nicht verfügbar'">
+            <span class="icon">{{ module.icon }}</span>
+            <strong>{{ module.name }}</strong>
+            <span>{{ module.description }}</span>
+          </article>
+        }
       }
     </section>
   </main>

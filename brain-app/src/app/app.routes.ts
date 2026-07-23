@@ -9,6 +9,11 @@ export const routes: Routes = [
     loadComponent: () => import('./notes/notes').then((m) => m.Notes),
   },
   {
+    path: 'workouts',
+    canActivate: [authGuard],
+    loadComponent: () => import('./workouts/workouts').then((m) => m.Workouts),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),

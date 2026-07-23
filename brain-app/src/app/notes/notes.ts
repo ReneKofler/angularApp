@@ -17,7 +17,7 @@ export class Notes {
   readonly editingId = signal<string | null>(null); readonly editorOpen = signal(false);
   readonly title = signal(''); readonly content = signal(''); readonly tags = signal('');
   readonly done = signal(false); readonly listId = signal(''); readonly reminderDate = signal('');
-  readonly mode = signal<NoteMode>('text'); readonly priority = signal<NotePriority>('normal');
+  readonly mode = signal<NoteMode>('text'); readonly priority = signal<NotePriority>('medium');
   readonly listName = signal('');
 
   readonly filteredNotes = computed(() => {
@@ -30,6 +30,20 @@ export class Notes {
         && (this.priorityFilter() === 'all' || note.priority === this.priorityFilter());
     });
   });
+  readonly groupedNotes = computed(() => {
+    const visible = this.filteredNotes();
+    const groups = this.lists()
+      .map((list) => ({
+        id: list.id,
+        name: list.name,
+        notes: visible.filter((note) => note.list_id === list.id),
+      }));
+    const uncategorized = visible.filter((note) => note.list_id === null);
+    if (uncategorized.length) {
+      groups.push({ id: 'uncategorized', name: 'Uncategorized', notes: uncategorized });
+    }
+    return groups;
+  });
 
   constructor() { void this.reload(); }
   async reload(): Promise<void> {
@@ -41,13 +55,18 @@ export class Notes {
   newNote(): void {
     this.editingId.set(null); this.title.set(''); this.content.set(''); this.tags.set('');
     this.done.set(false); this.listId.set(this.listFilter() !== 'all' && this.listFilter() !== 'none' ? this.listFilter() : '');
-    this.reminderDate.set(''); this.mode.set('text'); this.priority.set('normal'); this.editorOpen.set(true);
+    this.reminderDate.set(''); this.mode.set('text'); this.priority.set('medium'); this.editorOpen.set(true);
+  }
+  newNoteInList(listId: string): void {
+    this.listFilter.set(listId);
+    this.newNote();
+    this.listId.set(listId);
   }
   edit(note: Note): void {
     this.editingId.set(note.id); this.title.set(note.title); this.content.set(note.content);
     this.tags.set((note.tags ?? []).join(', ')); this.done.set(note.done); this.listId.set(note.list_id ?? '');
     this.reminderDate.set(note.reminder_date ?? ''); this.mode.set(note.mode ?? 'text');
-    this.priority.set(note.priority ?? 'normal'); this.editorOpen.set(true);
+    this.priority.set(note.priority ?? 'medium'); this.editorOpen.set(true);
   }
   async save(): Promise<void> {
     if (!this.title().trim() && !this.content().trim()) { this.error.set('Add a title or some content before saving.'); return; }
@@ -82,10 +101,23 @@ export class Notes {
     try { await this.notesService.saveList(name, list.position, list.id); await this.reload(); }
     catch (error) { this.error.set(this.message(error)); }
   }
+  renameGroup(id: string): void {
+    const list = this.lists().find((item) => item.id === id);
+    if (list) void this.renameList(list);
+  }
   async removeList(list: NoteList): Promise<void> {
     if (!confirm(`Delete “${list.name}”? Its notes will move to All notes.`)) return;
     try { await this.notesService.deleteList(list.id); if (this.listFilter() === list.id) this.listFilter.set('all'); await this.reload(); }
     catch (error) { this.error.set(this.message(error)); }
+  }
+  removeGroup(id: string): void {
+    const list = this.lists().find((item) => item.id === id);
+    if (list) void this.removeList(list);
+  }
+  formatDate(value: string | null | undefined): string {
+    if (!value) return '';
+    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return match ? `${match[3]}.${match[2]}.` : '';
   }
   private draft(note: Note): NoteDraft {
     const { title, content, tags, done, list_id, position, reminder_date, mode, priority } = note;
