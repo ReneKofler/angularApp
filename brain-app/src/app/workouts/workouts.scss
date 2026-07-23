@@ -1,0 +1,16 @@
+:host{display:block;min-height:100vh;background:#f3f2ec;color:#202722}.workouts-shell{max-width:1180px;margin:auto;padding:2rem}
+header,.header-actions,.filters,.editor-heading,.editor-actions,.sport-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+h1{font:500 clamp(2.5rem,6vw,4.8rem)/1 Georgia,serif;margin:.2rem 0}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:.72rem;color:#65736e;margin:.6rem 0}
+.back{color:#52655d;text-decoration:none}.primary{background:#315f50;color:white;border-color:#315f50}
+button,input,select,textarea{font:inherit;border:1px solid #c9cec8;border-radius:.55rem;padding:.7rem .9rem;background:#fff}button{cursor:pointer}.danger{color:#9b3d36}
+.message{padding:.8rem 1rem;margin:1rem 0;border-radius:.5rem}.error{background:#f7dfdb;color:#812d29}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin:2rem 0}.summary article,.workout-list article{background:#fff;border:1px solid #dde0da;border-radius:1rem;padding:1.2rem;box-shadow:0 8px 24px #23362a0b}
+.summary span{display:block;color:#6e7872;font-size:.78rem;text-transform:uppercase}.summary strong{display:block;font-size:1.7rem;margin-top:.4rem}.filters{justify-content:flex-start;margin-bottom:1.2rem}.filters input{min-width:320px}
+.workout-list{display:grid;gap:.8rem}.workout-list article{display:grid;grid-template-columns:160px 1fr auto;gap:1rem;align-items:center}.date span{display:block;color:#536e9d;margin-top:.25rem}
+.metrics{display:flex;flex-wrap:wrap;gap:.7rem 1.4rem}.metrics span{color:#68726c}.metrics strong{color:#26332d}.workout-list p{grid-column:2;margin:0;color:#626b66}.actions{display:flex;gap:.4rem}
+.empty{text-align:center;padding:5rem 1rem;color:#68726c}.empty>span{font-size:3rem}.empty h2{color:#26332d}.modal-backdrop{position:fixed;inset:0;z-index:5;display:grid;place-items:center;padding:1rem;background:#17221dbd}
+.editor{width:min(650px,100%);max-height:92vh;overflow:auto;background:#fafaf7;border-radius:1rem;padding:1.5rem;display:grid;gap:1rem}.editor h2{margin:0}.editor label{display:grid;gap:.35rem;font-size:.86rem;color:#526059}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.editor-actions{justify-content:flex-end}.check{display:flex!important;align-items:center;justify-content:flex-start}.check input{width:auto}
+.sport-row{border-bottom:1px solid #ddd;padding:.5rem 0}fieldset{border:1px solid #d4d8d2;border-radius:.6rem;display:flex;flex-wrap:wrap;gap:1rem}
+.records{margin:1rem 0 1.5rem}.records h2{font:500 1.5rem Georgia,serif}.records>div{display:flex;gap:.7rem;overflow:auto}.records article{min-width:220px;background:#e7ece8;border-radius:.8rem;padding:1rem;display:grid;gap:.3rem}.records strong{font-size:1.25rem}.records small{color:#65736e}.records button{justify-self:start;margin-top:.4rem}
+@media(max-width:750px){.workouts-shell{padding:1rem}.summary{grid-template-columns:1fr 1fr}header{align-items:flex-start}.header-actions{flex-direction:column}.filters{align-items:stretch;flex-direction:column}.filters input{min-width:0}.workout-list article{grid-template-columns:1fr}.workout-list p{grid-column:1}.form-grid{grid-template-columns:1fr}}

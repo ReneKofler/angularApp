@@ -1,0 +1,93 @@
+<div class="workouts-shell">
+  <header>
+    <div><a routerLink="/" class="back">← Dashboard</a><p class="eyebrow">Movement and progress</p><h1>Workouts</h1></div>
+    <div class="header-actions"><button type="button" (click)="openSportEditor()">Manage sports</button><button class="primary" type="button" (click)="newWorkout()">+ Log workout</button></div>
+  </header>
+  @if (error()) { <div class="message error" role="alert">{{ error() }}</div> }
+  <section class="summary" aria-label="Workout summary">
+    <article><span>Sessions</span><strong>{{ filteredWorkouts().length }}</strong></article>
+    <article><span>Distance</span><strong>{{ totalDistance().toFixed(1) }} km</strong></article>
+    <article><span>Training time</span><strong>{{ totalMinutes() }} min</strong></article>
+    <article><span>Personal records</span><strong>{{ records().length }}</strong></article>
+  </section>
+  <div class="filters">
+    <input type="search" aria-label="Search workouts" placeholder="Search sport or notes" [ngModel]="query()" (ngModelChange)="query.set($event)" />
+    <select aria-label="Sport" [ngModel]="sportFilter()" (ngModelChange)="sportFilter.set($event)">
+      <option value="all">All sports</option>@for (sport of sports(); track sport.id) { <option [value]="sport.id">{{ sport.name }}</option> }
+    </select>
+    <button type="button" (click)="openRecordEditor()">+ Personal record</button>
+  </div>
+  @if (records().length) {
+    <section class="records"><h2>Personal records</h2><div>
+      @for (record of records(); track record.id) {
+        <article><span>{{ record.sport_name }} · {{ record.metric }}</span><strong>{{ record.value }} {{ record.unit }}</strong><small>{{ record.achieved_at | slice:0:10 }}</small><button class="danger" type="button" (click)="removeRecord(record)">Delete</button></article>
+      }
+    </div></section>
+  }
+  @if (loading()) { <div class="empty">Loading workouts…</div> }
+  @else if (!filteredWorkouts().length) {
+    <div class="empty"><span>↗</span><h2>No workouts found</h2><p>Log a session to start tracking your progress.</p><button class="primary" (click)="newWorkout()">Log workout</button></div>
+  } @else {
+    <section class="workout-list">
+      @for (workout of filteredWorkouts(); track workout.id) {
+        <article>
+          <div class="date"><strong>{{ workout.performed_at | slice:0:10 }}</strong><span>{{ workout.sport_name }}</span></div>
+          <div class="metrics">
+            @if (workout.distance !== null) { <span><strong>{{ workout.distance }}</strong> {{ unitFor(workout) }}</span> }
+            @if (workout.duration_minutes !== null) { <span><strong>{{ workout.duration_minutes }}</strong> min</span> }
+            @if (workout.distance && workout.duration_minutes) { <span><strong>{{ pace(workout) }}</strong> pace</span> }
+            @if (workout.average_heart_rate !== null) { <span><strong>{{ workout.average_heart_rate }}</strong> bpm</span> }
+            @if (workout.elevation_gain !== null) { <span><strong>{{ workout.elevation_gain }}</strong> m climb</span> }
+            @if (workout.reps !== null) { <span><strong>{{ workout.reps }}</strong> reps</span> }
+            @if (workout.stationary) { <span><strong>Stationary</strong></span> }
+          </div>
+          @if (workout.notes) { <p>{{ workout.notes }}</p> }
+          <div class="actions"><button (click)="edit(workout)">Edit</button><button class="danger" (click)="remove(workout)">Delete</button></div>
+        </article>
+      }
+    </section>
+  }
+</div>
+@if (editorOpen()) {
+  <div class="modal-backdrop" (click)="editorOpen.set(false)">
+    <form class="editor" (click)="$event.stopPropagation()" (ngSubmit)="save()">
+      <div class="editor-heading"><h2>{{ editingId() ? 'Edit workout' : 'Log workout' }}</h2><button type="button" aria-label="Close" (click)="editorOpen.set(false)">×</button></div>
+      <div class="form-grid"><label>Sport<select [ngModel]="sportTypeId()" (ngModelChange)="sportTypeId.set($event)" name="sport">@for (sport of sports(); track sport.id) { <option [value]="sport.id">{{ sport.name }}</option> }</select></label>
+      <label>Date<input type="date" [ngModel]="performedAt()" (ngModelChange)="performedAt.set($event)" name="date" required /></label></div>
+      <div class="form-grid">
+        @if (selectedSport().capabilities.distance) { <label>Distance ({{ selectedSport().unit }})<input type="number" min="0" step="0.01" [ngModel]="distance()" (ngModelChange)="distance.set($event)" name="distance" /></label> }
+        @if (selectedSport().capabilities.duration) { <label>Duration (minutes)<input type="number" min="0" [ngModel]="duration()" (ngModelChange)="duration.set($event)" name="duration" /></label> }
+        @if (selectedSport().capabilities.heartRate) { <label>Average heart rate (bpm)<input type="number" min="0" [ngModel]="heartRate()" (ngModelChange)="heartRate.set($event)" name="heartRate" /></label> }
+        @if (selectedSport().capabilities.elevation) { <label>Elevation gain (m)<input type="number" min="0" [ngModel]="elevation()" (ngModelChange)="elevation.set($event)" name="elevation" /></label> }
+        @if (selectedSport().capabilities.reps) { <label>Repetitions<input type="number" min="0" [ngModel]="reps()" (ngModelChange)="reps.set($event)" name="reps" /></label> }
+      </div>
+      @if (selectedSport().capabilities.stationary) { <label class="check"><input type="checkbox" [ngModel]="stationary()" (ngModelChange)="stationary.set($event)" name="stationary" /> Stationary workout</label> }
+      <label>Notes<textarea rows="4" [ngModel]="notes()" (ngModelChange)="notes.set($event)" name="notes"></textarea></label>
+      <div class="editor-actions"><button type="button" (click)="editorOpen.set(false)">Cancel</button><button class="primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save workout' }}</button></div>
+    </form>
+  </div>
+}
+@if (recordEditorOpen()) {
+  <div class="modal-backdrop" (click)="recordEditorOpen.set(false)">
+    <form class="editor" (click)="$event.stopPropagation()" (ngSubmit)="saveRecord()">
+      <div class="editor-heading"><h2>Add personal record</h2><button type="button" aria-label="Close" (click)="recordEditorOpen.set(false)">×</button></div>
+      <div class="form-grid"><label>Sport<select [ngModel]="recordSportId()" (ngModelChange)="recordSportId.set($event)" name="recordSport">@for (sport of sports(); track sport.id) { <option [value]="sport.id">{{ sport.name }}</option> }</select></label>
+      <label>Date<input type="date" [ngModel]="recordDate()" (ngModelChange)="recordDate.set($event)" name="recordDate" /></label>
+      <label>Metric<input [ngModel]="recordMetric()" (ngModelChange)="recordMetric.set($event)" name="recordMetric" /></label>
+      <label>Value<input type="number" min="0" step="0.01" [ngModel]="recordValue()" (ngModelChange)="recordValue.set($event)" name="recordValue" /></label>
+      <label>Unit<input [ngModel]="recordUnit()" (ngModelChange)="recordUnit.set($event)" name="recordUnit" /></label></div>
+      <div class="editor-actions"><button type="button" (click)="recordEditorOpen.set(false)">Cancel</button><button class="primary" type="submit">Save record</button></div>
+    </form>
+  </div>
+}
+@if (sportEditorOpen()) {
+  <div class="modal-backdrop" (click)="sportEditorOpen.set(false)">
+    <form class="editor" (click)="$event.stopPropagation()" (ngSubmit)="saveSport()">
+      <div class="editor-heading"><h2>Custom sport types</h2><button type="button" aria-label="Close" (click)="sportEditorOpen.set(false)">×</button></div>
+      @for (sport of customSports(); track sport.id) { <div class="sport-row"><span>{{ sport.name }} · {{ sport.unit }}</span><button type="button" class="danger" (click)="removeSport(sport)">Delete</button></div> }
+      <div class="form-grid"><label>Name<input [ngModel]="sportName()" (ngModelChange)="sportName.set($event)" name="sportName" /></label><label>Distance unit<select [ngModel]="sportUnit()" (ngModelChange)="sportUnit.set($event)" name="unit"><option value="km">Kilometres</option><option value="mi">Miles</option></select></label></div>
+      <fieldset><legend>Supported fields</legend>@for (key of capabilityKeys; track key) { <label class="check"><input type="checkbox" [ngModel]="capabilityEnabled(key)" (ngModelChange)="toggleCapability(key, $event)" [name]="key" /> {{ key }}</label> }</fieldset>
+      <div class="editor-actions"><button type="button" (click)="sportEditorOpen.set(false)">Cancel</button><button class="primary" type="submit">Add sport</button></div>
+    </form>
+  </div>
+}
