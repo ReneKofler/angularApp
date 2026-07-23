@@ -1,0 +1,79 @@
+<div class="notes-shell">
+  <header>
+    <div><a routerLink="/" class="back">← Dashboard</a><p class="eyebrow">Organize your thoughts</p><h1>Notes</h1></div>
+    <button class="primary" type="button" (click)="newNote()">+ New note</button>
+  </header>
+  @if (error()) { <div class="message error" role="alert">{{ error() }}</div> }
+  <div class="workspace">
+    <aside>
+      <button [class.active]="listFilter() === 'all'" (click)="listFilter.set('all')">All notes <span>{{ notes().length }}</span></button>
+      <button [class.active]="listFilter() === 'none'" (click)="listFilter.set('none')">Unfiled</button>
+      @for (list of lists(); track list.id) {
+        <div class="list-row">
+          <button [class.active]="listFilter() === list.id" (click)="listFilter.set(list.id)">{{ list.name }}</button>
+          <button class="icon" aria-label="Rename list" (click)="renameList(list)">✎</button>
+          <button class="icon danger" aria-label="Delete list" (click)="removeList(list)">×</button>
+        </div>
+      }
+      <form class="new-list" (ngSubmit)="addList()">
+        <input aria-label="New list name" placeholder="New list" [ngModel]="listName()" (ngModelChange)="listName.set($event)" name="listName" />
+        <button type="submit" aria-label="Add list">+</button>
+      </form>
+    </aside>
+    <main>
+      <div class="filters">
+        <input type="search" aria-label="Search notes" placeholder="Search title, content, or tags" [ngModel]="query()" (ngModelChange)="query.set($event)" />
+        <select aria-label="Status" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
+          <option value="all">All statuses</option><option value="open">Open</option><option value="done">Done</option>
+        </select>
+        <select aria-label="Priority" [ngModel]="priorityFilter()" (ngModelChange)="priorityFilter.set($event)">
+          <option value="all">All priorities</option><option value="high">High</option><option value="normal">Normal</option><option value="low">Low</option>
+        </select>
+      </div>
+      @if (loading()) {
+        <div class="empty" aria-live="polite">Loading your notes…</div>
+      } @else if (filteredNotes().length === 0) {
+        <div class="empty"><span>✎</span><h2>No notes found</h2>
+          <p>{{ notes().length ? 'Try changing your filters.' : 'Capture your first idea or reminder.' }}</p>
+          <button class="primary" (click)="newNote()">Create a note</button>
+        </div>
+      } @else {
+        <div class="note-grid">
+          @for (note of filteredNotes(); track note.id) {
+            <article [class.completed]="note.done" [attr.data-priority]="note.priority">
+              <div class="note-top">
+                <button class="check" (click)="toggle(note)" [attr.aria-label]="note.done ? 'Reopen note' : 'Complete note'">{{ note.done ? '✓' : '' }}</button>
+                <div><h2>{{ note.title || 'Untitled note' }}</h2><span class="priority">{{ note.priority }}</span></div>
+              </div>
+              <p class="content">{{ note.content }}</p>
+              @if (note.tags.length) { <div class="tags">@for (tag of note.tags; track tag) { <span>#{{ tag }}</span> }</div> }
+              <div class="meta">
+                @if (note.mode === 'checklist') { <span>☑ Checklist</span> }
+                @if (note.reminder_date) { <span>◷ {{ note.reminder_date }}</span> }
+              </div>
+              <div class="actions"><button (click)="edit(note)">Edit</button><button class="danger" (click)="remove(note)">Delete</button></div>
+            </article>
+          }
+        </div>
+      }
+    </main>
+  </div>
+</div>
+@if (editorOpen()) {
+  <div class="modal-backdrop" (click)="editorOpen.set(false)">
+    <form class="editor" (click)="$event.stopPropagation()" (ngSubmit)="save()">
+      <div class="editor-heading"><h2>{{ editingId() ? 'Edit note' : 'New note' }}</h2><button type="button" class="icon" aria-label="Close editor" (click)="editorOpen.set(false)">×</button></div>
+      <label>Title<input [ngModel]="title()" (ngModelChange)="title.set($event)" name="title" autofocus /></label>
+      <label>Content<textarea rows="8" [ngModel]="content()" (ngModelChange)="content.set($event)" name="content"></textarea></label>
+      <div class="form-grid">
+        <label>Mode<select [ngModel]="mode()" (ngModelChange)="mode.set($event)" name="mode"><option value="text">Text</option><option value="checklist">Checklist</option></select></label>
+        <label>Priority<select [ngModel]="priority()" (ngModelChange)="priority.set($event)" name="priority"><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option></select></label>
+        <label>List<select [ngModel]="listId()" (ngModelChange)="listId.set($event)" name="list"><option value="">No list</option>@for (list of lists(); track list.id) { <option [value]="list.id">{{ list.name }}</option> }</select></label>
+        <label>Reminder<input type="date" [ngModel]="reminderDate()" (ngModelChange)="reminderDate.set($event)" name="reminder" /></label>
+      </div>
+      <label>Tags <small>comma separated</small><input [ngModel]="tags()" (ngModelChange)="tags.set($event)" name="tags" placeholder="work, idea" /></label>
+      <label class="done-field"><input type="checkbox" [ngModel]="done()" (ngModelChange)="done.set($event)" name="done" />Mark as done</label>
+      <div class="editor-actions"><button type="button" (click)="editorOpen.set(false)">Cancel</button><button class="primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save note' }}</button></div>
+    </form>
+  </div>
+}
