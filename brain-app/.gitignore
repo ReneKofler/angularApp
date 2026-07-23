@@ -31,13 +31,16 @@ yarn-error.log
 
 # Miscellaneous
 /.angular/cache
+/.angular/*.log
 .sass-cache/
 /connect.lock
 /coverage
 /test-results/
+/playwright-report/
 /libpeerconnection.log
 testem.log
 /typings
+/src/environments/environment.local.ts
 __screenshots__/
 
 # System files
