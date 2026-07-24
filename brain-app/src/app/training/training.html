@@ -1,0 +1,250 @@
+<div class="training-page">
+  <header>
+    <a routerLink="/" aria-label="Zurück">‹</a>
+    <h1>Übungen & Training</h1>
+    <span>💪</span>
+  </header>
+  <nav>
+    <button [class.active]="tab() === 'exercises'" (click)="tab.set('exercises'); editor.set(null)">
+      Übungen
+    </button>
+    <button [class.active]="tab() === 'equipment'" (click)="tab.set('equipment'); editor.set(null)">
+      Equipment
+    </button>
+    <button [class.active]="tab() === 'plans'" (click)="tab.set('plans'); editor.set(null)">
+      Trainingspläne
+    </button>
+  </nav>
+  <main>
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+    @if (!editor()) {
+      <button
+        class="add"
+        (click)="
+          newItem(tab() === 'plans' ? 'plan' : tab() === 'equipment' ? 'equipment' : 'exercise')
+        "
+      >
+        + {{ tab() === 'plans' ? 'Trainingsplan' : tab() === 'equipment' ? 'Equipment' : 'Übung' }}
+      </button>
+      <input
+        class="search"
+        aria-label="Suchen"
+        placeholder="Suchen…"
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)"
+      />
+      @if (loading()) {
+        <p class="empty">Wird geladen…</p>
+      }
+      @if (tab() === 'exercises') {
+        <section class="cards">
+          @for (item of filteredExercises(); track item.id) {
+            <button class="card" (click)="editExercise(item)">
+              <strong>{{ item.name }}</strong
+              ><small>{{ equipmentNames(item.equipment_ids) }}</small>
+              <div>
+                @for (label of capabilityLabels(item); track label) {
+                  <span>{{ label }}</span>
+                }
+              </div>
+            </button>
+          }
+        </section>
+      } @else if (tab() === 'equipment') {
+        <section class="cards">
+          @for (item of filteredEquipment(); track item.id) {
+            <button class="card" (click)="editEquipment(item)">
+              <strong>{{ item.icon || '🏋️' }} {{ item.name }}</strong>
+            </button>
+          }
+        </section>
+      } @else {
+        <section class="cards">
+          @for (item of filteredPlans(); track item.id) {
+            <article class="card plan">
+              <button (click)="editPlan(item)">
+                <strong>{{ item.name }}</strong
+                ><small>{{ item.duration_estimate || 'Keine Dauer' }}</small
+                ><span>{{ item.exercises.length }} Übungen</span></button
+              ><button class="log" (click)="openLog(item)">Training loggen</button>
+            </article>
+          }
+        </section>
+      }
+    } @else if (editor() === 'equipment') {
+      <form (ngSubmit)="save()">
+        <h2>{{ editingId() ? 'Equipment bearbeiten' : 'Equipment erstellen' }}</h2>
+        <label
+          >Icon<input
+            maxlength="4"
+            [ngModel]="icon()"
+            (ngModelChange)="icon.set($event)"
+            name="icon" /></label
+        ><label
+          >Name<input required [ngModel]="name()" (ngModelChange)="name.set($event)" name="name"
+        /></label>
+        <div class="actions">
+          @if (editingId()) {
+            <button type="button" class="delete" (click)="remove()">Löschen</button>
+          }
+          <button type="button" (click)="editor.set(null)">Abbrechen</button
+          ><button class="primary">Speichern</button>
+        </div>
+      </form>
+    } @else if (editor() === 'exercise') {
+      <form (ngSubmit)="save()">
+        <h2>{{ editingId() ? 'Übung bearbeiten' : 'Übung erstellen' }}</h2>
+        <label
+          >Name<input required [ngModel]="name()" (ngModelChange)="name.set($event)" name="name"
+        /></label>
+        <fieldset>
+          <legend>Equipment</legend>
+          <div class="checks">
+            @for (item of equipment(); track item.id) {
+              <label
+                ><input
+                  type="checkbox"
+                  [checked]="selectedEquipment().includes(item.id)"
+                  (change)="toggleEquipment(item.id, $any($event.target).checked)"
+                />{{ item.icon }} {{ item.name }}</label
+              >
+            }
+          </div>
+        </fieldset>
+        <label
+          >Muskelgruppen (kommagetrennt)<input
+            [ngModel]="muscles()"
+            (ngModelChange)="muscles.set($event)"
+            name="muscles"
+        /></label>
+        <fieldset>
+          <legend>Felder & Fähigkeiten</legend>
+          <div class="checks">
+            @for (
+              item of [
+                { key: 'kg', label: 'Gewicht' },
+                { key: 'reps', label: 'Wiederholungen' },
+                { key: 'time', label: 'Zeit' },
+                { key: 'meter', label: 'Meter' },
+                { key: 'calories', label: 'Kalorien' },
+                { key: 'oneRm', label: '1RM' },
+                { key: 'maxReps', label: 'Max Reps' },
+              ];
+              track item.key
+            ) {
+              <label
+                ><input
+                  type="checkbox"
+                  [checked]="$any(capabilities())[item.key]"
+                  (change)="toggleCapability($any(item.key), $any($event.target).checked)"
+                />{{ item.label }}</label
+              >
+            }
+          </div>
+        </fieldset>
+        <div class="actions">
+          @if (editingId()) {
+            <button type="button" class="delete" (click)="remove()">Löschen</button>
+          }
+          <button type="button" (click)="editor.set(null)">Abbrechen</button
+          ><button class="primary">Speichern</button>
+        </div>
+      </form>
+    } @else if (editor() === 'plan') {
+      <form (ngSubmit)="save()">
+        <h2>{{ editingId() ? 'Trainingsplan bearbeiten' : 'Trainingsplan erstellen' }}</h2>
+        <label
+          >Name<input
+            required
+            [ngModel]="name()"
+            (ngModelChange)="name.set($event)"
+            name="name" /></label
+        ><label
+          >Beschreibung<textarea
+            [ngModel]="description()"
+            (ngModelChange)="description.set($event)"
+            name="description"
+          ></textarea></label
+        ><label
+          >Geschätzte Dauer<input
+            placeholder="z.B. 45 Min."
+            [ngModel]="duration()"
+            (ngModelChange)="duration.set($event)"
+            name="duration"
+        /></label>
+        <fieldset>
+          <legend>Geordnete Übungen</legend>
+          @for (item of planExercises(); track $index) {
+            <div class="plan-row">
+              <strong>{{ $index + 1 }}. {{ item.name }}</strong
+              ><input
+                type="number"
+                min="1"
+                aria-label="Sätze"
+                [ngModel]="item.sets"
+                (ngModelChange)="updatePlanExercise($index, 'sets', $event)"
+                [name]="'sets' + $index"
+              /><input
+                type="number"
+                min="0"
+                aria-label="Reps"
+                [ngModel]="item.reps"
+                (ngModelChange)="updatePlanExercise($index, 'reps', $event)"
+                [name]="'reps' + $index"
+              /><button type="button" (click)="movePlanExercise($index, -1)">↑</button
+              ><button type="button" (click)="movePlanExercise($index, 1)">↓</button
+              ><button type="button" (click)="removePlanExercise($index)">×</button>
+            </div>
+          }
+          <select
+            aria-label="Übung hinzufügen"
+            [ngModel]="exerciseToAdd()"
+            (ngModelChange)="addPlanExercise($event)"
+            name="addExercise"
+          >
+            <option value="">+ Übung hinzufügen</option>
+            @for (item of exercises(); track item.id) {
+              <option [value]="item.id">{{ item.name }}</option>
+            }
+          </select>
+        </fieldset>
+        <div class="actions">
+          @if (editingId()) {
+            <button type="button" class="delete" (click)="remove()">Löschen</button>
+          }
+          <button type="button" (click)="editor.set(null)">Abbrechen</button
+          ><button class="primary">Speichern</button>
+        </div>
+      </form>
+    } @else if (editor() === 'log') {
+      <form (ngSubmit)="saveLog()">
+        <h2>{{ loggingPlan()?.name }} loggen</h2>
+        <label
+          >Datum<input
+            type="date"
+            [ngModel]="logDate()"
+            (ngModelChange)="logDate.set($event)"
+            name="logDate" /></label
+        ><label
+          >Dauer<input
+            placeholder="z.B. 42:00"
+            [ngModel]="logDuration()"
+            (ngModelChange)="logDuration.set($event)"
+            name="logDuration" /></label
+        ><label
+          >Notizen<textarea
+            [ngModel]="logNotes()"
+            (ngModelChange)="logNotes.set($event)"
+            name="logNotes"
+          ></textarea>
+        </label>
+        <div class="actions">
+          <button type="button" (click)="editor.set(null)">Abbrechen</button
+          ><button class="primary">Training speichern</button>
+        </div>
+      </form>
+    }
+  </main>
+</div>

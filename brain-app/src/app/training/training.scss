@@ -1,0 +1,196 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #0f1929;
+  color: #f8fafc;
+}
+.training-page {
+  min-height: 100vh;
+}
+header {
+  display: grid;
+  grid-template-columns: 3rem 1fr 3rem;
+  align-items: center;
+  padding: 1rem;
+  background: #1e2a3b;
+}
+header h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 1.25rem;
+}
+header a {
+  color: white;
+  font-size: 2rem;
+  text-decoration: none;
+}
+nav {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #1e2a3b;
+}
+nav button {
+  padding: 1rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  color: #94a3b8;
+  background: transparent;
+  font-weight: 700;
+}
+nav button.active {
+  border-color: #8b5cf6;
+  color: #c4b5fd;
+}
+main {
+  width: min(70rem, calc(100% - 2rem));
+  margin: auto;
+  padding: 1.5rem 0;
+}
+.add,
+.primary,
+.log {
+  border: 0;
+  border-radius: 0.6rem;
+  color: white;
+  background: #7c3aed;
+  font-weight: 700;
+  cursor: pointer;
+}
+.add {
+  width: 100%;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.search,
+input,
+textarea,
+select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  color: white;
+  background: #334155;
+  font: inherit;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+.card {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #344257;
+  border-radius: 0.7rem;
+  color: white;
+  background: #1e2a3b;
+  text-align: left;
+}
+.card div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.card span {
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  background: #334155;
+}
+.card.plan {
+  grid-template-columns: 1fr auto;
+}
+.card.plan > button:first-child {
+  display: grid;
+  gap: 0.4rem;
+  border: 0;
+  color: white;
+  background: transparent;
+  text-align: left;
+}
+.log {
+  padding: 0.6rem;
+}
+form {
+  display: grid;
+  gap: 1rem;
+  width: min(44rem, 100%);
+  margin: auto;
+  padding: 1.2rem;
+  border-radius: 0.8rem;
+  background: #1e2a3b;
+}
+form h2 {
+  margin: 0;
+}
+form label {
+  display: grid;
+  gap: 0.35rem;
+}
+fieldset {
+  border: 1px solid #475569;
+  border-radius: 0.6rem;
+}
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+.checks label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.checks input {
+  width: auto;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.actions button {
+  padding: 0.7rem 1rem;
+  border: 0;
+  border-radius: 0.5rem;
+}
+.delete {
+  margin-right: auto;
+  color: #fda4af;
+  background: #4c1d2a;
+}
+.plan-row {
+  display: grid;
+  grid-template-columns: 1fr 5rem 5rem auto auto auto;
+  gap: 0.35rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.plan-row button {
+  border: 0;
+  color: white;
+  background: #475569;
+}
+.empty,
+.error {
+  padding: 1rem;
+  border-radius: 0.6rem;
+  background: #1e2a3b;
+}
+.error {
+  color: #fecdd3;
+}
+@media (max-width: 700px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+  .plan-row {
+    grid-template-columns: 1fr 4rem 4rem;
+  }
+  .plan-row strong {
+    grid-column: 1/-1;
+  }
+}
