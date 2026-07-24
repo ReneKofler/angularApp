@@ -64,11 +64,22 @@
           <h2>Muskeln</h2>
           <p>Wähle rechts einen Muskel aus, um ihn am Körper hervorzuheben.</p>
           <div class="muscle-layout">
-            <img
-              class="muscle-figure"
-              src="images/muscle-anatomy.png"
-              alt="Frontansicht der menschlichen Muskelgruppen"
-            />
+            <div class="muscle-map">
+              <img
+                class="muscle-figure"
+                src="images/muscle-anatomy.png"
+                alt="Frontansicht der menschlichen Muskelgruppen"
+              />
+              @for (muscle of muscleGroups; track muscle) {
+                <span
+                  class="muscle-highlight"
+                  [class.active]="selectedMuscle() === muscle"
+                  [class]="'muscle-highlight ' + muscle.toLowerCase()"
+                  [attr.data-muscle]="muscle"
+                  aria-hidden="true"
+                ></span>
+              }
+            </div>
             <div class="muscle-list">
               @for (muscle of muscleGroups; track muscle) {
                 <button

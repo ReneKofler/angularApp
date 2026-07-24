@@ -74,4 +74,5 @@ test('selects muscles in the muscle overview', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Muskeln' })).toBeVisible();
   await page.getByRole('button', { name: 'Back' }).click();
   await expect(page.getByRole('button', { name: 'Back' })).toHaveClass(/active/);
+  await expect(page.locator('[data-muscle="Back"]')).toBeVisible();
 });
