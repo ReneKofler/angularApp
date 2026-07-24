@@ -83,6 +83,8 @@ export class Crossfit {
   readonly logReps = signal<number | null>(null);
   readonly logDnf = signal(false);
   readonly logMissingReps = signal<number | null>(null);
+  readonly logHeartRate = signal<number | null>(null);
+  readonly logFocus = signal<'conditioning' | 'strength'>('conditioning');
   readonly logDoneAlone = signal(false);
   readonly logNotes = signal('');
 
@@ -298,9 +300,30 @@ export class Crossfit {
     this.logReps.set(null);
     this.logDnf.set(false);
     this.logMissingReps.set(null);
+    this.logHeartRate.set(null);
+    this.logFocus.set(workout.crossfit_focus === 'strength' ? 'strength' : 'conditioning');
     this.logDoneAlone.set(false);
     this.logNotes.set('');
     this.logEditorOpen.set(true);
+  }
+
+  newSport() {
+    this.selectedLibrary.set(null);
+    this.logDate.set(this.today());
+    this.logDuration.set('');
+    this.logRounds.set(null);
+    this.logReps.set(null);
+    this.logDnf.set(false);
+    this.logMissingReps.set(null);
+    this.logHeartRate.set(null);
+    this.logFocus.set('conditioning');
+    this.logDoneAlone.set(false);
+    this.logNotes.set('');
+    this.logEditorOpen.set(true);
+  }
+
+  selectLibrary(id: string) {
+    this.selectedLibrary.set(this.library().find((workout) => workout.id === id) ?? null);
   }
 
   async saveLog() {
@@ -322,7 +345,7 @@ export class Crossfit {
       workout_date: this.logDate(),
       workout_name: workout.name,
       crossfit_type: workout.crossfit_type,
-      crossfit_description: workout.description,
+      crossfit_description: this.logFocus(),
       exercises: workout.exercises,
       time_cap: workout.time_cap,
       rounds: workout.rounds,
@@ -333,6 +356,7 @@ export class Crossfit {
       total_reps: this.logReps(),
       dnf: this.logDnf(),
       missing_reps: this.logDnf() ? this.logMissingReps() : null,
+      avg_heart_rate: this.logHeartRate(),
       is_hero: workout.is_hero,
       is_girl: workout.is_girl,
       is_open: workout.is_open,

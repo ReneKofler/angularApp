@@ -42,6 +42,7 @@ describe('Crossfit', () => {
     total_reps: null,
     dnf: true,
     missing_reps: 6,
+    avg_heart_rate: 150,
     is_hero: false,
     is_girl: true,
     is_open: false,

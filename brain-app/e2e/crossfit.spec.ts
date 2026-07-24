@@ -41,6 +41,7 @@ const log = {
   total_reps: 150,
   dnf: true,
   missing_reps: 44,
+  avg_heart_rate: 150,
   is_hero: false,
   is_girl: false,
   is_open: false,
@@ -87,6 +88,15 @@ test('filters recent sessions by type, focus, equipment, and search', async ({ p
 
   await page.getByLabel('Sports suchen').fill('nicht vorhanden');
   await expect(page.getByText('Keine Einheiten gefunden.')).toBeVisible();
+});
+
+test('+ Sport opens capture without changing tabs', async ({ page }) => {
+  await page.getByRole('button', { name: '+ Sport' }).click();
+  await expect(page.getByRole('button', { name: 'Sports' })).toHaveClass(/active/);
+  await expect(page.locator('form').getByRole('heading', { name: 'Sport erfassen' })).toBeVisible();
+  await expect(page.getByLabel('Workout wählen')).toBeVisible();
+  await expect(page.getByLabel('Ø Herzfrequenz (bpm) - optional')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Sport speichern' })).toBeDisabled();
 });
 
 test('opens a library workout as a prefilled result form', async ({ page }) => {

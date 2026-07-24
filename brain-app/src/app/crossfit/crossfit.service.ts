@@ -44,6 +44,7 @@ export interface CrossfitLog {
   total_reps: number | null;
   dnf: boolean | null;
   missing_reps: number | null;
+  avg_heart_rate: number | null;
   is_hero: boolean | null;
   is_girl: boolean | null;
   is_open: boolean | null;

@@ -20,7 +20,7 @@
     }
 
     @if (tab() === 'sports') {
-      <button type="button" class="add-sport" (click)="tab.set('workouts')">+ Sport</button>
+      <button type="button" class="add-sport" (click)="newSport()">+ Sport</button>
       <section class="recent-panel">
         <h2>Letzte Einheiten</h2>
         <div class="search-sort">
@@ -395,13 +395,17 @@
   </div>
 }
 
-@if (logEditorOpen() && selectedLibrary(); as workout) {
+@if (logEditorOpen()) {
   <div class="backdrop" (click)="logEditorOpen.set(false)">
     <form class="dialog result-dialog" (click)="$event.stopPropagation()" (ngSubmit)="saveLog()">
       <div class="dialog-title">
         <div>
-          <span class="type">{{ typeLabel(workout.crossfit_type) }}</span>
-          <h2>{{ workout.name }}</h2>
+          @if (selectedLibrary(); as workout) {
+            <span class="type">{{ typeLabel(workout.crossfit_type) }}</span>
+            <h2>{{ workout.name }}</h2>
+          } @else {
+            <h2>Sport erfassen</h2>
+          }
         </div>
         <button type="button" aria-label="Schließen" (click)="logEditorOpen.set(false)">×</button>
       </div>
@@ -415,72 +419,124 @@
           name="logDate"
         />
       </label>
-      @if (workout.crossfit_type === 'for_time') {
-        <label>
-          Zeit (mm:ss)
-          <input
-            placeholder="12:34"
-            [disabled]="logDnf()"
-            [ngModel]="logDuration()"
-            (ngModelChange)="logDuration.set($event)"
-            name="duration"
-          />
-        </label>
-        <label class="inline-check"
-          ><input
-            type="checkbox"
-            [ngModel]="logDnf()"
-            (ngModelChange)="logDnf.set($event)"
-            name="dnf"
-          />DNF</label
+      <label>
+        Workout wählen
+        <select
+          [ngModel]="selectedLibrary()?.id ?? ''"
+          (ngModelChange)="selectLibrary($event)"
+          name="selectedWorkout"
         >
-        @if (logDnf()) {
+          <option value="">Workout auswählen…</option>
+          @for (item of library(); track item.id) {
+            <option [value]="item.id">{{ item.name }}</option>
+          }
+        </select>
+      </label>
+      @if (!library().length) {
+        <p class="empty-hint">Keine Workouts gespeichert. Erstelle zuerst ein Workout.</p>
+      }
+      <fieldset>
+        <legend>Fokus</legend>
+        <div class="checks">
+          <label
+            ><input
+              type="radio"
+              name="logFocus"
+              value="conditioning"
+              [ngModel]="logFocus()"
+              (ngModelChange)="logFocus.set($event)"
+            />Conditioning</label
+          >
+          <label
+            ><input
+              type="radio"
+              name="logFocus"
+              value="strength"
+              [ngModel]="logFocus()"
+              (ngModelChange)="logFocus.set($event)"
+            />Strength</label
+          >
+        </div>
+      </fieldset>
+      @if (selectedLibrary(); as workout) {
+        @if (workout.crossfit_type === 'for_time') {
           <label>
-            Fehlende Reps
+            Zeit (mm:ss)
+            <input
+              placeholder="12:34"
+              [disabled]="logDnf()"
+              [ngModel]="logDuration()"
+              (ngModelChange)="logDuration.set($event)"
+              name="duration"
+            />
+          </label>
+          <label class="inline-check"
+            ><input
+              type="checkbox"
+              [ngModel]="logDnf()"
+              (ngModelChange)="logDnf.set($event)"
+              name="dnf"
+            />DNF</label
+          >
+          @if (logDnf()) {
+            <label>
+              Fehlende Reps
+              <input
+                type="number"
+                min="0"
+                [ngModel]="logMissingReps()"
+                (ngModelChange)="logMissingReps.set($event)"
+                name="missingReps"
+              />
+            </label>
+          }
+        }
+        @if (workout.crossfit_type === 'amrap' || workout.crossfit_type === 'custom') {
+          <label>
+            Geschaffte Runden
             <input
               type="number"
               min="0"
-              [ngModel]="logMissingReps()"
-              (ngModelChange)="logMissingReps.set($event)"
-              name="missingReps"
+              [ngModel]="logRounds()"
+              (ngModelChange)="logRounds.set($event)"
+              name="resultRounds"
             />
           </label>
         }
+        @if (workout.crossfit_type !== 'for_time') {
+          <label>
+            Geschaffte Reps
+            <input
+              type="number"
+              min="0"
+              [ngModel]="logReps()"
+              (ngModelChange)="logReps.set($event)"
+              name="resultReps"
+            />
+          </label>
+        }
+        @if (workout.is_partner) {
+          <label class="inline-check"
+            ><input
+              type="checkbox"
+              [ngModel]="logDoneAlone()"
+              (ngModelChange)="logDoneAlone.set($event)"
+              name="doneAlone"
+            />Alleine absolviert</label
+          >
+        }
       }
-      @if (workout.crossfit_type === 'amrap' || workout.crossfit_type === 'custom') {
-        <label>
-          Geschaffte Runden
-          <input
-            type="number"
-            min="0"
-            [ngModel]="logRounds()"
-            (ngModelChange)="logRounds.set($event)"
-            name="resultRounds"
-          />
-        </label>
-      }
-      @if (workout.crossfit_type !== 'for_time') {
-        <label>
-          Geschaffte Reps
-          <input
-            type="number"
-            min="0"
-            [ngModel]="logReps()"
-            (ngModelChange)="logReps.set($event)"
-            name="resultReps"
-          />
-        </label>
-      }
-      @if (workout.is_partner) {
-        <label class="inline-check"
-          ><input
-            type="checkbox"
-            [ngModel]="logDoneAlone()"
-            (ngModelChange)="logDoneAlone.set($event)"
-            name="doneAlone"
-          />Alleine absolviert</label
-        >
-      }
+      <label>
+        Ø Herzfrequenz (bpm) - optional
+        <input
+          type="number"
+          min="1"
+          placeholder="z.B. 165"
+          [ngModel]="logHeartRate()"
+          (ngModelChange)="logHeartRate.set($event)"
+          name="logHeartRate"
+        />
+      </label>
       <label>
         Notizen
         <textarea
@@ -490,7 +546,9 @@
           name="logNotes"
         ></textarea>
       </label>
-      <button type="submit" class="primary" [disabled]="saving()">Ergebnis speichern</button>
+      <button type="submit" class="primary" [disabled]="saving() || !selectedLibrary()">
+        Sport speichern
+      </button>
     </form>
   </div>
 }
