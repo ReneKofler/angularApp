@@ -1,0 +1,415 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  color: var(--text, #171717);
+  background: var(--background, #fff);
+}
+
+.crossfit-page {
+  min-height: 100vh;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 2.75rem 1fr 2.75rem;
+  align-items: center;
+  min-height: 4rem;
+  padding: 0 1rem;
+  color: white;
+  background: linear-gradient(135deg, #be123c, #e11d48);
+  box-shadow: 0 4px 18px rgb(136 19 55 / 25%);
+
+  h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 1.25rem;
+  }
+
+  a,
+  button {
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+    font-size: 1.8rem;
+    text-decoration: none;
+    cursor: pointer;
+  }
+}
+
+main {
+  width: min(72rem, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.5rem 0 4rem;
+}
+
+.error {
+  padding: 0.8rem 1rem;
+  border: 1px solid #fda4af;
+  border-radius: 0.75rem;
+  color: #9f1239;
+  background: #fff1f2;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.35rem;
+  width: fit-content;
+  margin-bottom: 1rem;
+  padding: 0.25rem;
+  border-radius: 0.8rem;
+  background: #f1f5f9;
+
+  button {
+    padding: 0.65rem 1rem;
+    border: 0;
+    border-radius: 0.6rem;
+    color: #475569;
+    background: transparent;
+    font-weight: 700;
+    cursor: pointer;
+
+    &.active {
+      color: #be123c;
+      background: white;
+      box-shadow: 0 1px 4px rgb(15 23 42 / 12%);
+    }
+  }
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+
+  > input {
+    flex: 1;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    white-space: nowrap;
+  }
+}
+
+input,
+select,
+textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.72rem 0.8rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.65rem;
+  color: inherit;
+  background: var(--surface, white);
+  font: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.workout-card,
+.history article {
+  padding: 1.1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: var(--surface, white);
+  box-shadow: 0 5px 16px rgb(15 23 42 / 7%);
+
+  h2 {
+    margin: 0.2rem 0 0;
+    font-size: 1.15rem;
+  }
+
+  p {
+    color: #64748b;
+  }
+}
+
+.card-heading,
+.dialog-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.type {
+  color: #be123c;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.favourite {
+  padding: 0.15rem;
+  border: 0;
+  color: #cbd5e1;
+  background: transparent;
+  font-size: 1.5rem;
+  cursor: pointer;
+
+  &.active {
+    color: #f59e0b;
+  }
+}
+
+.tags,
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tags {
+  margin-top: 0.75rem;
+
+  span {
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    color: #9f1239;
+    background: #ffe4e6;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+}
+
+.focus,
+.prescription {
+  font-weight: 700;
+}
+
+.workout-card ul {
+  padding-left: 1.25rem;
+}
+
+.card-actions,
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+button.primary,
+button.secondary,
+button.danger {
+  padding: 0.65rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: 0.65rem;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button.primary {
+  color: white;
+  background: #e11d48;
+}
+
+button.secondary {
+  border-color: #cbd5e1;
+  color: inherit;
+  background: transparent;
+}
+
+button.danger {
+  margin-right: auto;
+  color: #be123c;
+  background: #fff1f2;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.history {
+  display: grid;
+  gap: 0.75rem;
+
+  article {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  strong {
+    display: block;
+    margin-top: 0.5rem;
+    color: #047857;
+
+    &.dnf {
+      color: #be123c;
+    }
+  }
+}
+
+.history-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  color: #64748b;
+
+  button {
+    border: 0;
+    color: #be123c;
+    background: transparent;
+    font-size: 1.4rem;
+    cursor: pointer;
+  }
+}
+
+.empty {
+  padding: 3rem 1rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 1rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(15 23 42 / 55%);
+}
+
+.dialog {
+  display: grid;
+  gap: 0.9rem;
+  width: min(38rem, 100%);
+  max-height: calc(100vh - 2rem);
+  padding: 1.25rem;
+  overflow-y: auto;
+  border-radius: 1rem;
+  color: var(--text, #171717);
+  background: var(--surface, white);
+  box-shadow: 0 25px 60px rgb(15 23 42 / 30%);
+
+  h2 {
+    margin: 0;
+  }
+
+  > label,
+  .number-grid label {
+    display: grid;
+    gap: 0.35rem;
+    font-weight: 700;
+  }
+
+  fieldset {
+    border: 1px solid #cbd5e1;
+    border-radius: 0.75rem;
+  }
+}
+
+.dialog-title > button {
+  border: 0;
+  color: #64748b;
+  background: transparent;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.number-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.checks label,
+.inline-check {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+
+  input {
+    width: auto;
+  }
+}
+
+.result-dialog {
+  width: min(30rem, 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --text: #f8fafc;
+    --background: #09090b;
+    --surface: #18181b;
+  }
+
+  .tabs {
+    background: #27272a;
+
+    button.active {
+      color: #fda4af;
+      background: #3f3f46;
+    }
+  }
+
+  .workout-card,
+  .history article,
+  input,
+  select,
+  textarea,
+  .dialog {
+    border-color: #3f3f46;
+  }
+
+  .workout-card p,
+  .history-meta {
+    color: #a1a1aa;
+  }
+
+  .error {
+    border-color: #9f1239;
+    color: #fecdd3;
+    background: #4c0519;
+  }
+}
+
+@media (max-width: 700px) {
+  main {
+    width: min(100% - 1rem, 72rem);
+    padding-top: 0.75rem;
+  }
+
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .library-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .number-grid {
+    grid-template-columns: 1fr;
+  }
+}

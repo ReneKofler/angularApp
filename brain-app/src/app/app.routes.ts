@@ -14,6 +14,11 @@ export const routes: Routes = [
     loadComponent: () => import('./workouts/workouts').then((m) => m.Workouts),
   },
   {
+    path: 'crossfit',
+    canActivate: [authGuard],
+    loadComponent: () => import('./crossfit/crossfit').then((m) => m.Crossfit),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),

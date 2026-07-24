@@ -1,0 +1,425 @@
+<div class="crossfit-page">
+  <header>
+    <a routerLink="/" aria-label="Zurück">‹</a>
+    <h1>CrossFit</h1>
+    <button type="button" aria-label="Workout erstellen" (click)="newLibrary()">＋</button>
+  </header>
+
+  <main>
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+
+    <nav class="tabs" aria-label="CrossFit Ansichten">
+      <button type="button" [class.active]="tab() === 'library'" (click)="tab.set('library')">
+        Bibliothek
+      </button>
+      <button type="button" [class.active]="tab() === 'history'" (click)="tab.set('history')">
+        Letzte Einheiten
+      </button>
+    </nav>
+
+    @if (tab() === 'library') {
+      <section class="toolbar">
+        <input
+          type="search"
+          aria-label="Workouts suchen"
+          placeholder="Suchen nach Name, Übung…"
+          [ngModel]="query()"
+          (ngModelChange)="query.set($event)"
+        />
+        <label>
+          <input
+            type="checkbox"
+            [ngModel]="favouritesOnly()"
+            (ngModelChange)="favouritesOnly.set($event)"
+          />
+          Nur Favoriten
+        </label>
+      </section>
+
+      @if (loading()) {
+        <div class="empty">Workout-Bibliothek wird geladen…</div>
+      } @else if (!filteredLibrary().length) {
+        <div class="empty">Keine Workouts gefunden.</div>
+      } @else {
+        <section class="library-grid">
+          @for (workout of filteredLibrary(); track workout.id) {
+            <article class="workout-card">
+              <div class="card-heading">
+                <div>
+                  <span class="type">{{ typeLabel(workout.crossfit_type) }}</span>
+                  <h2>{{ workout.name }}</h2>
+                </div>
+                <button
+                  type="button"
+                  class="favourite"
+                  [class.active]="workout.is_favourite"
+                  [attr.aria-label]="
+                    workout.is_favourite ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'
+                  "
+                  (click)="toggleFavourite(workout)"
+                >
+                  ★
+                </button>
+              </div>
+              @if (tags(workout).length) {
+                <div class="tags">
+                  @for (tag of tags(workout); track tag) {
+                    <span>{{ tag }}</span>
+                  }
+                </div>
+              }
+              @if (workout.crossfit_focus) {
+                <p class="focus">{{ workout.crossfit_focus }}</p>
+              }
+              <ul>
+                @for (exercise of workout.exercises ?? []; track exercise) {
+                  <li>{{ exercise }}</li>
+                }
+              </ul>
+              @if (prescription(workout)) {
+                <p class="prescription">{{ prescription(workout) }}</p>
+              }
+              @if (workout.description) {
+                <p>{{ workout.description }}</p>
+              }
+              <div class="card-actions">
+                @if (workout.user_id) {
+                  <button type="button" class="secondary" (click)="editLibrary(workout)">
+                    Bearbeiten
+                  </button>
+                }
+                <button type="button" class="primary" (click)="startLog(workout)">
+                  Ergebnis eintragen
+                </button>
+              </div>
+            </article>
+          }
+        </section>
+      }
+    } @else {
+      @if (loading()) {
+        <div class="empty">Einheiten werden geladen…</div>
+      } @else if (!logs().length) {
+        <div class="empty">Noch keine CrossFit Einheiten erfasst.</div>
+      } @else {
+        <section class="history">
+          @for (log of logs(); track log.id) {
+            <article>
+              <div>
+                <span class="type">{{ typeLabel(log.crossfit_type) }}</span>
+                <h2>{{ log.workout_name || 'CrossFit Workout' }}</h2>
+                <strong [class.dnf]="log.dnf">{{ result(log) }}</strong>
+                @if (tags(log).length) {
+                  <div class="tags">
+                    @for (tag of tags(log); track tag) {
+                      <span>{{ tag }}</span>
+                    }
+                  </div>
+                }
+                @if (log.notes) {
+                  <p>{{ log.notes }}</p>
+                }
+              </div>
+              <div class="history-meta">
+                <time>{{ log.workout_date }}</time>
+                <button type="button" aria-label="Einheit löschen" (click)="deleteLog(log)">
+                  ×
+                </button>
+              </div>
+            </article>
+          }
+        </section>
+      }
+    }
+  </main>
+</div>
+
+@if (libraryEditorOpen()) {
+  <div class="backdrop" (click)="libraryEditorOpen.set(false)">
+    <form class="dialog" (click)="$event.stopPropagation()" (ngSubmit)="saveLibrary()">
+      <div class="dialog-title">
+        <h2>{{ editingLibraryId() ? 'Workout bearbeiten' : 'Workout erstellen' }}</h2>
+        <button type="button" aria-label="Schließen" (click)="libraryEditorOpen.set(false)">
+          ×
+        </button>
+      </div>
+      <label>
+        Name
+        <input
+          required
+          maxlength="255"
+          [ngModel]="libraryName()"
+          (ngModelChange)="libraryName.set($event)"
+          name="libraryName"
+        />
+      </label>
+      <label>
+        Typ
+        <select
+          [ngModel]="libraryType()"
+          (ngModelChange)="libraryType.set($event)"
+          name="libraryType"
+        >
+          <option value="for_time">For Time</option>
+          <option value="amrap">AMRAP</option>
+          <option value="rounds">Runden</option>
+          <option value="intervals">Intervalle</option>
+        </select>
+      </label>
+      <label>
+        Übungen (eine pro Zeile)
+        <textarea
+          required
+          rows="5"
+          placeholder="21-15-9 Thrusters&#10;Pull-ups"
+          [ngModel]="libraryExercises()"
+          (ngModelChange)="libraryExercises.set($event)"
+          name="libraryExercises"
+        ></textarea>
+      </label>
+      <div class="number-grid">
+        @if (libraryType() === 'for_time') {
+          <label>
+            Time Cap (Min.)
+            <input
+              type="number"
+              min="1"
+              [ngModel]="libraryTimeCap()"
+              (ngModelChange)="libraryTimeCap.set($event)"
+              name="timeCap"
+            />
+          </label>
+        }
+        @if (libraryType() === 'amrap') {
+          <label>
+            AMRAP Dauer (Min.)
+            <input
+              type="number"
+              min="1"
+              [ngModel]="libraryAmrapDuration()"
+              (ngModelChange)="libraryAmrapDuration.set($event)"
+              name="amrapDuration"
+            />
+          </label>
+        }
+        @if (libraryType() === 'rounds') {
+          <label>
+            Runden
+            <input
+              type="number"
+              min="1"
+              [ngModel]="libraryRounds()"
+              (ngModelChange)="libraryRounds.set($event)"
+              name="rounds"
+            />
+          </label>
+        }
+        @if (libraryType() === 'intervals') {
+          <label>
+            Arbeit (Min.)
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              [ngModel]="libraryWorkMinutes()"
+              (ngModelChange)="libraryWorkMinutes.set($event)"
+              name="workMinutes"
+            />
+          </label>
+          <label>
+            Pause (Min.)
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              [ngModel]="libraryRestMinutes()"
+              (ngModelChange)="libraryRestMinutes.set($event)"
+              name="restMinutes"
+            />
+          </label>
+        }
+        <label>
+          Gesamt-Reps
+          <input
+            type="number"
+            min="0"
+            [ngModel]="libraryTotalReps()"
+            (ngModelChange)="libraryTotalReps.set($event)"
+            name="libraryTotalReps"
+          />
+        </label>
+      </div>
+      <label>
+        Fokus
+        <input
+          placeholder="z.B. Conditioning"
+          [ngModel]="libraryFocus()"
+          (ngModelChange)="libraryFocus.set($event)"
+          name="focus"
+        />
+      </label>
+      <label>
+        Beschreibung
+        <textarea
+          rows="3"
+          [ngModel]="libraryDescription()"
+          (ngModelChange)="libraryDescription.set($event)"
+          name="description"
+        ></textarea>
+      </label>
+      <fieldset>
+        <legend>Kennzeichnungen</legend>
+        <div class="checks">
+          <label
+            ><input
+              type="checkbox"
+              [ngModel]="libraryFavourite()"
+              (ngModelChange)="libraryFavourite.set($event)"
+              name="favourite"
+            />Favorit</label
+          >
+          <label
+            ><input
+              type="checkbox"
+              [ngModel]="libraryHero()"
+              (ngModelChange)="libraryHero.set($event)"
+              name="hero"
+            />Hero</label
+          >
+          <label
+            ><input
+              type="checkbox"
+              [ngModel]="libraryGirl()"
+              (ngModelChange)="libraryGirl.set($event)"
+              name="girl"
+            />Girl</label
+          >
+          <label
+            ><input
+              type="checkbox"
+              [ngModel]="libraryOpen()"
+              (ngModelChange)="libraryOpen.set($event)"
+              name="open"
+            />Open</label
+          >
+          <label
+            ><input
+              type="checkbox"
+              [ngModel]="libraryPartner()"
+              (ngModelChange)="libraryPartner.set($event)"
+              name="partner"
+            />Partner</label
+          >
+        </div>
+      </fieldset>
+      <div class="dialog-actions">
+        @if (editingLibraryId()) {
+          <button type="button" class="danger" (click)="deleteLibrary()">Löschen</button>
+        }
+        <button type="submit" class="primary" [disabled]="saving()">Workout speichern</button>
+      </div>
+    </form>
+  </div>
+}
+
+@if (logEditorOpen() && selectedLibrary(); as workout) {
+  <div class="backdrop" (click)="logEditorOpen.set(false)">
+    <form class="dialog result-dialog" (click)="$event.stopPropagation()" (ngSubmit)="saveLog()">
+      <div class="dialog-title">
+        <div>
+          <span class="type">{{ typeLabel(workout.crossfit_type) }}</span>
+          <h2>{{ workout.name }}</h2>
+        </div>
+        <button type="button" aria-label="Schließen" (click)="logEditorOpen.set(false)">×</button>
+      </div>
+      <label>
+        Datum
+        <input
+          type="date"
+          required
+          [ngModel]="logDate()"
+          (ngModelChange)="logDate.set($event)"
+          name="logDate"
+        />
+      </label>
+      @if (workout.crossfit_type === 'for_time') {
+        <label>
+          Zeit (mm:ss)
+          <input
+            placeholder="12:34"
+            [disabled]="logDnf()"
+            [ngModel]="logDuration()"
+            (ngModelChange)="logDuration.set($event)"
+            name="duration"
+          />
+        </label>
+        <label class="inline-check"
+          ><input
+            type="checkbox"
+            [ngModel]="logDnf()"
+            (ngModelChange)="logDnf.set($event)"
+            name="dnf"
+          />DNF</label
+        >
+        @if (logDnf()) {
+          <label>
+            Fehlende Reps
+            <input
+              type="number"
+              min="0"
+              [ngModel]="logMissingReps()"
+              (ngModelChange)="logMissingReps.set($event)"
+              name="missingReps"
+            />
+          </label>
+        }
+      }
+      @if (workout.crossfit_type === 'amrap' || workout.crossfit_type === 'rounds') {
+        <label>
+          Geschaffte Runden
+          <input
+            type="number"
+            min="0"
+            [ngModel]="logRounds()"
+            (ngModelChange)="logRounds.set($event)"
+            name="resultRounds"
+          />
+        </label>
+      }
+      @if (workout.crossfit_type !== 'for_time') {
+        <label>
+          Geschaffte Reps
+          <input
+            type="number"
+            min="0"
+            [ngModel]="logReps()"
+            (ngModelChange)="logReps.set($event)"
+            name="resultReps"
+          />
+        </label>
+      }
+      @if (workout.is_partner) {
+        <label class="inline-check"
+          ><input
+            type="checkbox"
+            [ngModel]="logDoneAlone()"
+            (ngModelChange)="logDoneAlone.set($event)"
+            name="doneAlone"
+          />Alleine absolviert</label
+        >
+      }
+      <label>
+        Notizen
+        <textarea
+          rows="3"
+          [ngModel]="logNotes()"
+          (ngModelChange)="logNotes.set($event)"
+          name="logNotes"
+        ></textarea>
+      </label>
+      <button type="submit" class="primary" [disabled]="saving()">Ergebnis speichern</button>
+    </form>
+  </div>
+}
