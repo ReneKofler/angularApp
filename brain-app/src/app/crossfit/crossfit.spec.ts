@@ -51,7 +51,9 @@ describe('Crossfit', () => {
     notes: null,
   };
   const service = {
-    load: vi.fn().mockResolvedValue({ library: [library], logs: [log] }),
+    load: vi
+      .fn()
+      .mockResolvedValue({ library: [library], logs: [log], exercises: [], records: [] }),
     saveLibrary: vi.fn(),
     toggleFavourite: vi.fn(),
     deleteLibrary: vi.fn(),
@@ -61,7 +63,7 @@ describe('Crossfit', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    service.load.mockResolvedValue({ library: [library], logs: [log] });
+    service.load.mockResolvedValue({ library: [library], logs: [log], exercises: [], records: [] });
     await TestBed.configureTestingModule({
       imports: [Crossfit],
       providers: [provideRouter([]), { provide: CrossfitService, useValue: service }],

@@ -2,7 +2,19 @@
   <header>
     <a routerLink="/" aria-label="Zurück">‹</a>
     <h1>CrossFit</h1>
-    <div class="header-icons" aria-hidden="true"><span>🏋️</span><span>👑</span></div>
+    <div class="header-icons">
+      <button type="button" title="1RM Rechner" aria-label="1RM Rechner" (click)="openOneRm()">
+        🏋️
+      </button>
+      <button
+        type="button"
+        title="Persönliche Rekorde"
+        aria-label="Persönliche Rekorde"
+        (click)="openRecords()"
+      >
+        👑
+      </button>
+    </div>
   </header>
 
   <nav class="top-tabs" aria-label="CrossFit Ansichten">
@@ -733,5 +745,165 @@
         </button>
       </div>
     </form>
+  </div>
+}
+
+@if (oneRmOpen()) {
+  <div class="backdrop" (click)="oneRmOpen.set(false)">
+    <section
+      class="utility-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="one-rm-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="utility-title">
+        <h2 id="one-rm-title">🏋️ 1RM Rechner</h2>
+        <button type="button" aria-label="Schließen" (click)="oneRmOpen.set(false)">×</button>
+      </div>
+      <div class="utility-body">
+        <label>
+          Übung
+          <select
+            [ngModel]="oneRmExerciseId()"
+            (ngModelChange)="oneRmExerciseId.set($event)"
+            name="oneRmExercise"
+          >
+            <option value="">-- Übung wählen --</option>
+            @for (exercise of exercises(); track exercise.id) {
+              <option [value]="exercise.id">{{ exercise.name }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Gewicht (kg)
+          <input
+            type="number"
+            min="0"
+            step="0.5"
+            placeholder="z.B. 80"
+            [ngModel]="oneRmWeight()"
+            (ngModelChange)="oneRmWeight.set($event)"
+            name="oneRmWeight"
+          />
+        </label>
+        <label>
+          Wiederholungen
+          <input
+            type="number"
+            min="1"
+            placeholder="z.B. 5"
+            [ngModel]="oneRmReps()"
+            (ngModelChange)="oneRmReps.set($event)"
+            name="oneRmReps"
+          />
+        </label>
+        @if (estimatedOneRm(); as estimate) {
+          <output class="one-rm-result"
+            >Geschätztes 1RM: <strong>{{ estimate }} kg</strong></output
+          >
+        }
+      </div>
+    </section>
+  </div>
+}
+
+@if (recordsOpen()) {
+  <div class="backdrop" (click)="recordsOpen.set(false)">
+    <section
+      class="utility-dialog records-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="records-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="utility-title">
+        <h2 id="records-title">👑 Persönliche Rekorde</h2>
+        <div>
+          <button
+            type="button"
+            class="record-add"
+            aria-label="Rekord hinzufügen"
+            (click)="newRecord()"
+          >
+            +
+          </button>
+          <button type="button" aria-label="Schließen" (click)="recordsOpen.set(false)">×</button>
+        </div>
+      </div>
+      <div class="utility-body record-body">
+        @if (recordEditorOpen()) {
+          <form class="record-form" (ngSubmit)="saveRecord()">
+            <h3>{{ editingRecordId() ? 'Rekord bearbeiten' : 'Neuer Rekord' }}</h3>
+            <label>
+              Name
+              <input
+                placeholder="z.B. Squat, Snatch…"
+                [ngModel]="recordName()"
+                (ngModelChange)="recordName.set($event)"
+                name="recordName"
+              />
+            </label>
+            <label>
+              Wert
+              <input
+                [ngModel]="recordValue()"
+                (ngModelChange)="recordValue.set($event)"
+                name="recordValue"
+              />
+            </label>
+            <label>
+              Einheit
+              <select
+                [ngModel]="recordUnit()"
+                (ngModelChange)="recordUnit.set($event)"
+                name="recordUnit"
+              >
+                <option>kg</option>
+                <option>Zeit</option>
+                <option>Reps</option>
+                <option>m</option>
+                <option>km</option>
+              </select>
+            </label>
+            <label>
+              Datum
+              <input
+                type="date"
+                [ngModel]="recordDate()"
+                (ngModelChange)="recordDate.set($event)"
+                name="recordDate"
+              />
+            </label>
+            <div class="dialog-actions">
+              @if (editingRecordId()) {
+                <button type="button" class="danger" (click)="deleteRecord()">Löschen</button>
+              }
+              <button type="button" class="secondary" (click)="recordEditorOpen.set(false)">
+                Abbrechen
+              </button>
+              <button type="submit" class="primary">Speichern</button>
+            </div>
+          </form>
+        } @else if (!records().length) {
+          <div class="empty">Noch keine Rekorde. Klicke + um einen hinzuzufügen.</div>
+        } @else {
+          <div class="record-list">
+            @for (record of records(); track record.id) {
+              <button type="button" class="record-card" (click)="editRecord(record)">
+                <span>
+                  <strong>{{ record.record_name || 'Rekord' }}</strong>
+                  <b>{{ recordDisplay(record) }}</b>
+                </span>
+                <span class="record-meta">
+                  <em>{{ record.unit }}</em>
+                  <time>{{ displayDate(record.record_date) }}</time>
+                </span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </section>
   </div>
 }

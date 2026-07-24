@@ -57,13 +57,34 @@ export interface CrossfitLog {
 export type LibraryDraft = Omit<LibraryWorkout, 'id' | 'user_id' | 'created_at'>;
 export type CrossfitLogDraft = Omit<CrossfitLog, 'id' | 'user_id' | 'created_at'>;
 
+export interface OneRmExercise {
+  id: string;
+  name: string;
+}
+
+export interface PersonalRecord {
+  id: string;
+  user_id: string;
+  record_name: string | null;
+  value: string;
+  unit: string | null;
+  record_date: string;
+}
+
+export type PersonalRecordDraft = Omit<PersonalRecord, 'id' | 'user_id'>;
+
 @Injectable({ providedIn: 'root' })
 export class CrossfitService {
   private readonly auth = inject(AuthService);
 
-  async load(): Promise<{ library: LibraryWorkout[]; logs: CrossfitLog[] }> {
+  async load(): Promise<{
+    library: LibraryWorkout[];
+    logs: CrossfitLog[];
+    exercises: OneRmExercise[];
+    records: PersonalRecord[];
+  }> {
     const client = this.client();
-    const [library, logs] = await Promise.all([
+    const [library, logs, exercises, records] = await Promise.all([
       client
         .from('workouts_library')
         .select('*')
@@ -74,12 +95,18 @@ export class CrossfitService {
         .select('*')
         .eq('workout_type', 'crossfit')
         .order('workout_date', { ascending: false }),
+      client.from('exercises').select('id,name').eq('has_1rm', true).order('name'),
+      client.from('personal_records').select('*').order('record_date', { ascending: false }),
     ]);
     if (library.error) throw library.error;
     if (logs.error) throw logs.error;
+    if (exercises.error) throw exercises.error;
+    if (records.error) throw records.error;
     return {
       library: (library.data ?? []) as LibraryWorkout[],
       logs: (logs.data ?? []) as CrossfitLog[],
+      exercises: (exercises.data ?? []) as OneRmExercise[],
+      records: (records.data ?? []) as PersonalRecord[],
     };
   }
 
@@ -126,6 +153,26 @@ export class CrossfitService {
   async deleteLog(id: string): Promise<void> {
     const { error } = await this.client()
       .from('workouts')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', this.userId());
+    if (error) throw error;
+  }
+
+  async saveRecord(draft: PersonalRecordDraft, id?: string): Promise<PersonalRecord> {
+    const client = this.client();
+    const userId = this.userId();
+    const query = id
+      ? client.from('personal_records').update(draft).eq('id', id).eq('user_id', userId)
+      : client.from('personal_records').insert({ ...draft, user_id: userId });
+    const { data, error } = await query.select().single();
+    if (error) throw error;
+    return data as PersonalRecord;
+  }
+
+  async deleteRecord(id: string): Promise<void> {
+    const { error } = await this.client()
+      .from('personal_records')
       .delete()
       .eq('id', id)
       .eq('user_id', this.userId());

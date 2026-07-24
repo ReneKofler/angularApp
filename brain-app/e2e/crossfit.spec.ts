@@ -50,6 +50,18 @@ const log = {
   notes: null,
 };
 
+const exercises = [{ id: 'exercise-1', name: 'Bench Press' }];
+const records = [
+  {
+    id: 'record-1',
+    user_id: '22222222-2222-2222-2222-222222222222',
+    record_name: 'Bench Press',
+    value: '72.5',
+    unit: 'kg',
+    record_date: '2026-01-29',
+  },
+];
+
 async function mockCrossfit(page: Page) {
   await page.route('**/rest/v1/workouts_library**', (route) =>
     route.fulfill({
@@ -60,6 +72,16 @@ async function mockCrossfit(page: Page) {
   );
   await page.route(/\/rest\/v1\/workouts\?.*workout_type/, (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([log]) }),
+  );
+  await page.route('**/rest/v1/exercises**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(exercises),
+    }),
+  );
+  await page.route('**/rest/v1/personal_records**', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(records) }),
   );
 }
 
@@ -135,4 +157,25 @@ test('+ Workout opens an inline creation form', async ({ page }) => {
   await expect(form.getByRole('heading', { name: 'Workout erstellen' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Abbrechen' })).toBeVisible();
   await expect(page.locator('.backdrop')).toHaveCount(0);
+});
+
+test('opens the 1RM calculator and calculates an estimate', async ({ page }) => {
+  await page.getByRole('button', { name: '1RM Rechner' }).click();
+  const dialog = page.getByRole('dialog', { name: /1RM Rechner/ });
+  await expect(dialog).toBeVisible();
+  await dialog.getByLabel('Übung').selectOption('exercise-1');
+  await dialog.getByLabel('Gewicht (kg)').fill('80');
+  await dialog.getByLabel('Wiederholungen').fill('5');
+  await expect(dialog.getByText('Geschätztes 1RM:')).toContainText('93.3 kg');
+});
+
+test('lists personal records and opens record creation', async ({ page }) => {
+  await page.getByRole('button', { name: 'Persönliche Rekorde' }).click();
+  const dialog = page.getByRole('dialog', { name: /Persönliche Rekorde/ });
+  await expect(dialog.getByText('Bench Press')).toBeVisible();
+  await expect(dialog.getByText('72.5 kg')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Rekord hinzufügen' }).click();
+  await expect(dialog.getByRole('heading', { name: 'Neuer Rekord' })).toBeVisible();
+  await expect(dialog.getByLabel('Name')).toBeVisible();
+  await expect(dialog.getByLabel('Wert')).toBeVisible();
 });

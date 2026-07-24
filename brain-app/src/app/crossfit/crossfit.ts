@@ -9,6 +9,9 @@ import {
   CrossfitType,
   LibraryDraft,
   LibraryWorkout,
+  OneRmExercise,
+  PersonalRecord,
+  PersonalRecordDraft,
 } from './crossfit.service';
 
 const TYPE_LABELS: Record<CrossfitType, string> = {
@@ -46,6 +49,8 @@ export class Crossfit {
 
   readonly library = signal<LibraryWorkout[]>([]);
   readonly logs = signal<CrossfitLog[]>([]);
+  readonly exercises = signal<OneRmExercise[]>([]);
+  readonly records = signal<PersonalRecord[]>([]);
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly error = signal('');
@@ -56,6 +61,17 @@ export class Crossfit {
   readonly typeFilter = signal<'all' | CrossfitType | 'hero' | 'girl' | 'open'>('all');
   readonly focusFilter = signal<'all' | 'conditioning' | 'strength'>('all');
   readonly equipmentFilter = signal('');
+  readonly oneRmOpen = signal(false);
+  readonly oneRmExerciseId = signal('');
+  readonly oneRmWeight = signal<number | null>(null);
+  readonly oneRmReps = signal<number | null>(null);
+  readonly recordsOpen = signal(false);
+  readonly recordEditorOpen = signal(false);
+  readonly editingRecordId = signal<string | null>(null);
+  readonly recordName = signal('');
+  readonly recordValue = signal('');
+  readonly recordUnit = signal('kg');
+  readonly recordDate = signal(this.today());
   readonly libraryEditorOpen = signal(false);
   readonly logEditorOpen = signal(false);
   readonly inlineCaptureOpen = signal(false);
@@ -170,6 +186,12 @@ export class Crossfit {
       return a.workout_date.localeCompare(b.workout_date) * direction;
     });
   });
+  readonly estimatedOneRm = computed(() => {
+    const weight = this.oneRmWeight();
+    const reps = this.oneRmReps();
+    if (!weight || !reps || reps < 1) return null;
+    return Math.round(weight * (1 + reps / 30) * 10) / 10;
+  });
 
   constructor() {
     void this.reload();
@@ -182,6 +204,8 @@ export class Crossfit {
       const data = await this.service.load();
       this.library.set(data.library);
       this.logs.set(data.logs);
+      this.exercises.set(data.exercises ?? []);
+      this.records.set(data.records ?? []);
     } catch (error) {
       this.error.set(this.message(error));
     } finally {
@@ -475,6 +499,77 @@ export class Crossfit {
     } catch (error) {
       this.error.set(this.message(error));
     }
+  }
+
+  openOneRm() {
+    this.oneRmExerciseId.set('');
+    this.oneRmWeight.set(null);
+    this.oneRmReps.set(null);
+    this.oneRmOpen.set(true);
+  }
+
+  openRecords() {
+    this.recordEditorOpen.set(false);
+    this.recordsOpen.set(true);
+  }
+
+  newRecord() {
+    this.editingRecordId.set(null);
+    this.recordName.set('');
+    this.recordValue.set('');
+    this.recordUnit.set('kg');
+    this.recordDate.set(this.today());
+    this.recordEditorOpen.set(true);
+  }
+
+  editRecord(record: PersonalRecord) {
+    this.editingRecordId.set(record.id);
+    this.recordName.set(record.record_name ?? '');
+    this.recordValue.set(record.value);
+    this.recordUnit.set(record.unit ?? 'kg');
+    this.recordDate.set(record.record_date);
+    this.recordEditorOpen.set(true);
+  }
+
+  async saveRecord() {
+    if (!this.recordName().trim() || !this.recordValue().trim()) {
+      this.error.set('Name und Wert sind erforderlich.');
+      return;
+    }
+    const draft: PersonalRecordDraft = {
+      record_name: this.recordName().trim(),
+      value: this.recordValue().trim(),
+      unit: this.recordUnit(),
+      record_date: this.recordDate(),
+    };
+    try {
+      await this.service.saveRecord(draft, this.editingRecordId() ?? undefined);
+      this.recordEditorOpen.set(false);
+      await this.reload();
+    } catch (error) {
+      this.error.set(this.message(error));
+    }
+  }
+
+  async deleteRecord() {
+    const id = this.editingRecordId();
+    if (!id || !confirm('Persönlichen Rekord löschen?')) return;
+    try {
+      await this.service.deleteRecord(id);
+      this.recordEditorOpen.set(false);
+      await this.reload();
+    } catch (error) {
+      this.error.set(this.message(error));
+    }
+  }
+
+  recordDisplay(record: PersonalRecord) {
+    return `${record.value}${record.unit ? ` ${record.unit}` : ''}`;
+  }
+
+  displayDate(value: string) {
+    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    return match ? `${Number(match[3])}.${Number(match[2])}.${match[1]}` : value;
   }
 
   private libraryFromLog(log: CrossfitLog): LibraryWorkout {
