@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
@@ -35,7 +36,7 @@ const EQUIPMENT = [
 
 @Component({
   selector: 'app-crossfit',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, NgTemplateOutlet],
   templateUrl: './crossfit.html',
   styleUrl: './crossfit.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -92,14 +93,35 @@ export class Crossfit {
 
   readonly filteredLibrary = computed(() => {
     const query = this.query().trim().toLowerCase();
-    return this.library().filter(
-      (workout) =>
-        (!this.favouritesOnly() || workout.is_favourite) &&
-        (!query ||
-          `${workout.name} ${workout.description ?? ''} ${(workout.exercises ?? []).join(' ')}`
-            .toLowerCase()
-            .includes(query)),
-    );
+    const type = this.typeFilter();
+    const focus = this.focusFilter();
+    const equipment = this.equipmentFilter()
+      .replace(/^\S+\s/, '')
+      .toLowerCase();
+    return this.library()
+      .filter(
+        (workout) =>
+          (!this.favouritesOnly() || workout.is_favourite) &&
+          (type === 'all' ||
+            workout.crossfit_type === type ||
+            (type === 'hero' && workout.is_hero) ||
+            (type === 'girl' && workout.is_girl) ||
+            (type === 'open' && workout.is_open)) &&
+          (focus === 'all' || workout.crossfit_focus === focus) &&
+          (!equipment ||
+            `${workout.name} ${(workout.exercises ?? []).join(' ')} ${workout.description ?? ''}`
+              .toLowerCase()
+              .includes(equipment)) &&
+          (!query ||
+            `${workout.name} ${workout.description ?? ''} ${(workout.exercises ?? []).join(' ')}`
+              .toLowerCase()
+              .includes(query)),
+      )
+      .sort((a, b) => {
+        if (this.sort() === 'name') return a.name.localeCompare(b.name);
+        const direction = this.sort() === 'oldest' ? 1 : -1;
+        return (a.created_at ?? '').localeCompare(b.created_at ?? '') * direction;
+      });
   });
   readonly equipment = EQUIPMENT;
   readonly typeFilters: {
@@ -207,6 +229,28 @@ export class Crossfit {
   newLibrary() {
     this.resetLibrary();
     this.libraryEditorOpen.set(true);
+  }
+
+  equipmentFor(workout: LibraryWorkout) {
+    const text =
+      `${workout.name} ${(workout.exercises ?? []).join(' ')} ${workout.description ?? ''}`.toLowerCase();
+    const aliases: [string, string[]][] = [
+      ['📦 Box', ['box', 'box jump']],
+      ['🔗 Kettlebell', ['kettlebell', 'kb']],
+      ['🪜 Klimmzugstange', ['pull-up', 'pullup', 'klimmzug']],
+      ['🏋️ Kurzhantel', ['dumbbell', 'kurzhantel']],
+      ['🏋️ Langhantel', ['barbell', 'snatch', 'clean', 'thruster']],
+      ['🥕 Ringe', ['ring']],
+      ['🚣 Rudergerät', ['row', 'rudern']],
+      ['🔴 Sandbag', ['sandbag']],
+      ['🛷 Schlitten', ['sled', 'schlitten']],
+      ['🧬 Springseil', ['rope', 'double-under', 'single-under']],
+      ['🎯 Target', ['wall ball', 'target']],
+      ['🧱 Wand', ['wall walk', 'handstand']],
+    ];
+    return aliases
+      .filter(([, terms]) => terms.some((term) => text.includes(term)))
+      .map(([label]) => label);
   }
 
   editLibrary(workout: LibraryWorkout) {

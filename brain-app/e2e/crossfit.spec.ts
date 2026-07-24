@@ -114,12 +114,25 @@ test('opens a recent-session tile for editing with delete inside the dialog', as
   await expect(page.getByLabel('Workout wählen')).toHaveValue(library.id);
 });
 
-test('opens a library workout as a prefilled result form', async ({ page }) => {
+test('matches the Workouts layout and edits tiles inline', async ({ page }) => {
   await page.getByRole('button', { name: 'Workouts' }).click();
-  await expect(page.getByRole('heading', { name: 'Workout-Bibliothek' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Workouts', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: '+ Workout' })).toBeVisible();
+  await expect(page.getByLabel('Workouts sortieren')).toHaveValue('newest');
   await expect(page.getByRole('heading', { name: library.name })).toBeVisible();
-  await page.getByRole('button', { name: 'Ergebnis eintragen' }).click();
-  await expect(page.locator('form').getByRole('heading', { name: library.name })).toBeVisible();
-  await expect(page.getByLabel('Datum')).toBeVisible();
-  await expect(page.getByText('DNF', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: /5 Rounds: Cal \/ Sit-ups/ }).click();
+  const form = page.locator('main form.library-capture');
+  await expect(form.getByRole('heading', { name: 'Workout bearbeiten' })).toBeVisible();
+  await expect(form.getByLabel('Name')).toHaveValue(library.name);
+  await expect(form.getByRole('button', { name: 'Löschen' })).toBeVisible();
+  await expect(page.locator('.backdrop')).toHaveCount(0);
+});
+
+test('+ Workout opens an inline creation form', async ({ page }) => {
+  await page.getByRole('button', { name: 'Workouts' }).click();
+  await page.getByRole('button', { name: '+ Workout' }).click();
+  const form = page.locator('main form.library-capture');
+  await expect(form.getByRole('heading', { name: 'Workout erstellen' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Abbrechen' })).toBeVisible();
+  await expect(page.locator('.backdrop')).toHaveCount(0);
 });
