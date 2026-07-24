@@ -220,20 +220,8 @@ fieldset {
 .muscle-figure {
   width: 100%;
   max-height: 23rem;
-}
-.muscle-figure > circle,
-.muscle-figure > path {
-  fill: #dbe4f3;
-  stroke: #dbe4f3;
-  stroke-width: 3;
-}
-.muscle-figure .zone {
-  fill: transparent;
-  stroke: transparent;
-  transition: fill 150ms ease;
-}
-.muscle-figure .zone.selected {
-  fill: #8b5cf6;
+  object-fit: contain;
+  mix-blend-mode: screen;
 }
 .muscle-list {
   display: grid;
