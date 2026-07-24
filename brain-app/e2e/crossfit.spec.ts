@@ -50,7 +50,10 @@ const log = {
   notes: null,
 };
 
-const exercises = [{ id: 'exercise-1', name: 'Bench Press' }];
+const exercises = [
+  { id: 'exercise-1', name: 'Bench Press', has_1rm: true },
+  { id: 'exercise-2', name: 'Row', has_1rm: false },
+];
 const records = [
   {
     id: 'record-1',
@@ -145,7 +148,11 @@ test('matches the Workouts layout and edits tiles inline', async ({ page }) => {
   await page.getByRole('button', { name: /5 Rounds: Cal \/ Sit-ups/ }).click();
   const form = page.locator('main form.library-capture');
   await expect(form.getByRole('heading', { name: 'Workout bearbeiten' })).toBeVisible();
-  await expect(form.getByLabel('Name')).toHaveValue(library.name);
+  await expect(form.getByLabel('Workout Name')).toHaveValue(library.name);
+  await expect(form.getByRole('button', { name: 'Als Favorit markieren' })).toHaveClass(/active/);
+  await expect(form.getByRole('button', { name: 'Conditioning' })).toHaveClass(/active/);
+  await expect(form.locator('.exercise-row span').filter({ hasText: 'Row' })).toBeVisible();
+  await expect(form.getByRole('button', { name: 'Row entfernen' })).toBeVisible();
   await expect(form.getByRole('button', { name: 'Löschen' })).toBeVisible();
   await expect(page.locator('.backdrop')).toHaveCount(0);
 });

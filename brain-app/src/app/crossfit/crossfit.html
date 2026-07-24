@@ -398,11 +398,11 @@
 
 <ng-template #libraryForm>
   <form class="capture-form library-capture" (ngSubmit)="saveLibrary()">
-    <div class="dialog-title">
-      <h2>{{ editingLibraryId() ? 'Workout bearbeiten' : 'Workout erstellen' }}</h2>
+    <div class="library-form-title">
+      <h2>🩹 {{ editingLibraryId() ? 'Workout bearbeiten' : 'Workout erstellen' }}</h2>
     </div>
     <label>
-      Name
+      Workout Name
       <input
         required
         maxlength="255"
@@ -411,71 +411,156 @@
         name="libraryName"
       />
     </label>
+    <button
+      type="button"
+      class="favourite-toggle"
+      [class.active]="libraryFavourite()"
+      (click)="libraryFavourite.set(!libraryFavourite())"
+    >
+      <span>★</span> Als Favorit markieren
+    </button>
+    <div class="flag-checks">
+      <label
+        ><input
+          type="checkbox"
+          [ngModel]="libraryHero()"
+          (ngModelChange)="libraryHero.set($event)"
+          name="hero"
+        />Hero WOD</label
+      >
+      <label
+        ><input
+          type="checkbox"
+          [ngModel]="libraryGirl()"
+          (ngModelChange)="libraryGirl.set($event)"
+          name="girl"
+        />Girl WOD</label
+      >
+      <label
+        ><input
+          type="checkbox"
+          [ngModel]="libraryOpen()"
+          (ngModelChange)="libraryOpen.set($event)"
+          name="open"
+        />Open Workout</label
+      >
+      <label
+        ><input
+          type="checkbox"
+          [ngModel]="libraryPartner()"
+          (ngModelChange)="libraryPartner.set($event)"
+          name="partner"
+        />Partner Workout</label
+      >
+    </div>
+    <fieldset class="focus-picker">
+      <legend>Fokus</legend>
+      <div>
+        <button
+          type="button"
+          [class.active]="libraryFocus() === 'conditioning'"
+          (click)="libraryFocus.set('conditioning')"
+        >
+          Conditioning
+        </button>
+        <button
+          type="button"
+          [class.active]="libraryFocus() === 'strength'"
+          (click)="libraryFocus.set('strength')"
+        >
+          Strength
+        </button>
+      </div>
+    </fieldset>
     <label>
-      Typ
+      Beschreibung (optional)
+      <textarea
+        rows="4"
+        [ngModel]="libraryDescription()"
+        (ngModelChange)="libraryDescription.set($event)"
+        name="description"
+      ></textarea>
+    </label>
+    <label>
+      Workout-Typ
       <select
         [ngModel]="libraryType()"
         (ngModelChange)="libraryType.set($event)"
         name="libraryType"
       >
-        <option value="for_time">For Time</option>
-        <option value="amrap">AMRAP</option>
-        <option value="emom">EMOM</option>
-        <option value="tabata">Tabata</option>
-        <option value="custom">Custom</option>
+        <option value="for_time">For Time - Workout so schnell wie möglich absolvieren</option>
+        <option value="emom">EMOM - Every Minute On the Minute</option>
+        <option value="amrap">AMRAP - As Many Rounds/Reps As Possible</option>
+        <option value="tabata">Tabata - Intervalltraining mit festen Work/Rest Perioden</option>
+        <option value="custom">Custom - Eigenes Workout</option>
       </select>
     </label>
-    <label>
-      Übungen (eine pro Zeile)
-      <textarea
-        required
-        rows="5"
-        placeholder="21-15-9 Thrusters&#10;Pull-ups"
-        [ngModel]="libraryExercises()"
-        (ngModelChange)="libraryExercises.set($event)"
-        name="libraryExercises"
-      ></textarea>
-    </label>
-    <div class="number-grid">
-      @if (libraryType() === 'for_time') {
-        <label>
-          Time Cap (Min.)
-          <input
-            type="number"
-            min="1"
-            [ngModel]="libraryTimeCap()"
-            (ngModelChange)="libraryTimeCap.set($event)"
-            name="timeCap"
-          />
-        </label>
+    <fieldset class="exercise-editor">
+      <legend>Übungen</legend>
+      @for (exercise of libraryExerciseItems(); track $index) {
+        <div class="exercise-row">
+          <span>{{ exercise }}</span>
+          <button
+            type="button"
+            [attr.aria-label]="exercise + ' entfernen'"
+            (click)="removeLibraryExercise($index)"
+          >
+            ×
+          </button>
+        </div>
       }
-      @if (libraryType() === 'amrap') {
+      <select
+        aria-label="Übung hinzufügen"
+        [ngModel]="exerciseToAdd()"
+        (ngModelChange)="addLibraryExercise($event)"
+        name="exerciseToAdd"
+      >
+        <option value="">+ Übung hinzufügen</option>
+        @for (exercise of exercises(); track exercise.id) {
+          <option [value]="exercise.name">{{ exercise.name }}</option>
+        }
+      </select>
+    </fieldset>
+    @if (libraryType() === 'for_time') {
+      <label>
+        Time Cap (Minuten)
+        <input
+          type="number"
+          min="1"
+          [ngModel]="libraryTimeCap()"
+          (ngModelChange)="libraryTimeCap.set($event)"
+          name="timeCap"
+        />
+      </label>
+    }
+    @if (libraryType() === 'amrap') {
+      <label>
+        AMRAP Dauer (Minuten)
+        <input
+          type="number"
+          min="1"
+          [ngModel]="libraryAmrapDuration()"
+          (ngModelChange)="libraryAmrapDuration.set($event)"
+          name="amrapDuration"
+        />
+      </label>
+    }
+    @if (libraryType() === 'custom') {
+      <label>
+        Rounds
+        <input
+          type="number"
+          min="1"
+          [ngModel]="libraryRounds()"
+          (ngModelChange)="libraryRounds.set($event)"
+          name="rounds"
+        />
+      </label>
+    }
+    @if (libraryType() === 'emom' || libraryType() === 'tabata') {
+      <div class="number-grid">
         <label>
-          AMRAP Dauer (Min.)
-          <input
-            type="number"
-            min="1"
-            [ngModel]="libraryAmrapDuration()"
-            (ngModelChange)="libraryAmrapDuration.set($event)"
-            name="amrapDuration"
-          />
-        </label>
-      }
-      @if (libraryType() === 'custom') {
-        <label>
-          Runden
-          <input
-            type="number"
-            min="1"
-            [ngModel]="libraryRounds()"
-            (ngModelChange)="libraryRounds.set($event)"
-            name="rounds"
-          />
-        </label>
-      }
-      @if (libraryType() === 'emom' || libraryType() === 'tabata') {
-        <label>
-          Arbeit (Min.)
+          Arbeit (Minuten)
           <input
             type="number"
             min="0"
@@ -486,7 +571,7 @@
           />
         </label>
         <label>
-          Pause (Min.)
+          Pause (Minuten)
           <input
             type="number"
             min="0"
@@ -496,86 +581,24 @@
             name="restMinutes"
           />
         </label>
-      }
-      <label>
-        Gesamt-Reps
-        <input
-          type="number"
-          min="0"
-          [ngModel]="libraryTotalReps()"
-          (ngModelChange)="libraryTotalReps.set($event)"
-          name="libraryTotalReps"
-        />
-      </label>
-    </div>
+      </div>
+    }
     <label>
-      Fokus
+      Total Reps (optional)
       <input
-        placeholder="z.B. Conditioning"
-        [ngModel]="libraryFocus()"
-        (ngModelChange)="libraryFocus.set($event)"
-        name="focus"
+        type="number"
+        min="0"
+        placeholder="z.B. 150"
+        [ngModel]="libraryTotalReps()"
+        (ngModelChange)="libraryTotalReps.set($event)"
+        name="libraryTotalReps"
       />
     </label>
-    <label>
-      Beschreibung
-      <textarea
-        rows="3"
-        [ngModel]="libraryDescription()"
-        (ngModelChange)="libraryDescription.set($event)"
-        name="description"
-      ></textarea>
-    </label>
-    <fieldset>
-      <legend>Kennzeichnungen</legend>
-      <div class="checks">
-        <label
-          ><input
-            type="checkbox"
-            [ngModel]="libraryFavourite()"
-            (ngModelChange)="libraryFavourite.set($event)"
-            name="favourite"
-          />Favorit</label
-        >
-        <label
-          ><input
-            type="checkbox"
-            [ngModel]="libraryHero()"
-            (ngModelChange)="libraryHero.set($event)"
-            name="hero"
-          />Hero</label
-        >
-        <label
-          ><input
-            type="checkbox"
-            [ngModel]="libraryGirl()"
-            (ngModelChange)="libraryGirl.set($event)"
-            name="girl"
-          />Girl</label
-        >
-        <label
-          ><input
-            type="checkbox"
-            [ngModel]="libraryOpen()"
-            (ngModelChange)="libraryOpen.set($event)"
-            name="open"
-          />Open</label
-        >
-        <label
-          ><input
-            type="checkbox"
-            [ngModel]="libraryPartner()"
-            (ngModelChange)="libraryPartner.set($event)"
-            name="partner"
-          />Partner</label
-        >
-      </div>
-    </fieldset>
-    <div class="dialog-actions">
+    <div class="library-actions">
       @if (editingLibraryId()) {
         <button type="button" class="danger" (click)="deleteLibrary()">Löschen</button>
       }
-      <button type="submit" class="primary" [disabled]="saving()">Workout speichern</button>
+      <button type="submit" class="primary" [disabled]="saving()">Speichern</button>
     </div>
   </form>
 </ng-template>
@@ -770,7 +793,7 @@
             name="oneRmExercise"
           >
             <option value="">-- Übung wählen --</option>
-            @for (exercise of exercises(); track exercise.id) {
+            @for (exercise of oneRmExercises(); track exercise.id) {
               <option [value]="exercise.id">{{ exercise.name }}</option>
             }
           </select>

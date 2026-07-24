@@ -60,6 +60,7 @@ export type CrossfitLogDraft = Omit<CrossfitLog, 'id' | 'user_id' | 'created_at'
 export interface OneRmExercise {
   id: string;
   name: string;
+  has_1rm: boolean;
 }
 
 export interface PersonalRecord {
@@ -95,7 +96,7 @@ export class CrossfitService {
         .select('*')
         .eq('workout_type', 'crossfit')
         .order('workout_date', { ascending: false }),
-      client.from('exercises').select('id,name').eq('has_1rm', true).order('name'),
+      client.from('exercises').select('id,name,has_1rm').order('name'),
       client.from('personal_records').select('*').order('record_date', { ascending: false }),
     ]);
     if (library.error) throw library.error;

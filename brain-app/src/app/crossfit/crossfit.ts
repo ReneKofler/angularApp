@@ -72,6 +72,7 @@ export class Crossfit {
   readonly recordValue = signal('');
   readonly recordUnit = signal('kg');
   readonly recordDate = signal(this.today());
+  readonly exerciseToAdd = signal('');
   readonly libraryEditorOpen = signal(false);
   readonly logEditorOpen = signal(false);
   readonly inlineCaptureOpen = signal(false);
@@ -192,6 +193,13 @@ export class Crossfit {
     if (!weight || !reps || reps < 1) return null;
     return Math.round(weight * (1 + reps / 30) * 10) / 10;
   });
+  readonly oneRmExercises = computed(() => this.exercises().filter((exercise) => exercise.has_1rm));
+  readonly libraryExerciseItems = computed(() =>
+    this.libraryExercises()
+      .split(/\r?\n/)
+      .map((exercise) => exercise.trim())
+      .filter(Boolean),
+  );
 
   constructor() {
     void this.reload();
@@ -275,6 +283,20 @@ export class Crossfit {
     return aliases
       .filter(([, terms]) => terms.some((term) => text.includes(term)))
       .map(([label]) => label);
+  }
+
+  removeLibraryExercise(index: number) {
+    this.libraryExercises.set(
+      this.libraryExerciseItems()
+        .filter((_, itemIndex) => itemIndex !== index)
+        .join('\n'),
+    );
+  }
+
+  addLibraryExercise(name: string) {
+    if (!name) return;
+    this.libraryExercises.set([...this.libraryExerciseItems(), name].join('\n'));
+    this.exerciseToAdd.set('');
   }
 
   editLibrary(workout: LibraryWorkout) {
