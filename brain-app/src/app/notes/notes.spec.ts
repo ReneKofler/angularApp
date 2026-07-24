@@ -23,6 +23,13 @@ describe('Notes', () => {
     const text=fixture.nativeElement.textContent;
     expect(text).toContain('Todos'); expect(text).toContain('Release plan'); expect(text).toContain('Ship the notes feature');
   });
+  it('keeps notes visible when their list response is missing', async () => {
+    service.load.mockResolvedValueOnce({notes:[{...note,list_id:'missing-list'}],lists:[]});
+    const fixture=TestBed.createComponent(Notes); await fixture.whenStable();
+    expect(fixture.componentInstance.groupedNotes()).toEqual([
+      expect.objectContaining({name:'Uncategorized',notes:[expect.objectContaining({id:'note-1'})]}),
+    ]);
+  });
   it('normalizes tags and saves a new note', async () => {
     const fixture=TestBed.createComponent(Notes); await fixture.whenStable(); const component=fixture.componentInstance;
     component.newNote(); component.title.set('Idea'); component.tags.set('work, idea, work'); await component.save();

@@ -32,13 +32,14 @@ export class Notes {
   });
   readonly groupedNotes = computed(() => {
     const visible = this.filteredNotes();
-    const groups = this.lists()
-      .map((list) => ({
+    const lists = this.lists();
+    const listIds = new Set(lists.map((list) => list.id));
+    const groups = lists.map((list) => ({
         id: list.id,
         name: list.name,
         notes: visible.filter((note) => note.list_id === list.id),
       }));
-    const uncategorized = visible.filter((note) => note.list_id === null);
+    const uncategorized = visible.filter((note) => note.list_id === null || !listIds.has(note.list_id));
     if (uncategorized.length) {
       groups.push({ id: 'uncategorized', name: 'Uncategorized', notes: uncategorized });
     }

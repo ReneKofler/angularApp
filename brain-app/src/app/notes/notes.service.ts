@@ -17,13 +17,37 @@ export class NotesService {
 
   async load(): Promise<{ notes: Note[]; lists: NoteList[] }> {
     const client = this.client();
+    const userId = this.userId();
     const [notesResult, listsResult] = await Promise.all([
-      client.from('notes').select('*').order('position').order('created_at', { ascending: false }),
-      client.from('note_lists').select('*').order('position').order('created_at'),
+      client.from('notes')
+        .select('id,user_id,title,content,tags,done,list_id,position,reminder_date,mode,priority,created_at,updated_at')
+        .eq('user_id', userId)
+        .order('position', { ascending: true })
+        .order('created_at', { ascending: true }),
+      client.from('note_lists')
+        .select('id,user_id,name,position,created_at')
+        .eq('user_id', userId)
+        .order('position', { ascending: true })
+        .order('created_at', { ascending: true }),
     ]);
     if (notesResult.error) throw notesResult.error;
     if (listsResult.error) throw listsResult.error;
-    return { notes: (notesResult.data ?? []) as Note[], lists: (listsResult.data ?? []) as NoteList[] };
+    const lists = (listsResult.data ?? []).map((list) => ({
+      ...list,
+      name: list.name?.trim() || 'Unnamed list',
+      position: Number.isFinite(list.position) ? list.position : 0,
+    })) as NoteList[];
+    const notes = (notesResult.data ?? []).map((note) => ({
+      ...note,
+      title: note.title ?? '',
+      content: note.content ?? '',
+      tags: Array.isArray(note.tags) ? note.tags : [],
+      done: Boolean(note.done),
+      position: Number.isFinite(note.position) ? note.position : 0,
+      mode: note.mode === 'tasks' ? 'tasks' : 'text',
+      priority: note.priority === 'high' || note.priority === 'low' ? note.priority : 'medium',
+    })) as Note[];
+    return { notes, lists };
   }
 
   async saveNote(draft: NoteDraft, id?: string): Promise<Note> {
