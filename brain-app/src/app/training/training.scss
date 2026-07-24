@@ -245,9 +245,12 @@ fieldset {
   opacity: 1;
 }
 .muscle-overlay path {
-  fill: #8b5cf6;
-  opacity: 0.88;
-  mix-blend-mode: color;
+  fill: rgb(139 92 246 / 72%);
+  stroke: #c4b5fd;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 7px #8b5cf6);
+  mix-blend-mode: screen;
 }
 .muscle-list {
   display: grid;
