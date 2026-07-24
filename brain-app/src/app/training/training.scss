@@ -8,20 +8,26 @@
   min-height: 100vh;
 }
 header {
-  display: grid;
-  grid-template-columns: 3rem 1fr 3rem;
+  display: flex;
   align-items: center;
-  padding: 1rem;
+  gap: 1rem;
+  min-height: 4.35rem;
+  padding: 0 2rem;
+  border-top: 6px solid #ead0b2;
+  border-bottom: 1px solid #344257;
   background: #1e2a3b;
 }
 header h1 {
   margin: 0;
-  text-align: center;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
 }
 header a {
+  display: grid;
+  width: 1.5rem;
+  place-items: center;
   color: white;
-  font-size: 2rem;
+  font-size: 2.2rem;
+  line-height: 1;
   text-decoration: none;
 }
 nav {
@@ -30,21 +36,22 @@ nav {
   background: #1e2a3b;
 }
 nav button {
-  padding: 1rem;
+  min-height: 2.5rem;
+  padding: 0.65rem 1rem;
   border: 0;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
   color: #94a3b8;
   background: transparent;
-  font-weight: 700;
+  cursor: pointer;
 }
 nav button.active {
   border-color: #8b5cf6;
-  color: #c4b5fd;
+  color: #9147ff;
 }
 main {
-  width: min(70rem, calc(100% - 2rem));
+  width: min(52rem, calc(100% - 2rem));
   margin: auto;
-  padding: 1.5rem 0;
+  padding: 2rem 0;
 }
 .add,
 .primary,
@@ -184,6 +191,13 @@ fieldset {
   color: #fecdd3;
 }
 @media (max-width: 700px) {
+  header {
+    padding-inline: 1rem;
+  }
+  nav button {
+    padding-inline: 0.35rem;
+    font-size: 0.78rem;
+  }
   .cards {
     grid-template-columns: 1fr;
   }

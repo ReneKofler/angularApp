@@ -52,7 +52,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('shows associated exercises and capability flags', async ({ page }) => {
-  await expect(page.getByRole('heading', { name: 'Übungen & Training' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Übungen' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Trainingsbereiche' })).toBeVisible();
   await expect(page.getByText('Back Squat')).toBeVisible();
   await expect(page.getByText('Barbell')).toBeVisible();
   await page.getByRole('button', { name: /Back Squat/ }).click();

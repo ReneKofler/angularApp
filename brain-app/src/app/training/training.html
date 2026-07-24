@@ -1,10 +1,9 @@
 <div class="training-page">
   <header>
     <a routerLink="/" aria-label="Zurück">‹</a>
-    <h1>Übungen & Training</h1>
-    <span>💪</span>
+    <h1>Übungen</h1>
   </header>
-  <nav>
+  <nav aria-label="Trainingsbereiche">
     <button [class.active]="tab() === 'exercises'" (click)="tab.set('exercises'); editor.set(null)">
       Übungen
     </button>
