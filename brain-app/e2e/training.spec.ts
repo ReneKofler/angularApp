@@ -52,7 +52,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('shows associated exercises and capability flags', async ({ page }) => {
-  await expect(page.getByRole('heading', { name: 'Übungen' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Übungen', level: 1 })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Trainingsbereiche' })).toBeVisible();
   await expect(page.getByText('Back Squat')).toBeVisible();
   await expect(page.getByText('Barbell')).toBeVisible();
@@ -62,20 +62,16 @@ test('shows associated exercises and capability flags', async ({ page }) => {
   await expect(page.getByLabel('1RM')).toBeChecked();
 });
 
-test('builds an ordered training plan and exposes capability-driven values', async ({ page }) => {
-  await page.getByRole('button', { name: 'Trainingspläne' }).click();
-  await page.getByRole('button', { name: '+ Trainingsplan' }).click();
-  await page.getByLabel('Name').fill('Strength A');
-  await page.getByLabel('Übung hinzufügen').selectOption('ex-1');
-  await expect(page.getByText('1. Back Squat')).toBeVisible();
-  await expect(page.getByLabel('Sätze')).toHaveValue('3');
-  await expect(page.getByLabel('Reps')).toHaveValue('10');
+test('shows equipment in its own tab', async ({ page }) => {
+  await page.getByRole('button', { name: 'Equipment', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Equipment' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Barbell/ })).toBeVisible();
 });
 
-test('opens plan workout logging', async ({ page }) => {
-  await page.getByRole('button', { name: 'Trainingspläne' }).click();
-  await page.getByRole('button', { name: 'Training loggen' }).click();
-  await expect(page.getByRole('heading', { name: 'Leg Day loggen' })).toBeVisible();
-  await expect(page.getByLabel('Datum')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Training speichern' })).toBeVisible();
+test('selects muscles in the muscle overview', async ({ page }) => {
+  await expect(page.getByRole('button', { name: 'Trainingspläne' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Muskeln' }).click();
+  await expect(page.getByRole('heading', { name: 'Muskeln' })).toBeVisible();
+  await page.getByRole('button', { name: 'Back' }).click();
+  await expect(page.getByRole('button', { name: 'Back' })).toHaveClass(/active/);
 });

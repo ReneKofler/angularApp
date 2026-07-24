@@ -18,7 +18,7 @@ import {
 })
 export class Training {
   private readonly service = inject(TrainingService);
-  readonly tab = signal<'exercises' | 'equipment' | 'plans'>('exercises');
+  readonly tab = signal<'exercises' | 'equipment' | 'muscles'>('exercises');
   readonly equipment = signal<Equipment[]>([]);
   readonly exercises = signal<Exercise[]>([]);
   readonly plans = signal<TrainingPlan[]>([]);
@@ -27,6 +27,20 @@ export class Training {
   readonly query = signal('');
   readonly editor = signal<'exercise' | 'equipment' | 'plan' | 'log' | null>(null);
   readonly editingId = signal<string | null>(null);
+  readonly selectedMuscle = signal('Chest');
+  readonly muscleGroups = [
+    'Chest',
+    'Back',
+    'Shoulders',
+    'Biceps',
+    'Triceps',
+    'Forearms',
+    'Core',
+    'Quads',
+    'Glutes',
+    'Hamstrings',
+    'Calves',
+  ];
 
   readonly name = signal('');
   readonly icon = signal('🏋️');

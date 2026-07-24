@@ -10,8 +10,8 @@
     <button [class.active]="tab() === 'equipment'" (click)="tab.set('equipment'); editor.set(null)">
       Equipment
     </button>
-    <button [class.active]="tab() === 'plans'" (click)="tab.set('plans'); editor.set(null)">
-      Trainingspläne
+    <button [class.active]="tab() === 'muscles'" (click)="tab.set('muscles'); editor.set(null)">
+      Muskeln
     </button>
   </nav>
   <main>
@@ -19,57 +19,111 @@
       <p class="error" role="alert">{{ error() }}</p>
     }
     @if (!editor()) {
-      <button
-        class="add"
-        (click)="
-          newItem(tab() === 'plans' ? 'plan' : tab() === 'equipment' ? 'equipment' : 'exercise')
-        "
-      >
-        + {{ tab() === 'plans' ? 'Trainingsplan' : tab() === 'equipment' ? 'Equipment' : 'Übung' }}
-      </button>
-      <input
-        class="search"
-        aria-label="Suchen"
-        placeholder="Suchen…"
-        [ngModel]="query()"
-        (ngModelChange)="query.set($event)"
-      />
-      @if (loading()) {
-        <p class="empty">Wird geladen…</p>
-      }
       @if (tab() === 'exercises') {
-        <section class="cards">
-          @for (item of filteredExercises(); track item.id) {
-            <button class="card" (click)="editExercise(item)">
-              <strong>{{ item.name }}</strong
-              ><small>{{ equipmentNames(item.equipment_ids) }}</small>
-              <div>
-                @for (label of capabilityLabels(item); track label) {
-                  <span>{{ label }}</span>
-                }
-              </div>
-            </button>
-          }
+        <button class="add" (click)="newItem('exercise')">+ Übung</button>
+        <input
+          class="search"
+          aria-label="Suchen"
+          placeholder="Suchen…"
+          [ngModel]="query()"
+          (ngModelChange)="query.set($event)"
+        />
+        @if (loading()) {
+          <p class="empty">Wird geladen…</p>
+        }
+        <section class="collection-panel">
+          <h2>Übungen</h2>
+          <section class="cards">
+            @for (item of filteredExercises(); track item.id) {
+              <button class="card" (click)="editExercise(item)">
+                <strong>{{ item.name }}</strong
+                ><small>{{ equipmentNames(item.equipment_ids) }}</small>
+                <div>
+                  @for (label of capabilityLabels(item); track label) {
+                    <span>{{ label }}</span>
+                  }
+                </div>
+              </button>
+            }
+          </section>
         </section>
       } @else if (tab() === 'equipment') {
-        <section class="cards">
-          @for (item of filteredEquipment(); track item.id) {
-            <button class="card" (click)="editEquipment(item)">
-              <strong>{{ item.icon || '🏋️' }} {{ item.name }}</strong>
-            </button>
-          }
+        <button class="add" (click)="newItem('equipment')">+ Equipment</button>
+        <section class="collection-panel">
+          <h2>Equipment</h2>
+          <section class="cards">
+            @for (item of filteredEquipment(); track item.id) {
+              <button class="card" (click)="editEquipment(item)">
+                <strong>{{ item.icon || '🏋️' }} {{ item.name }}</strong>
+              </button>
+            }
+          </section>
         </section>
       } @else {
-        <section class="cards">
-          @for (item of filteredPlans(); track item.id) {
-            <article class="card plan">
-              <button (click)="editPlan(item)">
-                <strong>{{ item.name }}</strong
-                ><small>{{ item.duration_estimate || 'Keine Dauer' }}</small
-                ><span>{{ item.exercises.length }} Übungen</span></button
-              ><button class="log" (click)="openLog(item)">Training loggen</button>
-            </article>
-          }
+        <section class="muscle-panel">
+          <h2>Muskeln</h2>
+          <p>Wähle rechts einen Muskel aus, um ihn am Körper hervorzuheben.</p>
+          <div class="muscle-layout">
+            <svg class="muscle-figure" viewBox="0 0 220 360" aria-label="Muskelübersicht">
+              <circle cx="110" cy="35" r="24" />
+              <path
+                d="M85 68Q55 76 38 118L57 128 78 101 75 188 91 218 82 330H104L110 238 116 330H138L129 218 145 188 142 101 163 128 182 118Q165 76 135 68Z"
+              />
+              <path
+                class="zone chest"
+                [class.selected]="selectedMuscle() === 'Chest'"
+                d="M83 82Q110 68 137 82L132 120H88Z"
+              />
+              <path
+                class="zone core"
+                [class.selected]="selectedMuscle() === 'Core'"
+                d="M91 124H129L126 185 110 207 94 185Z"
+              />
+              <path
+                class="zone shoulder left"
+                [class.selected]="selectedMuscle() === 'Shoulders'"
+                d="M82 80Q60 79 52 98L72 110 88 94Z"
+              />
+              <path
+                class="zone shoulder right"
+                [class.selected]="selectedMuscle() === 'Shoulders'"
+                d="M138 80Q160 79 168 98L148 110 132 94Z"
+              />
+              <path
+                class="zone arm left"
+                [class.selected]="['Biceps', 'Triceps', 'Forearms'].includes(selectedMuscle())"
+                d="M51 103 35 155 54 161 73 112Z"
+              />
+              <path
+                class="zone arm right"
+                [class.selected]="['Biceps', 'Triceps', 'Forearms'].includes(selectedMuscle())"
+                d="M169 103 185 155 166 161 147 112Z"
+              />
+              <path
+                class="zone legs"
+                [class.selected]="
+                  ['Quads', 'Glutes', 'Hamstrings', 'Calves'].includes(selectedMuscle())
+                "
+                d="M91 208 82 330H104L110 238 116 330H138L129 208Z"
+              />
+              <path
+                class="zone back"
+                [class.selected]="selectedMuscle() === 'Back'"
+                d="M84 83 136 83 130 152 110 174 90 152Z"
+              />
+            </svg>
+            <div class="muscle-list">
+              @for (muscle of muscleGroups; track muscle) {
+                <button
+                  type="button"
+                  [class.active]="selectedMuscle() === muscle"
+                  (click)="selectedMuscle.set(muscle)"
+                >
+                  {{ muscle }}
+                </button>
+              }
+            </div>
+          </div>
         </section>
       }
     } @else if (editor() === 'equipment') {

@@ -81,6 +81,15 @@ select {
   background: #334155;
   font: inherit;
 }
+.collection-panel {
+  margin-top: 1rem;
+  padding: 1.5rem;
+  border-radius: 0.6rem;
+  background: #1e2a3b;
+}
+.collection-panel h2 {
+  margin: 0;
+}
 .cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -190,6 +199,60 @@ fieldset {
 .error {
   color: #fecdd3;
 }
+.muscle-panel {
+  padding: 1.5rem;
+  border-radius: 0.6rem;
+  background: #1e2a3b;
+}
+.muscle-panel h2 {
+  margin: 0;
+}
+.muscle-panel > p {
+  margin: 0.4rem 0 1.2rem;
+  color: #94a3b8;
+}
+.muscle-layout {
+  display: grid;
+  grid-template-columns: 14rem 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+.muscle-figure {
+  width: 100%;
+  max-height: 23rem;
+}
+.muscle-figure > circle,
+.muscle-figure > path {
+  fill: #dbe4f3;
+  stroke: #dbe4f3;
+  stroke-width: 3;
+}
+.muscle-figure .zone {
+  fill: transparent;
+  stroke: transparent;
+  transition: fill 150ms ease;
+}
+.muscle-figure .zone.selected {
+  fill: #8b5cf6;
+}
+.muscle-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.muscle-list button {
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #475569;
+  border-radius: 0.4rem;
+  color: white;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.muscle-list button.active {
+  border-color: #8b5cf6;
+  background: rgb(139 92 246 / 20%);
+}
 @media (max-width: 700px) {
   header {
     padding-inline: 1rem;
@@ -206,5 +269,12 @@ fieldset {
   }
   .plan-row strong {
     grid-column: 1/-1;
+  }
+  .muscle-layout {
+    grid-template-columns: 1fr;
+  }
+  .muscle-figure {
+    width: min(14rem, 100%);
+    margin: auto;
   }
 }
