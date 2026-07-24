@@ -33,3 +33,9 @@ npm run build
 ```
 
 Production builds include the Angular service worker and web app manifest.
+
+## UX parity reference
+
+The authenticated route inventory, Supabase screen map, responsive visual
+references, parity checklist, and known-behavior register are documented in
+[`docs/authenticated-ux-parity.md`](docs/authenticated-ux-parity.md).
