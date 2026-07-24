@@ -57,6 +57,7 @@ export class Crossfit {
   readonly equipmentFilter = signal('');
   readonly libraryEditorOpen = signal(false);
   readonly logEditorOpen = signal(false);
+  readonly inlineCaptureOpen = signal(false);
   readonly editingLibraryId = signal<string | null>(null);
   readonly selectedLibrary = signal<LibraryWorkout | null>(null);
   readonly editingLogId = signal<string | null>(null);
@@ -294,6 +295,7 @@ export class Crossfit {
   }
 
   startLog(workout: LibraryWorkout) {
+    this.inlineCaptureOpen.set(false);
     this.editingLogId.set(null);
     this.selectedLibrary.set(workout);
     this.logDate.set(this.today());
@@ -322,7 +324,8 @@ export class Crossfit {
     this.logFocus.set('conditioning');
     this.logDoneAlone.set(false);
     this.logNotes.set('');
-    this.logEditorOpen.set(true);
+    this.logEditorOpen.set(false);
+    this.inlineCaptureOpen.set(true);
   }
 
   selectLibrary(id: string) {
@@ -330,6 +333,7 @@ export class Crossfit {
   }
 
   editLog(log: CrossfitLog) {
+    this.inlineCaptureOpen.set(false);
     this.editingLogId.set(log.id);
     this.selectedLibrary.set(
       this.library().find((workout) => workout.name === log.workout_name) ??
@@ -396,6 +400,7 @@ export class Crossfit {
         await this.service.saveLog(draft);
       }
       this.logEditorOpen.set(false);
+      this.inlineCaptureOpen.set(false);
       this.tab.set('sports');
       await this.reload();
     } catch (error) {

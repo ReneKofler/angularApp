@@ -96,7 +96,10 @@ test('filters recent sessions by type, focus, equipment, and search', async ({ p
 test('+ Sport opens capture without changing tabs', async ({ page }) => {
   await page.getByRole('button', { name: '+ Sport' }).click();
   await expect(page.getByRole('button', { name: 'Sports' })).toHaveClass(/active/);
-  await expect(page.locator('form').getByRole('heading', { name: 'Sport erfassen' })).toBeVisible();
+  const capture = page.locator('main form.capture-form');
+  await expect(capture.getByRole('heading', { name: 'Sport erfassen' })).toBeVisible();
+  await expect(page.locator('.backdrop')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Abbrechen' })).toBeVisible();
   await expect(page.getByLabel('Workout wählen')).toBeVisible();
   await expect(page.getByLabel('Ø Herzfrequenz (bpm) - optional')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Sport speichern' })).toBeDisabled();
