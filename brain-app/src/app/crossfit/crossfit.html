@@ -38,8 +38,10 @@
         <button type="button" class="add-sport cancel" (click)="inlineCaptureOpen.set(false)">
           Abbrechen
         </button>
-        <form class="capture-form" (ngSubmit)="saveLog()">
-          <h2>Sport erfassen</h2>
+        <form class="capture-form sport-capture" (ngSubmit)="saveLog()">
+          <div class="sport-form-title">
+            <h2>🏋️ {{ editingLogId() ? 'Sport bearbeiten' : 'Sport erfassen' }}</h2>
+          </div>
           <label>
             Datum
             <input
@@ -66,27 +68,23 @@
           @if (!library().length) {
             <p class="empty-hint">Keine Workouts gespeichert. Erstelle zuerst ein Workout.</p>
           }
-          <fieldset>
+          <fieldset class="focus-picker">
             <legend>Fokus</legend>
-            <div class="checks">
-              <label
-                ><input
-                  type="radio"
-                  name="inlineLogFocus"
-                  value="conditioning"
-                  [ngModel]="logFocus()"
-                  (ngModelChange)="logFocus.set($event)"
-                />Conditioning</label
+            <div>
+              <button
+                type="button"
+                [class.active]="logFocus() === 'conditioning'"
+                (click)="logFocus.set('conditioning')"
               >
-              <label
-                ><input
-                  type="radio"
-                  name="inlineLogFocus"
-                  value="strength"
-                  [ngModel]="logFocus()"
-                  (ngModelChange)="logFocus.set($event)"
-                />Strength</label
+                Conditioning
+              </button>
+              <button
+                type="button"
+                [class.active]="logFocus() === 'strength'"
+                (click)="logFocus.set('strength')"
               >
+                Strength
+              </button>
             </div>
           </fieldset>
           @if (selectedLibrary(); as workout) {
@@ -178,9 +176,14 @@
               name="inlineLogNotes"
             ></textarea>
           </label>
-          <button type="submit" class="primary" [disabled]="saving() || !selectedLibrary()">
-            Sport speichern
-          </button>
+          <div class="sport-actions">
+            @if (editingLogId()) {
+              <button type="button" class="danger" (click)="deleteEditingLog()">Löschen</button>
+            }
+            <button type="submit" class="primary" [disabled]="saving() || !selectedLibrary()">
+              Speichern
+            </button>
+          </div>
         </form>
       }
       <section class="recent-panel">

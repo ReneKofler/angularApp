@@ -311,3 +311,57 @@ input {
     grid-column: 2;
   }
 }
+
+.sport-capture {
+  width: min(42rem, 100%);
+  margin: 0 auto 1.2rem;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #344257;
+  color: #f8fafc;
+  background: #1e2a3b;
+
+  > label,
+  > fieldset,
+  > .empty-hint {
+    margin-right: 1rem;
+    margin-left: 1rem;
+  }
+
+  input,
+  select,
+  textarea {
+    border-color: #536177;
+    color: #f8fafc;
+    background: #3a475c;
+  }
+}
+
+.sport-form-title {
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid #344257;
+
+  h2 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+}
+
+.sport-actions {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+  background: #1e2a3b;
+  box-shadow: 0 -8px 20px rgb(15 25 41 / 35%);
+
+  button {
+    width: 100%;
+  }
+
+  button.primary:only-child {
+    grid-column: 2;
+  }
+}

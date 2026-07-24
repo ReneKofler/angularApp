@@ -398,7 +398,9 @@ export class Crossfit {
     this.logFocus.set(workout.crossfit_focus === 'strength' ? 'strength' : 'conditioning');
     this.logDoneAlone.set(false);
     this.logNotes.set('');
-    this.logEditorOpen.set(true);
+    this.logEditorOpen.set(false);
+    this.inlineCaptureOpen.set(true);
+    this.tab.set('sports');
   }
 
   newSport() {
@@ -439,7 +441,8 @@ export class Crossfit {
     this.logFocus.set(log.crossfit_description === 'strength' ? 'strength' : 'conditioning');
     this.logDoneAlone.set(!!log.done_alone);
     this.logNotes.set(log.notes ?? '');
-    this.logEditorOpen.set(true);
+    this.logEditorOpen.set(false);
+    this.inlineCaptureOpen.set(true);
   }
 
   async saveLog() {
@@ -516,6 +519,7 @@ export class Crossfit {
     try {
       await this.service.deleteLog(log.id);
       this.logEditorOpen.set(false);
+      this.inlineCaptureOpen.set(false);
       this.editingLogId.set(null);
       await this.reload();
     } catch (error) {

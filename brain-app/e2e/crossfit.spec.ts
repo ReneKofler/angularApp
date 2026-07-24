@@ -127,16 +127,20 @@ test('+ Sport opens capture without changing tabs', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Abbrechen' })).toBeVisible();
   await expect(page.getByLabel('Workout wählen')).toBeVisible();
   await expect(page.getByLabel('Ø Herzfrequenz (bpm) - optional')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Sport speichern' })).toBeDisabled();
+  await expect(capture.getByRole('button', { name: 'Speichern' })).toBeDisabled();
 });
 
-test('opens a recent-session tile for editing with delete inside the dialog', async ({ page }) => {
+test('opens a recent-session tile for inline editing with delete inside the form', async ({
+  page,
+}) => {
   const tile = page.getByRole('button', { name: /5 Rounds: Cal \/ Sit-ups/ });
   await expect(page.getByRole('button', { name: 'Einheit löschen' })).toHaveCount(0);
   await tile.click();
-  await expect(page.locator('form').getByRole('heading', { name: library.name })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Löschen', exact: true })).toBeVisible();
-  await expect(page.getByLabel('Workout wählen')).toHaveValue(library.id);
+  const form = page.locator('main form.sport-capture');
+  await expect(form.getByRole('heading', { name: 'Sport bearbeiten' })).toBeVisible();
+  await expect(form.getByRole('button', { name: 'Löschen', exact: true })).toBeVisible();
+  await expect(form.getByLabel('Workout wählen')).toHaveValue(library.id);
+  await expect(page.locator('.backdrop')).toHaveCount(0);
 });
 
 test('matches the Workouts layout and edits tiles inline', async ({ page }) => {
