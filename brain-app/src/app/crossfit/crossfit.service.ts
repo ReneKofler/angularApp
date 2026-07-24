@@ -112,12 +112,13 @@ export class CrossfitService {
     if (error) throw error;
   }
 
-  async saveLog(draft: CrossfitLogDraft): Promise<CrossfitLog> {
-    const { data, error } = await this.client()
-      .from('workouts')
-      .insert({ ...draft, user_id: this.userId() })
-      .select()
-      .single();
+  async saveLog(draft: CrossfitLogDraft, id?: string): Promise<CrossfitLog> {
+    const client = this.client();
+    const userId = this.userId();
+    const query = id
+      ? client.from('workouts').update(draft).eq('id', id).eq('user_id', userId)
+      : client.from('workouts').insert({ ...draft, user_id: userId });
+    const { data, error } = await query.select().single();
     if (error) throw error;
     return data as CrossfitLog;
   }

@@ -81,8 +81,11 @@ test('matches the original Sports layout and renders DNF results', async ({ page
 
 test('filters recent sessions by type, focus, equipment, and search', async ({ page }) => {
   await page.getByRole('button', { name: 'FOR_TIME' }).click();
-  await page.getByRole('button', { name: 'Conditioning' }).click();
-  await page.getByRole('button', { name: /Rudergerät/ }).click();
+  await page.getByLabel('Fokus').getByRole('button', { name: 'Conditioning' }).click();
+  await page
+    .getByLabel('Equipment')
+    .getByRole('button', { name: /Rudergerät/ })
+    .click();
   await page.getByLabel('Sports suchen').fill('Sit-ups');
   await expect(page.getByRole('heading', { name: library.name })).toBeVisible();
 
@@ -97,6 +100,15 @@ test('+ Sport opens capture without changing tabs', async ({ page }) => {
   await expect(page.getByLabel('Workout wählen')).toBeVisible();
   await expect(page.getByLabel('Ø Herzfrequenz (bpm) - optional')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Sport speichern' })).toBeDisabled();
+});
+
+test('opens a recent-session tile for editing with delete inside the dialog', async ({ page }) => {
+  const tile = page.getByRole('button', { name: /5 Rounds: Cal \/ Sit-ups/ });
+  await expect(page.getByRole('button', { name: 'Einheit löschen' })).toHaveCount(0);
+  await tile.click();
+  await expect(page.locator('form').getByRole('heading', { name: library.name })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Löschen', exact: true })).toBeVisible();
+  await expect(page.getByLabel('Workout wählen')).toHaveValue(library.id);
 });
 
 test('opens a library workout as a prefilled result form', async ({ page }) => {

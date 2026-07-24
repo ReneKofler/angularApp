@@ -87,7 +87,12 @@
         } @else {
           <section class="history">
             @for (log of filteredLogs(); track log.id) {
-              <article>
+              <article
+                tabindex="0"
+                role="button"
+                (click)="editLog(log)"
+                (keydown.enter)="editLog(log)"
+              >
                 <div>
                   <div class="session-title">
                     <h3>{{ log.workout_name || 'CrossFit Workout' }}</h3>
@@ -110,9 +115,6 @@
                 </div>
                 <div class="history-meta">
                   <time>{{ log.workout_date }}</time>
-                  <button type="button" aria-label="Einheit löschen" (click)="deleteLog(log)">
-                    ×
-                  </button>
                 </div>
               </article>
             }
@@ -427,6 +429,11 @@
           name="selectedWorkout"
         >
           <option value="">Workout auswählen…</option>
+          @if (selectedLibrary(); as selected) {
+            @if (!library().includes(selected)) {
+              <option [value]="selected.id">{{ selected.name }}</option>
+            }
+          }
           @for (item of library(); track item.id) {
             <option [value]="item.id">{{ item.name }}</option>
           }
@@ -546,9 +553,14 @@
           name="logNotes"
         ></textarea>
       </label>
-      <button type="submit" class="primary" [disabled]="saving() || !selectedLibrary()">
-        Sport speichern
-      </button>
+      <div class="dialog-actions">
+        @if (editingLogId()) {
+          <button type="button" class="danger" (click)="deleteEditingLog()">Löschen</button>
+        }
+        <button type="submit" class="primary" [disabled]="saving() || !selectedLibrary()">
+          Sport speichern
+        </button>
+      </div>
     </form>
   </div>
 }

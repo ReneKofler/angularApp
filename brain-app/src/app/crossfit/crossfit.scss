@@ -347,6 +347,17 @@ button:disabled {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
+    cursor: pointer;
+    transition:
+      border-color 150ms ease,
+      transform 150ms ease;
+
+    &:hover,
+    &:focus-visible {
+      border-color: #ff1f57;
+      outline: none;
+      transform: translateY(-1px);
+    }
   }
 
   strong {

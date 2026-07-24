@@ -59,6 +59,7 @@ export class Crossfit {
   readonly logEditorOpen = signal(false);
   readonly editingLibraryId = signal<string | null>(null);
   readonly selectedLibrary = signal<LibraryWorkout | null>(null);
+  readonly editingLogId = signal<string | null>(null);
 
   readonly libraryName = signal('');
   readonly libraryType = signal<CrossfitType>('for_time');
@@ -293,6 +294,7 @@ export class Crossfit {
   }
 
   startLog(workout: LibraryWorkout) {
+    this.editingLogId.set(null);
     this.selectedLibrary.set(workout);
     this.logDate.set(this.today());
     this.logDuration.set('');
@@ -308,6 +310,7 @@ export class Crossfit {
   }
 
   newSport() {
+    this.editingLogId.set(null);
     this.selectedLibrary.set(null);
     this.logDate.set(this.today());
     this.logDuration.set('');
@@ -324,6 +327,25 @@ export class Crossfit {
 
   selectLibrary(id: string) {
     this.selectedLibrary.set(this.library().find((workout) => workout.id === id) ?? null);
+  }
+
+  editLog(log: CrossfitLog) {
+    this.editingLogId.set(log.id);
+    this.selectedLibrary.set(
+      this.library().find((workout) => workout.name === log.workout_name) ??
+        this.libraryFromLog(log),
+    );
+    this.logDate.set(log.workout_date);
+    this.logDuration.set(log.duration ?? '');
+    this.logRounds.set(log.result_rounds);
+    this.logReps.set(log.total_reps);
+    this.logDnf.set(!!log.dnf);
+    this.logMissingReps.set(log.missing_reps);
+    this.logHeartRate.set(log.avg_heart_rate);
+    this.logFocus.set(log.crossfit_description === 'strength' ? 'strength' : 'conditioning');
+    this.logDoneAlone.set(!!log.done_alone);
+    this.logNotes.set(log.notes ?? '');
+    this.logEditorOpen.set(true);
   }
 
   async saveLog() {
@@ -367,7 +389,12 @@ export class Crossfit {
     this.saving.set(true);
     this.error.set('');
     try {
-      await this.service.saveLog(draft);
+      const editingId = this.editingLogId();
+      if (editingId) {
+        await this.service.saveLog(draft, editingId);
+      } else {
+        await this.service.saveLog(draft);
+      }
       this.logEditorOpen.set(false);
       this.tab.set('sports');
       await this.reload();
@@ -386,6 +413,42 @@ export class Crossfit {
     } catch (error) {
       this.error.set(this.message(error));
     }
+  }
+
+  async deleteEditingLog() {
+    const log = this.logs().find((item) => item.id === this.editingLogId());
+    if (!log || !confirm(`${log.workout_name ?? 'CrossFit Workout'} löschen?`)) return;
+    try {
+      await this.service.deleteLog(log.id);
+      this.logEditorOpen.set(false);
+      this.editingLogId.set(null);
+      await this.reload();
+    } catch (error) {
+      this.error.set(this.message(error));
+    }
+  }
+
+  private libraryFromLog(log: CrossfitLog): LibraryWorkout {
+    return {
+      id: `log-${log.id}`,
+      user_id: null,
+      name: log.workout_name ?? 'CrossFit Workout',
+      crossfit_type: log.crossfit_type ?? 'custom',
+      exercises: log.exercises,
+      time_cap: log.time_cap,
+      rounds: log.rounds,
+      work_minutes: log.work_minutes,
+      rest_minutes: log.rest_minutes,
+      is_favourite: false,
+      description: log.description ?? null,
+      amrap_duration: null,
+      is_hero: !!log.is_hero,
+      is_girl: !!log.is_girl,
+      is_open: !!log.is_open,
+      total_reps: log.total_reps,
+      is_partner: !!log.is_partner,
+      crossfit_focus: log.crossfit_description,
+    };
   }
 
   private exerciseList() {
