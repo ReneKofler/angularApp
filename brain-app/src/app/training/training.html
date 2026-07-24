@@ -70,15 +70,53 @@
                 src="images/muscle-anatomy.png"
                 alt="Frontansicht der menschlichen Muskelgruppen"
               />
-              @for (muscle of muscleGroups; track muscle) {
-                <span
-                  class="muscle-highlight"
-                  [class.active]="selectedMuscle() === muscle"
-                  [class]="'muscle-highlight ' + muscle.toLowerCase()"
-                  [attr.data-muscle]="muscle"
-                  aria-hidden="true"
-                ></span>
-              }
+              <svg class="muscle-overlay" viewBox="0 0 512 768" aria-hidden="true">
+                <g data-muscle="Chest" [class.active]="selectedMuscle() === 'Chest'">
+                  <path d="M171 164Q208 139 250 163L248 217Q211 229 174 207Z" />
+                  <path d="M341 164Q304 139 262 163L264 217Q301 229 338 207Z" />
+                </g>
+                <g data-muscle="Back" [class.active]="selectedMuscle() === 'Back'">
+                  <path d="M213 137Q235 143 250 160L230 181 199 162Z" />
+                  <path d="M299 137Q277 143 262 160L282 181 313 162Z" />
+                  <path d="M174 211Q192 222 215 229L226 326 190 291Z" />
+                  <path d="M338 211Q320 222 297 229L286 326 322 291Z" />
+                </g>
+                <g data-muscle="Shoulders" [class.active]="selectedMuscle() === 'Shoulders'">
+                  <path d="M126 153Q153 125 187 151L178 194Q147 190 122 171Z" />
+                  <path d="M386 153Q359 125 325 151L334 194Q365 190 390 171Z" />
+                </g>
+                <g data-muscle="Biceps" [class.active]="selectedMuscle() === 'Biceps'">
+                  <path d="M112 161Q91 174 84 207 101 233 132 225L151 191Q135 166 112 161Z" />
+                  <path d="M400 161Q421 174 428 207 411 233 380 225L361 191Q377 166 400 161Z" />
+                </g>
+                <g data-muscle="Triceps" [class.active]="selectedMuscle() === 'Triceps'">
+                  <path d="M128 183Q151 188 159 213L145 253Q121 246 111 224Z" />
+                  <path d="M384 183Q361 188 353 213L367 253Q391 246 401 224Z" />
+                </g>
+                <g data-muscle="Forearms" [class.active]="selectedMuscle() === 'Forearms'">
+                  <path d="M82 198Q61 178 48 146L68 132Q91 157 112 188L105 222Z" />
+                  <path d="M430 198Q451 178 464 146L444 132Q421 157 400 188L407 222Z" />
+                </g>
+                <g data-muscle="Core" [class.active]="selectedMuscle() === 'Core'">
+                  <path d="M216 222Q256 211 296 222L291 348 256 378 221 348Z" />
+                </g>
+                <g data-muscle="Quads" [class.active]="selectedMuscle() === 'Quads'">
+                  <path d="M196 372Q230 361 247 394L229 528Q198 536 178 499Z" />
+                  <path d="M316 372Q282 361 265 394L283 528Q314 536 334 499Z" />
+                </g>
+                <g data-muscle="Glutes" [class.active]="selectedMuscle() === 'Glutes'">
+                  <path d="M190 343Q224 333 252 365L241 411Q207 408 181 385Z" />
+                  <path d="M322 343Q288 333 260 365L271 411Q305 408 331 385Z" />
+                </g>
+                <g data-muscle="Hamstrings" [class.active]="selectedMuscle() === 'Hamstrings'">
+                  <path d="M184 390Q207 375 226 403L217 524Q190 519 177 488Z" />
+                  <path d="M328 390Q305 375 286 403L295 524Q322 519 335 488Z" />
+                </g>
+                <g data-muscle="Calves" [class.active]="selectedMuscle() === 'Calves'">
+                  <path d="M184 527Q214 514 224 546L211 657Q186 674 172 646Z" />
+                  <path d="M328 527Q298 514 288 546L301 657Q326 674 340 646Z" />
+                </g>
+              </svg>
             </div>
             <div class="muscle-list">
               @for (muscle of muscleGroups; track muscle) {

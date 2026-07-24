@@ -72,7 +72,21 @@ test('selects muscles in the muscle overview', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Trainingspläne' })).toHaveCount(0);
   await page.getByRole('button', { name: 'Muskeln' }).click();
   await expect(page.getByRole('heading', { name: 'Muskeln' })).toBeVisible();
-  await page.getByRole('button', { name: 'Back' }).click();
-  await expect(page.getByRole('button', { name: 'Back' })).toHaveClass(/active/);
-  await expect(page.locator('[data-muscle="Back"]')).toBeVisible();
+  for (const muscle of [
+    'Chest',
+    'Back',
+    'Shoulders',
+    'Biceps',
+    'Triceps',
+    'Forearms',
+    'Core',
+    'Quads',
+    'Glutes',
+    'Hamstrings',
+    'Calves',
+  ]) {
+    await page.getByRole('button', { name: muscle }).click();
+    await expect(page.getByRole('button', { name: muscle })).toHaveClass(/active/);
+    await expect(page.locator(`[data-muscle="${muscle}"]`)).toHaveCSS('opacity', '1');
+  }
 });

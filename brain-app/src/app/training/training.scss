@@ -230,118 +230,27 @@ fieldset {
   object-fit: contain;
   mix-blend-mode: screen;
 }
-.muscle-highlight {
+.muscle-overlay {
   position: absolute;
+  inset: 0;
   z-index: 1;
-  display: none;
-  border: 2px solid rgb(167 139 250 / 95%);
-  background: rgb(124 58 237 / 68%);
-  box-shadow:
-    0 0 0.8rem #8b5cf6,
-    inset 0 0 0.5rem rgb(255 255 255 / 35%);
-  mix-blend-mode: screen;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
-.muscle-highlight.active {
-  display: block;
+.muscle-overlay g {
+  opacity: 0;
 }
-.muscle-highlight.chest {
-  top: 18%;
-  left: 32%;
-  width: 36%;
-  height: 11%;
-  border-radius: 48% 48% 38% 38%;
+.muscle-overlay g.active {
+  opacity: 1;
 }
-.muscle-highlight.back {
-  top: 17%;
-  left: 29%;
-  width: 42%;
-  height: 22%;
-  clip-path: polygon(8% 0, 50% 16%, 92% 0, 78% 100%, 22% 100%);
-}
-.muscle-highlight.shoulders {
-  top: 16%;
-  left: 21%;
-  width: 58%;
-  height: 10%;
-  border-radius: 50%;
-  clip-path: polygon(0 0, 25% 0, 31% 100%, 69% 100%, 75% 0, 100% 0, 100% 100%, 0 100%);
-}
-.muscle-highlight.biceps,
-.muscle-highlight.triceps {
-  top: 18%;
-  left: 12%;
-  width: 76%;
-  height: 15%;
-  border-radius: 45%;
-  clip-path: polygon(
-    0 0,
-    18% 6%,
-    24% 100%,
-    16% 94%,
-    0 48%,
-    76% 100%,
-    82% 6%,
-    100% 0,
-    100% 48%,
-    84% 94%
-  );
-}
-.muscle-highlight.triceps {
-  top: 22%;
-  opacity: 0.82;
-}
-.muscle-highlight.forearms {
-  top: 9%;
-  left: 9%;
-  width: 82%;
-  height: 18%;
-  border-radius: 45%;
-  clip-path: polygon(
-    0 0,
-    16% 4%,
-    24% 100%,
-    17% 100%,
-    0 45%,
-    76% 100%,
-    84% 4%,
-    100% 0,
-    100% 45%,
-    83% 100%
-  );
-}
-.muscle-highlight.core {
-  top: 28%;
-  left: 39%;
-  width: 22%;
-  height: 19%;
-  border-radius: 35% 35% 45% 45%;
-}
-.muscle-highlight.quads,
-.muscle-highlight.glutes,
-.muscle-highlight.hamstrings {
-  top: 47%;
-  left: 31%;
-  width: 38%;
-  height: 21%;
-  border-radius: 45%;
-  clip-path: polygon(0 0, 42% 0, 48% 100%, 0 88%, 58% 0, 100% 0, 100% 88%, 52% 100%);
-}
-.muscle-highlight.glutes {
-  top: 43%;
-  height: 10%;
-}
-.muscle-highlight.hamstrings {
-  top: 52%;
-  opacity: 0.82;
-}
-.muscle-highlight.calves {
-  top: 67%;
-  left: 31%;
-  width: 38%;
-  height: 21%;
-  border-radius: 45%;
-  clip-path: polygon(0 0, 42% 0, 48% 100%, 8% 86%, 58% 0, 100% 0, 92% 86%, 52% 100%);
+.muscle-overlay path {
+  fill: rgb(139 92 246 / 72%);
+  stroke: #c4b5fd;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 7px #8b5cf6);
+  mix-blend-mode: screen;
 }
 .muscle-list {
   display: grid;
