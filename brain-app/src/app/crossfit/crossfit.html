@@ -2,24 +2,128 @@
   <header>
     <a routerLink="/" aria-label="Zurück">‹</a>
     <h1>CrossFit</h1>
-    <button type="button" aria-label="Workout erstellen" (click)="newLibrary()">＋</button>
+    <div class="header-icons" aria-hidden="true"><span>🏋️</span><span>👑</span></div>
   </header>
+
+  <nav class="top-tabs" aria-label="CrossFit Ansichten">
+    <button type="button" [class.active]="tab() === 'sports'" (click)="tab.set('sports')">
+      Sports
+    </button>
+    <button type="button" [class.active]="tab() === 'workouts'" (click)="tab.set('workouts')">
+      Workouts
+    </button>
+  </nav>
 
   <main>
     @if (error()) {
       <p class="error" role="alert">{{ error() }}</p>
     }
 
-    <nav class="tabs" aria-label="CrossFit Ansichten">
-      <button type="button" [class.active]="tab() === 'library'" (click)="tab.set('library')">
-        Bibliothek
-      </button>
-      <button type="button" [class.active]="tab() === 'history'" (click)="tab.set('history')">
-        Letzte Einheiten
-      </button>
-    </nav>
+    @if (tab() === 'sports') {
+      <button type="button" class="add-sport" (click)="tab.set('workouts')">+ Sport</button>
+      <section class="recent-panel">
+        <h2>Letzte Einheiten</h2>
+        <div class="search-sort">
+          <input
+            type="search"
+            aria-label="Sports suchen"
+            placeholder="Suchen nach Name, Übung…"
+            [ngModel]="query()"
+            (ngModelChange)="query.set($event)"
+          />
+          <select
+            aria-label="Sports sortieren"
+            [ngModel]="sort()"
+            (ngModelChange)="sort.set($event)"
+          >
+            <option value="newest">Erstellt: neueste zuerst</option>
+            <option value="oldest">Erstellt: älteste zuerst</option>
+            <option value="name">Name: A–Z</option>
+          </select>
+        </div>
+        <div class="filter-row" aria-label="Workout-Typ">
+          @for (filter of typeFilters; track filter.value) {
+            <button
+              type="button"
+              [class.active]="typeFilter() === filter.value"
+              (click)="typeFilter.set(filter.value)"
+            >
+              {{ filter.label }}
+            </button>
+          }
+        </div>
+        <div class="filter-row" aria-label="Fokus">
+          <button
+            type="button"
+            [class.active]="focusFilter() === 'conditioning'"
+            (click)="focusFilter.set(focusFilter() === 'conditioning' ? 'all' : 'conditioning')"
+          >
+            Conditioning
+          </button>
+          <button
+            type="button"
+            [class.active]="focusFilter() === 'strength'"
+            (click)="focusFilter.set(focusFilter() === 'strength' ? 'all' : 'strength')"
+          >
+            Strength
+          </button>
+        </div>
+        <div class="filter-row equipment" aria-label="Equipment">
+          @for (item of equipment; track item) {
+            <button
+              type="button"
+              [class.active]="equipmentFilter() === item"
+              (click)="equipmentFilter.set(equipmentFilter() === item ? '' : item)"
+            >
+              {{ item }}
+            </button>
+          }
+        </div>
 
-    @if (tab() === 'library') {
+        @if (loading()) {
+          <div class="empty">Einheiten werden geladen…</div>
+        } @else if (!filteredLogs().length) {
+          <div class="empty">Keine Einheiten gefunden.</div>
+        } @else {
+          <section class="history">
+            @for (log of filteredLogs(); track log.id) {
+              <article>
+                <div>
+                  <div class="session-title">
+                    <h3>{{ log.workout_name || 'CrossFit Workout' }}</h3>
+                    <span class="type-badge">{{ typeLabel(log.crossfit_type) }}</span>
+                    @if (log.crossfit_description) {
+                      <span class="focus-badge">{{ log.crossfit_description }}</span>
+                    }
+                  </div>
+                  <p class="result" [class.dnf]="log.dnf">{{ result(log) }}</p>
+                  @if (log.exercises?.length) {
+                    <p class="exercises">{{ (log.exercises ?? []).join(', ') }}</p>
+                  }
+                  @if (tags(log).length) {
+                    <div class="tags">
+                      @for (tag of tags(log); track tag) {
+                        <span>{{ tag }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+                <div class="history-meta">
+                  <time>{{ log.workout_date }}</time>
+                  <button type="button" aria-label="Einheit löschen" (click)="deleteLog(log)">
+                    ×
+                  </button>
+                </div>
+              </article>
+            }
+          </section>
+        }
+      </section>
+    } @else {
+      <div class="workouts-heading">
+        <h2>Workout-Bibliothek</h2>
+        <button type="button" class="primary" (click)="newLibrary()">+ Workout</button>
+      </div>
       <section class="toolbar">
         <input
           type="search"
@@ -98,40 +202,6 @@
           }
         </section>
       }
-    } @else {
-      @if (loading()) {
-        <div class="empty">Einheiten werden geladen…</div>
-      } @else if (!logs().length) {
-        <div class="empty">Noch keine CrossFit Einheiten erfasst.</div>
-      } @else {
-        <section class="history">
-          @for (log of logs(); track log.id) {
-            <article>
-              <div>
-                <span class="type">{{ typeLabel(log.crossfit_type) }}</span>
-                <h2>{{ log.workout_name || 'CrossFit Workout' }}</h2>
-                <strong [class.dnf]="log.dnf">{{ result(log) }}</strong>
-                @if (tags(log).length) {
-                  <div class="tags">
-                    @for (tag of tags(log); track tag) {
-                      <span>{{ tag }}</span>
-                    }
-                  </div>
-                }
-                @if (log.notes) {
-                  <p>{{ log.notes }}</p>
-                }
-              </div>
-              <div class="history-meta">
-                <time>{{ log.workout_date }}</time>
-                <button type="button" aria-label="Einheit löschen" (click)="deleteLog(log)">
-                  ×
-                </button>
-              </div>
-            </article>
-          }
-        </section>
-      }
     }
   </main>
 </div>
@@ -164,8 +234,9 @@
         >
           <option value="for_time">For Time</option>
           <option value="amrap">AMRAP</option>
-          <option value="rounds">Runden</option>
-          <option value="intervals">Intervalle</option>
+          <option value="emom">EMOM</option>
+          <option value="tabata">Tabata</option>
+          <option value="custom">Custom</option>
         </select>
       </label>
       <label>
@@ -204,7 +275,7 @@
             />
           </label>
         }
-        @if (libraryType() === 'rounds') {
+        @if (libraryType() === 'custom') {
           <label>
             Runden
             <input
@@ -216,7 +287,7 @@
             />
           </label>
         }
-        @if (libraryType() === 'intervals') {
+        @if (libraryType() === 'emom' || libraryType() === 'tabata') {
           <label>
             Arbeit (Min.)
             <input
@@ -376,7 +447,7 @@
           </label>
         }
       }
-      @if (workout.crossfit_type === 'amrap' || workout.crossfit_type === 'rounds') {
+      @if (workout.crossfit_type === 'amrap' || workout.crossfit_type === 'custom') {
         <label>
           Geschaffte Runden
           <input

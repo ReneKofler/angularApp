@@ -70,12 +70,13 @@ describe('Crossfit', () => {
   it('renders library metadata and result variants', async () => {
     const fixture = TestBed.createComponent(Crossfit);
     await fixture.whenStable();
+    fixture.componentInstance.tab.set('workouts');
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Fran');
     expect(fixture.nativeElement.textContent).toContain('Time Cap 10 Min.');
     expect(fixture.nativeElement.textContent).toContain('Girl');
 
-    fixture.componentInstance.tab.set('history');
+    fixture.componentInstance.tab.set('sports');
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('DNF · 6 Reps fehlen');
   });

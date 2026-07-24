@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { AuthService } from '../core/auth.service';
 
-export type CrossfitType = 'for_time' | 'amrap' | 'rounds' | 'intervals';
+export type CrossfitType = 'for_time' | 'amrap' | 'emom' | 'tabata' | 'custom';
 
 export interface LibraryWorkout {
   id: string;
@@ -33,6 +33,7 @@ export interface CrossfitLog {
   workout_name: string | null;
   crossfit_type: CrossfitType | null;
   crossfit_description: string | null;
+  description?: string | null;
   exercises: string[] | null;
   time_cap: number | null;
   rounds: number | null;

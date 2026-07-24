@@ -11,11 +11,27 @@ import {
 } from './crossfit.service';
 
 const TYPE_LABELS: Record<CrossfitType, string> = {
-  for_time: 'For Time',
+  for_time: 'FOR_TIME',
   amrap: 'AMRAP',
-  rounds: 'Runden',
-  intervals: 'Intervalle',
+  emom: 'EMOM',
+  tabata: 'TABATA',
+  custom: 'CUSTOM',
 };
+
+const EQUIPMENT = [
+  '📦 Box',
+  '🔗 Kettlebell',
+  '🪜 Klimmzugstange',
+  '🏋️ Kurzhantel',
+  '🏋️ Langhantel',
+  '🥕 Ringe',
+  '🚣 Rudergerät',
+  '🔴 Sandbag',
+  '🛷 Schlitten',
+  '🧬 Springseil',
+  '🎯 Target',
+  '🧱 Wand',
+];
 
 @Component({
   selector: 'app-crossfit',
@@ -34,7 +50,11 @@ export class Crossfit {
   readonly error = signal('');
   readonly query = signal('');
   readonly favouritesOnly = signal(false);
-  readonly tab = signal<'library' | 'history'>('library');
+  readonly tab = signal<'sports' | 'workouts'>('sports');
+  readonly sort = signal<'newest' | 'oldest' | 'name'>('newest');
+  readonly typeFilter = signal<'all' | CrossfitType | 'hero' | 'girl' | 'open'>('all');
+  readonly focusFilter = signal<'all' | 'conditioning' | 'strength'>('all');
+  readonly equipmentFilter = signal('');
   readonly libraryEditorOpen = signal(false);
   readonly logEditorOpen = signal(false);
   readonly editingLibraryId = signal<string | null>(null);
@@ -76,6 +96,53 @@ export class Crossfit {
             .toLowerCase()
             .includes(query)),
     );
+  });
+  readonly equipment = EQUIPMENT;
+  readonly typeFilters: {
+    value: 'all' | CrossfitType | 'hero' | 'girl' | 'open';
+    label: string;
+  }[] = [
+    { value: 'all', label: 'Alle' },
+    { value: 'for_time', label: 'FOR_TIME' },
+    { value: 'emom', label: 'EMOM' },
+    { value: 'amrap', label: 'AMRAP' },
+    { value: 'tabata', label: 'TABATA' },
+    { value: 'custom', label: 'CUSTOM' },
+    { value: 'hero', label: 'Hero WOD' },
+    { value: 'girl', label: 'Girl WOD' },
+    { value: 'open', label: 'Open Workout' },
+  ];
+  readonly filteredLogs = computed(() => {
+    const query = this.query().trim().toLowerCase();
+    const type = this.typeFilter();
+    const focus = this.focusFilter();
+    const equipment = this.equipmentFilter()
+      .replace(/^\S+\s/, '')
+      .toLowerCase();
+    const matches = this.logs().filter((log) => {
+      const haystack =
+        `${log.workout_name ?? ''} ${(log.exercises ?? []).join(' ')} ${log.crossfit_description ?? ''} ${log.description ?? ''}`.toLowerCase();
+      const matchesType =
+        type === 'all' ||
+        log.crossfit_type === type ||
+        (type === 'hero' && !!log.is_hero) ||
+        (type === 'girl' && !!log.is_girl) ||
+        (type === 'open' && !!log.is_open);
+      const matchesFocus =
+        focus === 'all' ||
+        `${log.crossfit_description ?? ''} ${log.description ?? ''}`.toLowerCase().includes(focus);
+      return (
+        matchesType &&
+        matchesFocus &&
+        (!query || haystack.includes(query)) &&
+        (!equipment || haystack.includes(equipment))
+      );
+    });
+    return [...matches].sort((a, b) => {
+      if (this.sort() === 'name') return (a.workout_name ?? '').localeCompare(b.workout_name ?? '');
+      const direction = this.sort() === 'oldest' ? 1 : -1;
+      return a.workout_date.localeCompare(b.workout_date) * direction;
+    });
   });
 
   constructor() {
@@ -278,7 +345,7 @@ export class Crossfit {
     try {
       await this.service.saveLog(draft);
       this.logEditorOpen.set(false);
-      this.tab.set('history');
+      this.tab.set('sports');
       await this.reload();
     } catch (error) {
       this.error.set(this.message(error));

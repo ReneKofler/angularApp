@@ -19,8 +19,8 @@ header {
   min-height: 4rem;
   padding: 0 1rem;
   color: white;
-  background: linear-gradient(135deg, #be123c, #e11d48);
-  box-shadow: 0 4px 18px rgb(136 19 55 / 25%);
+  background: #1e2a3b;
+  box-shadow: 0 1px 0 rgb(148 163 184 / 18%);
 
   h1 {
     margin: 0;
@@ -40,10 +40,111 @@ header {
   }
 }
 
+.header-icons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  font-size: 1.15rem;
+}
+
+.top-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0 20%;
+  background: #1e2a3b;
+
+  button {
+    padding: 1rem;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    color: #94a3b8;
+    background: transparent;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+
+    &.active {
+      border-bottom-color: #ff1f57;
+      color: #ff527b;
+    }
+  }
+}
+
 main {
   width: min(72rem, calc(100% - 2rem));
   margin: 0 auto;
   padding: 1.5rem 0 4rem;
+}
+
+.add-sport {
+  width: 100%;
+  margin: 0.8rem 0 1.2rem;
+  padding: 1rem;
+  border: 0;
+  border-radius: 0.7rem;
+  color: white;
+  background: #ff1f57;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.recent-panel {
+  padding: 1.4rem;
+  border-radius: 0.8rem;
+  background: var(--surface, white);
+
+  > h2 {
+    margin: 0 0 1.2rem;
+  }
+}
+
+.search-sort {
+  display: grid;
+  grid-template-columns: 1fr minmax(15rem, 0.4fr);
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.5rem 0;
+
+  button {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid #475569;
+    border-radius: 999px;
+    color: #cbd5e1;
+    background: transparent;
+    font: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+
+    &.active {
+      border-color: #ff1f57;
+      color: white;
+      background: #ff1f57;
+    }
+  }
+
+  &.equipment {
+    margin-bottom: 1rem;
+  }
+}
+
+.workouts-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0;
+  }
 }
 
 .error {
@@ -259,6 +360,38 @@ button:disabled {
   }
 }
 
+.session-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+.type-badge,
+.focus-badge {
+  padding: 0.18rem 0.5rem;
+  border-radius: 0.3rem;
+  color: #ff527b;
+  background: rgb(255 31 87 / 16%);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.result,
+.exercises {
+  margin: 0.45rem 0 0;
+  color: #94a3b8;
+
+  &.dnf {
+    color: #ff315f;
+  }
+}
+
 .history-meta {
   display: flex;
   flex-direction: column;
@@ -348,6 +481,10 @@ button:disabled {
   }
 }
 
+.dialog > label.inline-check {
+  display: flex;
+}
+
 .result-dialog {
   width: min(30rem, 100%);
 }
@@ -355,8 +492,8 @@ button:disabled {
 @media (prefers-color-scheme: dark) {
   :host {
     --text: #f8fafc;
-    --background: #09090b;
-    --surface: #18181b;
+    --background: #0f1929;
+    --surface: #1e2a3b;
   }
 
   .tabs {
@@ -374,7 +511,7 @@ button:disabled {
   select,
   textarea,
   .dialog {
-    border-color: #3f3f46;
+    border-color: #344257;
   }
 
   .workout-card p,
@@ -390,6 +527,10 @@ button:disabled {
 }
 
 @media (max-width: 700px) {
+  .top-tabs {
+    padding: 0;
+  }
+
   main {
     width: min(100% - 1rem, 72rem);
     padding-top: 0.75rem;
@@ -398,6 +539,14 @@ button:disabled {
   .toolbar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .search-sort {
+    grid-template-columns: 1fr;
+  }
+
+  .recent-panel {
+    padding: 1rem;
   }
 
   .library-grid {
