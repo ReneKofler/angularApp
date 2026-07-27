@@ -14,6 +14,7 @@ jobs:
   test:
     name: Build, unit, and Playwright tests
     runs-on: ubuntu-latest
+    environment: e2e
     defaults:
       run:
         working-directory: brain-app
