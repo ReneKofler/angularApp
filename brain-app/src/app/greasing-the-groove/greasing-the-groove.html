@@ -1,0 +1,84 @@
+<div class="groove-page">
+  <header>
+    <a routerLink="/" aria-label="Zurück">‹</a>
+    <h1>Greasing the Groove</h1>
+  </header>
+
+  <main>
+    <section class="date-picker" aria-label="Trainingstag auswählen">
+      <button type="button" aria-label="Vorheriger Tag" (click)="shiftDate(-1)">‹</button>
+      <label>
+        <span>Trainingstag</span>
+        <input type="date" [ngModel]="selectedDate()" (ngModelChange)="changeDate($event)" />
+      </label>
+      <button type="button" aria-label="Nächster Tag" (click)="shiftDate(1)">›</button>
+    </section>
+
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+    @if (loading()) {
+      <p class="empty">Wird geladen…</p>
+    } @else if (!selectedDay()) {
+      <section class="empty">
+        <span>🔁</span>
+        <h2>Noch kein Training an diesem Tag</h2>
+        <p>Starte den Tag und sammle über den Tag verteilt Wiederholungen.</p>
+        <button type="button" class="primary" [disabled]="saving()" (click)="startDay()">
+          Tag starten
+        </button>
+      </section>
+    } @else {
+      <section class="summary">
+        <div><small>Wiederholungen heute</small><strong>{{ totalReps() }}</strong></div>
+        <div><small>Übungen</small><strong>{{ dayEntries().length }}</strong></div>
+      </section>
+
+      <section class="exercise-picker">
+        <label for="groove-exercise">Übung hinzufügen</label>
+        <select
+          id="groove-exercise"
+          [disabled]="saving() || !availableExercises().length"
+          [ngModel]="exerciseToAdd()"
+          (ngModelChange)="addExercise($event)"
+        >
+          <option value="">
+            {{ availableExercises().length ? 'Übung auswählen…' : 'Alle Übungen hinzugefügt' }}
+          </option>
+          @for (exercise of availableExercises(); track exercise.id) {
+            <option [value]="exercise.id">{{ exercise.name }}</option>
+          }
+        </select>
+      </section>
+
+      <section class="entries" aria-label="Tägliche Übungen">
+        @for (entry of dayEntries(); track entry.id) {
+          <article>
+            <div class="entry-title">
+              <strong>{{ entry.name }}</strong>
+              <button type="button" aria-label="Übung entfernen" (click)="remove(entry)">×</button>
+            </div>
+            <div class="counter">
+              <button type="button" [disabled]="saving() || entry.reps === 0" (click)="addReps(entry, -1)">−</button>
+              <label>
+                <span>Wiederholungen für {{ entry.name }}</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  [disabled]="saving()"
+                  [ngModel]="entry.reps"
+                  (change)="setReps(entry, $any($event.target).value)"
+                />
+              </label>
+              <button type="button" [disabled]="saving()" (click)="addReps(entry, 1)">+</button>
+              <button type="button" class="quick" [disabled]="saving()" (click)="addReps(entry, 5)">+5</button>
+            </div>
+          </article>
+        } @empty {
+          <p class="empty compact">Wähle eine Übung aus, um Wiederholungen zu sammeln.</p>
+        }
+      </section>
+    }
+  </main>
+</div>

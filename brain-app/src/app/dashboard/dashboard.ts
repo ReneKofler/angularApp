@@ -72,6 +72,13 @@ export class Dashboard {
       color: '#7226e6',
       route: '/training',
     },
+    {
+      icon: '🔁',
+      name: 'Greasing the Groove',
+      description: 'Tägliche Wiederholungen sammeln',
+      color: '#0f9f82',
+      route: '/greasing-the-groove',
+    },
     { icon: '🏢', name: 'GYM', description: 'Trainingseinheiten tracken', color: '#54657d' },
     { icon: '🎮', name: 'Games', description: 'Spiele & Challenges', color: '#0497b7' },
     { icon: '🏈', name: 'Flag Football', description: 'Plays & Routes planen', color: '#9228e5' },

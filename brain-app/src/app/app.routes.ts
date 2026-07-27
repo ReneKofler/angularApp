@@ -24,6 +24,12 @@ export const routes: Routes = [
     loadComponent: () => import('./training/training').then((m) => m.Training),
   },
   {
+    path: 'greasing-the-groove',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./greasing-the-groove/greasing-the-groove').then((m) => m.GreasingTheGroove),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
