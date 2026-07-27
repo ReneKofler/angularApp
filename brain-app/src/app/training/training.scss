@@ -13,18 +13,20 @@ header {
   gap: 1rem;
   min-height: 4.35rem;
   padding: 0 2rem;
-  border-top: 6px solid #ead0b2;
   border-bottom: 1px solid #344257;
   background: #1e2a3b;
 }
 header h1 {
   margin: 0;
   font-size: 1.2rem;
+  line-height: 1;
 }
 header a {
   display: grid;
-  width: 1.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   place-items: center;
+  transform: translateY(-0.125rem);
   color: white;
   font-size: 2.2rem;
   line-height: 1;

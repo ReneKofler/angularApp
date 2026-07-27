@@ -51,6 +51,13 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/training');
 });
 
+test('returns to the dashboard without a decorative line above the header', async ({ page }) => {
+  await expect(page.locator('header')).toHaveCSS('border-top-width', '0px');
+  await page.getByRole('link', { name: 'Zurück' }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByText('BrainApp', { exact: true })).toBeVisible();
+});
+
 test('shows associated exercises and capability flags', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Übungen', level: 1 })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Trainingsbereiche' })).toBeVisible();

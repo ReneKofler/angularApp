@@ -6,8 +6,10 @@ test.beforeEach(async ({ page }) => signIn(page));
 test('shows the complete module grid and working modules', async ({ page }) => {
   await expect(page.locator('.module')).toHaveCount(20);
   await expect(page.getByRole('link', { name: /Sport Tracking/ })).toHaveAttribute('href', '/workouts');
+  await expect(page.getByRole('link', { name: /CrossFit/ })).toHaveAttribute('href', '/crossfit');
   await expect(page.getByRole('link', { name: /Notizen/ })).toHaveAttribute('href', '/notes');
-  await expect(page.locator('.module.unavailable')).toHaveCount(18);
+  await expect(page.getByRole('link', { name: /Übungen/ })).toHaveAttribute('href', '/training');
+  await expect(page.locator('.module.unavailable')).toHaveCount(16);
 });
 
 test('navigates to Notes and back to the dashboard', async ({ page }) => {

@@ -105,7 +105,7 @@ test('matches the original Sports layout and renders DNF results', async ({ page
 });
 
 test('filters recent sessions by type, focus, equipment, and search', async ({ page }) => {
-  await page.getByRole('button', { name: 'FOR_TIME' }).click();
+  await page.getByRole('button', { name: 'FOR_TIME', exact: true }).click();
   await page.getByLabel('Fokus').getByRole('button', { name: 'Conditioning' }).click();
   await page
     .getByLabel('Equipment')
