@@ -36,6 +36,7 @@ export class GreasingTheGroove {
   readonly totalReps = computed(() =>
     this.dayEntries().reduce((total, entry) => total + entry.reps, 0),
   );
+  readonly isPastDay = computed(() => this.selectedDate() < this.today());
   readonly availableExercises = computed(() => {
     const selected = new Set(this.dayEntries().map((entry) => entry.exercise_id));
     return this.exercises().filter((exercise) => !selected.has(exercise.id));
@@ -127,6 +128,15 @@ export class GreasingTheGroove {
     await this.run(async () => {
       await this.service.removeExercise(day, entry, this.dayEntries());
       this.entries.update((entries) => entries.filter((item) => item.id !== entry.id));
+    });
+  }
+
+  async createSportEntry() {
+    const day = this.selectedDay();
+    if (!day || !this.isPastDay() || day.sport_workout_id) return;
+    await this.run(async () => {
+      const updated = await this.service.createSportEntry(day, this.dayEntries());
+      this.days.update((days) => days.map((item) => (item.id === updated.id ? updated : item)));
     });
   }
 

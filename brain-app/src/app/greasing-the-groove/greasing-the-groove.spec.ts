@@ -31,6 +31,10 @@ describe('GreasingTheGroove', () => {
       ],
     }),
     startDay: vi.fn().mockResolvedValue(day),
+    createSportEntry: vi.fn().mockImplementation(async (current) => ({
+      ...current,
+      sport_workout_id: 'workout-1',
+    })),
     addExercise: vi.fn(),
     setReps: vi.fn().mockImplementation(async (_day, current, reps) => ({ ...current, reps })),
     removeExercise: vi.fn(),
@@ -70,5 +74,17 @@ describe('GreasingTheGroove', () => {
     await fixture.componentInstance.startDay();
     expect(service.startDay).toHaveBeenCalledWith(expect.any(String));
     expect(fixture.componentInstance.days()).toContain(day);
+  });
+
+  it('creates a linked sport entry for a past day', async () => {
+    const pastDay = { ...day, practice_date: '2026-06-02', sport_workout_id: null };
+    service.load.mockResolvedValueOnce({ days: [pastDay], entries: [], exercises: [] });
+    const fixture = TestBed.createComponent(GreasingTheGroove);
+    fixture.componentInstance.selectedDate.set('2026-06-02');
+    await fixture.whenStable();
+    fixture.componentInstance.days.set([pastDay]);
+    await fixture.componentInstance.createSportEntry();
+    expect(service.createSportEntry).toHaveBeenCalledWith(pastDay, []);
+    expect(fixture.componentInstance.selectedDay()?.sport_workout_id).toBe('workout-1');
   });
 });

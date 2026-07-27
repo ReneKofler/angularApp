@@ -82,34 +82,58 @@ export class GreasingTheGrooveService {
     if (existing.error) throw existing.error;
     if (existing.data) return existing.data as GrooveDay;
 
-    const workout = await client
-      .from('workouts')
-      .insert({
-        user_id: userId,
-        workout_type: 'greasing_the_groove',
-        workout_date: practiceDate,
-        workout_name: 'Greasing the Groove',
-        reps: 0,
-        exercise_reps: [],
-      })
-      .select('id')
-      .single();
-    if (workout.error) throw workout.error;
-
     const day = await client
       .from('greasing_the_groove_days')
       .insert({
         user_id: userId,
         practice_date: practiceDate,
-        sport_workout_id: workout.data.id,
       })
       .select()
       .single();
-    if (day.error) {
-      await client.from('workouts').delete().eq('id', workout.data.id).eq('user_id', userId);
-      throw day.error;
-    }
+    if (day.error) throw day.error;
     return day.data as GrooveDay;
+  }
+
+  async createSportEntry(
+    day: GrooveDay,
+    dayEntries: GrooveExercise[],
+  ): Promise<GrooveDay> {
+    if (day.sport_workout_id) return day;
+    const client = this.client();
+    const userId = this.userId();
+    const exerciseReps = dayEntries.map((entry) => ({
+      exercise_id: entry.exercise_id,
+      name: entry.name,
+      reps: entry.reps,
+    }));
+    const workout = await client
+      .from('workouts')
+      .insert({
+        user_id: userId,
+        workout_type: 'greasing_the_groove',
+        workout_date: day.practice_date,
+        workout_name: 'Greasing the Groove',
+        reps: exerciseReps.reduce((sum, entry) => sum + entry.reps, 0),
+        exercise_reps: exerciseReps,
+      })
+      .select('id')
+      .single();
+    if (workout.error) throw workout.error;
+
+    const updatedDay = await client
+      .from('greasing_the_groove_days')
+      .update({ sport_workout_id: workout.data.id })
+      .eq('id', day.id)
+      .eq('user_id', userId)
+      .is('sport_workout_id', null)
+      .select()
+      .maybeSingle();
+    if (updatedDay.error || !updatedDay.data) {
+      await client.from('workouts').delete().eq('id', workout.data.id).eq('user_id', userId);
+      if (updatedDay.error) throw updatedDay.error;
+      throw new Error('Der Sport-Eintrag wurde bereits erstellt.');
+    }
+    return updatedDay.data as GrooveDay;
   }
 
   async addExercise(

@@ -79,6 +79,21 @@
           <p class="empty compact">Wähle eine Übung aus, um Wiederholungen zu sammeln.</p>
         }
       </section>
+
+      @if (isPastDay()) {
+        @if (selectedDay()?.sport_workout_id) {
+          <p class="sport-status" role="status">Sport-Eintrag wurde bereits erstellt.</p>
+        } @else {
+          <button
+            type="button"
+            class="sport-entry"
+            [disabled]="saving() || !dayEntries().length"
+            (click)="createSportEntry()"
+          >
+            Sport-Eintrag erstellen
+          </button>
+        }
+      }
     }
   </main>
 </div>
