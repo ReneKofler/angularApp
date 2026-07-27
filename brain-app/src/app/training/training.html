@@ -1,0 +1,313 @@
+<div class="training-page">
+  <header>
+    <a routerLink="/" aria-label="Zurück">‹</a>
+    <h1>Übungen</h1>
+  </header>
+  <nav aria-label="Trainingsbereiche">
+    <button [class.active]="tab() === 'exercises'" (click)="tab.set('exercises'); editor.set(null)">
+      Übungen
+    </button>
+    <button [class.active]="tab() === 'equipment'" (click)="tab.set('equipment'); editor.set(null)">
+      Equipment
+    </button>
+    <button [class.active]="tab() === 'muscles'" (click)="tab.set('muscles'); editor.set(null)">
+      Muskeln
+    </button>
+  </nav>
+  <main>
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+    @if (!editor()) {
+      @if (tab() === 'exercises') {
+        <button class="add" (click)="newItem('exercise')">+ Übung</button>
+        <input
+          class="search"
+          aria-label="Suchen"
+          placeholder="Suchen…"
+          [ngModel]="query()"
+          (ngModelChange)="query.set($event)"
+        />
+        @if (loading()) {
+          <p class="empty">Wird geladen…</p>
+        }
+        <section class="collection-panel">
+          <h2>Übungen</h2>
+          <section class="cards">
+            @for (item of filteredExercises(); track item.id) {
+              <button class="card" (click)="editExercise(item)">
+                <strong>{{ item.name }}</strong
+                ><small>{{ equipmentNames(item.equipment_ids) }}</small>
+                <div>
+                  @for (label of capabilityLabels(item); track label) {
+                    <span>{{ label }}</span>
+                  }
+                </div>
+              </button>
+            }
+          </section>
+        </section>
+      } @else if (tab() === 'equipment') {
+        <button class="add" (click)="newItem('equipment')">+ Equipment</button>
+        <section class="collection-panel">
+          <h2>Equipment</h2>
+          <section class="cards">
+            @for (item of filteredEquipment(); track item.id) {
+              <button class="card" (click)="editEquipment(item)">
+                <strong>{{ item.icon || '🏋️' }} {{ item.name }}</strong>
+              </button>
+            }
+          </section>
+        </section>
+      } @else {
+        <section class="muscle-panel">
+          <h2>Muskeln</h2>
+          <p>Wähle rechts einen Muskel aus, um ihn am Körper hervorzuheben.</p>
+          <div class="muscle-layout">
+            <div class="muscle-map">
+              <img
+                class="muscle-figure"
+                src="images/muscle-anatomy.png"
+                alt="Frontansicht der menschlichen Muskelgruppen"
+              />
+              <svg class="muscle-overlay" viewBox="0 0 512 768" aria-hidden="true">
+                <g data-muscle="Chest" [class.active]="selectedMuscle() === 'Chest'">
+                  <path d="M171 164Q208 139 250 163L248 217Q211 229 174 207Z" />
+                  <path d="M341 164Q304 139 262 163L264 217Q301 229 338 207Z" />
+                </g>
+                <g data-muscle="Back" [class.active]="selectedMuscle() === 'Back'">
+                  <path d="M213 137Q235 143 250 160L230 181 199 162Z" />
+                  <path d="M299 137Q277 143 262 160L282 181 313 162Z" />
+                  <path d="M174 211Q192 222 215 229L226 326 190 291Z" />
+                  <path d="M338 211Q320 222 297 229L286 326 322 291Z" />
+                </g>
+                <g data-muscle="Shoulders" [class.active]="selectedMuscle() === 'Shoulders'">
+                  <path d="M126 153Q153 125 187 151L178 194Q147 190 122 171Z" />
+                  <path d="M386 153Q359 125 325 151L334 194Q365 190 390 171Z" />
+                </g>
+                <g data-muscle="Biceps" [class.active]="selectedMuscle() === 'Biceps'">
+                  <path
+                    d="M132 139Q157 126 184 144L190 169Q169 190 137 177L123 158Q121 147 132 139Z"
+                  />
+                  <path
+                    d="M380 139Q355 126 328 144L322 169Q343 190 375 177L389 158Q391 147 380 139Z"
+                  />
+                </g>
+                <g data-muscle="Triceps" [class.active]="selectedMuscle() === 'Triceps'">
+                  <path d="M128 183Q151 188 159 213L145 253Q121 246 111 224Z" />
+                  <path d="M384 183Q361 188 353 213L367 253Q391 246 401 224Z" />
+                </g>
+                <g data-muscle="Forearms" [class.active]="selectedMuscle() === 'Forearms'">
+                  <path d="M130 58Q155 50 175 70L208 116Q188 116 166 101L137 79Q124 70 130 58Z" />
+                  <path d="M382 58Q357 50 337 70L304 116Q324 116 346 101L375 79Q388 70 382 58Z" />
+                </g>
+                <g data-muscle="Core" [class.active]="selectedMuscle() === 'Core'">
+                  <path d="M216 222Q256 211 296 222L291 348 256 378 221 348Z" />
+                </g>
+                <g data-muscle="Quads" [class.active]="selectedMuscle() === 'Quads'">
+                  <path d="M196 372Q230 361 247 394L229 528Q198 536 178 499Z" />
+                  <path d="M316 372Q282 361 265 394L283 528Q314 536 334 499Z" />
+                </g>
+                <g data-muscle="Glutes" [class.active]="selectedMuscle() === 'Glutes'">
+                  <path d="M190 343Q224 333 252 365L241 411Q207 408 181 385Z" />
+                  <path d="M322 343Q288 333 260 365L271 411Q305 408 331 385Z" />
+                </g>
+                <g data-muscle="Hamstrings" [class.active]="selectedMuscle() === 'Hamstrings'">
+                  <path d="M184 390Q207 375 226 403L217 524Q190 519 177 488Z" />
+                  <path d="M328 390Q305 375 286 403L295 524Q322 519 335 488Z" />
+                </g>
+                <g data-muscle="Calves" [class.active]="selectedMuscle() === 'Calves'">
+                  <path d="M184 527Q214 514 224 546L211 657Q186 674 172 646Z" />
+                  <path d="M328 527Q298 514 288 546L301 657Q326 674 340 646Z" />
+                </g>
+              </svg>
+            </div>
+            <div class="muscle-list">
+              @for (muscle of muscleGroups; track muscle) {
+                <button
+                  type="button"
+                  [class.active]="selectedMuscle() === muscle"
+                  (click)="selectedMuscle.set(muscle)"
+                >
+                  {{ muscle }}
+                </button>
+              }
+            </div>
+          </div>
+        </section>
+      }
+    } @else if (editor() === 'equipment') {
+      <form (ngSubmit)="save()">
+        <h2>{{ editingId() ? 'Equipment bearbeiten' : 'Equipment erstellen' }}</h2>
+        <label
+          >Icon<input
+            maxlength="4"
+            [ngModel]="icon()"
+            (ngModelChange)="icon.set($event)"
+            name="icon" /></label
+        ><label
+          >Name<input required [ngModel]="name()" (ngModelChange)="name.set($event)" name="name"
+        /></label>
+        <div class="actions">
+          @if (editingId()) {
+            <button type="button" class="delete" (click)="remove()">Löschen</button>
+          }
+          <button type="button" (click)="editor.set(null)">Abbrechen</button
+          ><button class="primary">Speichern</button>
+        </div>
+      </form>
+    } @else if (editor() === 'exercise') {
+      <form (ngSubmit)="save()">
+        <h2>{{ editingId() ? 'Übung bearbeiten' : 'Übung erstellen' }}</h2>
+        <label
+          >Name<input required [ngModel]="name()" (ngModelChange)="name.set($event)" name="name"
+        /></label>
+        <fieldset>
+          <legend>Equipment</legend>
+          <div class="checks">
+            @for (item of equipment(); track item.id) {
+              <label
+                ><input
+                  type="checkbox"
+                  [checked]="selectedEquipment().includes(item.id)"
+                  (change)="toggleEquipment(item.id, $any($event.target).checked)"
+                />{{ item.icon }} {{ item.name }}</label
+              >
+            }
+          </div>
+        </fieldset>
+        <label
+          >Muskelgruppen (kommagetrennt)<input
+            [ngModel]="muscles()"
+            (ngModelChange)="muscles.set($event)"
+            name="muscles"
+        /></label>
+        <fieldset>
+          <legend>Felder & Fähigkeiten</legend>
+          <div class="checks">
+            @for (
+              item of [
+                { key: 'kg', label: 'Gewicht' },
+                { key: 'reps', label: 'Wiederholungen' },
+                { key: 'time', label: 'Zeit' },
+                { key: 'meter', label: 'Meter' },
+                { key: 'calories', label: 'Kalorien' },
+                { key: 'oneRm', label: '1RM' },
+                { key: 'maxReps', label: 'Max Reps' },
+              ];
+              track item.key
+            ) {
+              <label
+                ><input
+                  type="checkbox"
+                  [checked]="$any(capabilities())[item.key]"
+                  (change)="toggleCapability($any(item.key), $any($event.target).checked)"
+                />{{ item.label }}</label
+              >
+            }
+          </div>
+        </fieldset>
+        <div class="actions">
+          @if (editingId()) {
+            <button type="button" class="delete" (click)="remove()">Löschen</button>
+          }
+          <button type="button" (click)="editor.set(null)">Abbrechen</button
+          ><button class="primary">Speichern</button>
+        </div>
+      </form>
+    } @else if (editor() === 'plan') {
+      <form (ngSubmit)="save()">
+        <h2>{{ editingId() ? 'Trainingsplan bearbeiten' : 'Trainingsplan erstellen' }}</h2>
+        <label
+          >Name<input
+            required
+            [ngModel]="name()"
+            (ngModelChange)="name.set($event)"
+            name="name" /></label
+        ><label
+          >Beschreibung<textarea
+            [ngModel]="description()"
+            (ngModelChange)="description.set($event)"
+            name="description"
+          ></textarea></label
+        ><label
+          >Geschätzte Dauer<input
+            placeholder="z.B. 45 Min."
+            [ngModel]="duration()"
+            (ngModelChange)="duration.set($event)"
+            name="duration"
+        /></label>
+        <fieldset>
+          <legend>Geordnete Übungen</legend>
+          @for (item of planExercises(); track $index) {
+            <div class="plan-row">
+              <strong>{{ $index + 1 }}. {{ item.name }}</strong
+              ><input
+                type="number"
+                min="1"
+                aria-label="Sätze"
+                [ngModel]="item.sets"
+                (ngModelChange)="updatePlanExercise($index, 'sets', $event)"
+                [name]="'sets' + $index"
+              /><input
+                type="number"
+                min="0"
+                aria-label="Reps"
+                [ngModel]="item.reps"
+                (ngModelChange)="updatePlanExercise($index, 'reps', $event)"
+                [name]="'reps' + $index"
+              /><button type="button" (click)="movePlanExercise($index, -1)">↑</button
+              ><button type="button" (click)="movePlanExercise($index, 1)">↓</button
+              ><button type="button" (click)="removePlanExercise($index)">×</button>
+            </div>
+          }
+          <select
+            aria-label="Übung hinzufügen"
+            [ngModel]="exerciseToAdd()"
+            (ngModelChange)="addPlanExercise($event)"
+            name="addExercise"
+          >
+            <option value="">+ Übung hinzufügen</option>
+            @for (item of exercises(); track item.id) {
+              <option [value]="item.id">{{ item.name }}</option>
+            }
+          </select>
+        </fieldset>
+        <div class="actions">
+          @if (editingId()) {
+            <button type="button" class="delete" (click)="remove()">Löschen</button>
+          }
+          <button type="button" (click)="editor.set(null)">Abbrechen</button
+          ><button class="primary">Speichern</button>
+        </div>
+      </form>
+    } @else if (editor() === 'log') {
+      <form (ngSubmit)="saveLog()">
+        <h2>{{ loggingPlan()?.name }} loggen</h2>
+        <label
+          >Datum<input
+            type="date"
+            [ngModel]="logDate()"
+            (ngModelChange)="logDate.set($event)"
+            name="logDate" /></label
+        ><label
+          >Dauer<input
+            placeholder="z.B. 42:00"
+            [ngModel]="logDuration()"
+            (ngModelChange)="logDuration.set($event)"
+            name="logDuration" /></label
+        ><label
+          >Notizen<textarea
+            [ngModel]="logNotes()"
+            (ngModelChange)="logNotes.set($event)"
+            name="logNotes"
+          ></textarea>
+        </label>
+        <div class="actions">
+          <button type="button" (click)="editor.set(null)">Abbrechen</button
+          ><button class="primary">Training speichern</button>
+        </div>
+      </form>
+    }
+  </main>
+</div>

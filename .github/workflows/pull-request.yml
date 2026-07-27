@@ -1,0 +1,77 @@
+name: Pull request checks
+
+on:
+  pull_request:
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build, unit, and Playwright tests
+    runs-on: ubuntu-latest
+    environment: e2e
+    defaults:
+      run:
+        working-directory: brain-app
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: brain-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure test environment
+        env:
+          SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
+          E2E_USER: ${{ secrets.E2E_EMAIL }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ] || [ -z "$E2E_USER" ] || [ -z "$E2E_PASSWORD" ]; then
+            echo "::error::Configure NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, ORIGINAL_PAGE_USER, and ORIGINAL_PAGE_PASSWORD as repository secrets."
+            exit 1
+          fi
+          printf '%s\n' \
+            "NEXT_PUBLIC_SUPABASE_URL=$SUPABASE_URL" \
+            "NEXT_PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY" \
+            "ORIGINAL_PAGE_USER=$E2E_USER" \
+            "ORIGINAL_PAGE_PASSWORD=$E2E_PASSWORD" > ../.env
+
+      - name: Generate local Angular environment
+        run: npm run prestart
+
+      - name: Run unit tests
+        run: npm test -- --watch=false
+
+      - name: Build application
+        run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chrome
+
+      - name: Run Playwright tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            brain-app/playwright-report
+            brain-app/test-results
+          if-no-files-found: ignore
+          retention-days: 7
