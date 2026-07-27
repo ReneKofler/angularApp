@@ -32,13 +32,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run unit tests
-        run: npm test -- --watch=false
-
-      - name: Build application
-        run: npm run build
-
-      - name: Configure end-to-end test environment
+      - name: Configure test environment
         env:
           SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -54,6 +48,15 @@ jobs:
             "NEXT_PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY" \
             "ORIGINAL_PAGE_USER=$E2E_USER" \
             "ORIGINAL_PAGE_PASSWORD=$E2E_PASSWORD" > ../.env
+
+      - name: Generate local Angular environment
+        run: npm run prestart
+
+      - name: Run unit tests
+        run: npm test -- --watch=false
+
+      - name: Build application
+        run: npm run build
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps chrome
