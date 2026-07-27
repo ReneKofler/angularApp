@@ -1,0 +1,17 @@
+:host{display:block;min-height:100vh;color:#f8fafc;background:#0f1929}
+header{display:flex;min-height:4.35rem;align-items:center;gap:1rem;padding:0 2rem;border-bottom:1px solid #344257;background:#1e2a3b}
+header a{color:#fff;font-size:2.2rem;text-decoration:none}header h1{margin:0;font-size:1.2rem}header button{margin-left:auto}
+main{width:min(52rem,calc(100% - 2rem));margin:auto;padding:2rem 0}
+button{padding:.65rem .9rem;border:1px solid #475569;border-radius:.5rem;color:#fff;background:#334155;cursor:pointer}
+.date-nav{display:grid;grid-template-columns:auto 1fr auto;gap:.7rem;padding:1rem;border-radius:.7rem;background:#1e2a3b}
+input{box-sizing:border-box;width:100%;padding:.7rem;border:1px solid #475569;border-radius:.5rem;color:#fff;background:#334155;font:inherit}
+.progress-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin:1rem 0}.progress-grid article{padding:1rem;border-radius:.7rem;background:#1e2a3b}
+.progress-grid article div{display:flex;justify-content:space-between;gap:.5rem}.progress-grid span{color:#94a3b8;font-size:.85rem}
+progress{width:100%;height:.65rem;margin-top:.7rem;accent-color:#00a477}
+.add{width:100%;border:0;background:#009e76;font-weight:700}.meals{margin-top:1rem;padding:1.2rem;border-radius:.7rem;background:#1e2a3b}.meals h2{margin-top:0}
+.meal{display:grid;width:100%;grid-template-columns:1fr auto;gap:.4rem;margin-top:.6rem;text-align:left}.meal small{grid-column:1/-1;color:#94a3b8}
+form{display:grid;gap:1rem;margin-top:1rem;padding:1.2rem;border-radius:.7rem;background:#1e2a3b}form h2,form p{margin:0}form p{color:#94a3b8}
+label{display:grid;gap:.35rem}.fields{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.actions{display:flex;justify-content:flex-end;gap:.5rem}.actions .delete{margin-right:auto;color:#fda4af;background:#4c1d2a}.primary{border:0;background:#009e76}
+.empty{text-align:center;color:#94a3b8}.error{padding:1rem;border-radius:.6rem;color:#fecdd3;background:#4c1d2a}
+button:disabled{cursor:not-allowed;opacity:.55}
+@media(max-width:600px){header{padding-inline:1rem}main{padding-top:1rem}.progress-grid,.fields{grid-template-columns:1fr}.progress-grid article div{align-items:flex-start;flex-direction:column}}

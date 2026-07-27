@@ -13,7 +13,8 @@ test('shows the complete module grid and working modules', async ({ page }) => {
     'href',
     '/greasing-the-groove',
   );
-  await expect(page.locator('.module.unavailable')).toHaveCount(16);
+  await expect(page.getByRole('link', { name: /Ernährung/ })).toHaveAttribute('href', '/nutrition');
+  await expect(page.locator('.module.unavailable')).toHaveCount(15);
 });
 
 test('navigates to Greasing the Groove and back to the dashboard', async ({ page }) => {

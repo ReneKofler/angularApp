@@ -1,0 +1,57 @@
+<div class="nutrition-page">
+  <header><a routerLink="/" aria-label="Zurück">‹</a><h1>Ernährung</h1><button type="button" (click)="openGoals()">Ziele</button></header>
+  <main>
+    <section class="date-nav" aria-label="Tagebuchdatum">
+      <button type="button" aria-label="Vorheriger Tag" (click)="shiftDate(-1)">‹</button>
+      <input type="date" aria-label="Datum" [ngModel]="date()" (ngModelChange)="changeDate($event)" />
+      <button type="button" aria-label="Nächster Tag" (click)="shiftDate(1)">›</button>
+    </section>
+    @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+    @if (editor() === 'goals') {
+      <form (ngSubmit)="saveGoals()">
+        <h2>Ernährungsziele</h2>
+        <p>Änderungen werden mit Datum gespeichert und verändern frühere Tagesziele nicht.</p>
+        <div class="fields">
+          @for (item of nutrientConfig; track item.key) {
+            <label>{{ item.label }} ({{ item.unit }})<input type="number" min="0" step="0.1" [ngModel]="goalDraft()[item.goal]" (ngModelChange)="setGoal(item.goal, $event)" [name]="item.goal" /></label>
+          }
+        </div>
+        <div class="actions"><button type="button" (click)="editor.set(null)">Abbrechen</button><button class="primary" [disabled]="saving()">Ziele speichern</button></div>
+      </form>
+    } @else if (editor() === 'meal') {
+      <form (ngSubmit)="saveMeal()">
+        <h2>{{ editingId() ? 'Mahlzeit bearbeiten' : 'Mahlzeit hinzufügen' }}</h2>
+        <label>Name<input required [ngModel]="name()" (ngModelChange)="name.set($event)" name="name" /></label>
+        <div class="fields">
+          @for (item of nutrientConfig; track item.key) {
+            <label>{{ item.label }} ({{ item.unit }})<input type="number" min="0" step="0.1" [ngModel]="nutrients()[item.key]" (ngModelChange)="setNutrient(item.key, $event)" [name]="item.key" /></label>
+          }
+        </div>
+        <div class="actions">
+          @if (editingId()) { <button type="button" class="delete" (click)="deleteMeal()">Löschen</button> }
+          <button type="button" (click)="editor.set(null)">Abbrechen</button><button class="primary" [disabled]="saving()">Speichern</button>
+        </div>
+      </form>
+    } @else {
+      <section class="progress-grid" aria-label="Tagesfortschritt">
+        @for (item of nutrientConfig; track item.key) {
+          <article>
+            <div><strong>{{ item.label }}</strong><span>{{ rounded(totals()[item.key]) }} / {{ rounded(activeGoals()[item.goal]) }} {{ item.unit }}</span></div>
+            <progress [value]="progress(totals()[item.key], activeGoals()[item.goal])" max="100"></progress>
+          </article>
+        }
+      </section>
+      <button class="add" type="button" (click)="newMeal()">+ Mahlzeit</button>
+      <section class="meals">
+        <h2>Mahlzeiten</h2>
+        @if (loading()) { <p class="empty">Wird geladen…</p> }
+        @for (meal of meals(); track meal.id) {
+          <button type="button" class="meal" (click)="editMeal(meal)">
+            <strong>{{ meal.name }}</strong><span>{{ rounded(meal.kcal) }} kcal</span>
+            <small>P {{ rounded(meal.protein_g) }} g · F {{ rounded(meal.fat_g) }} g · KH {{ rounded(meal.carbs_g) }} g · Ballaststoffe {{ rounded(meal.fiber_g) }} g · Salz {{ rounded(meal.salt_g) }} g</small>
+          </button>
+        } @empty { @if (!loading()) { <p class="empty">Noch keine Mahlzeiten für diesen Tag.</p> } }
+      </section>
+    }
+  </main>
+</div>
