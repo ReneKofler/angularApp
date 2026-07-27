@@ -30,6 +30,11 @@ export const routes: Routes = [
       import('./greasing-the-groove/greasing-the-groove').then((m) => m.GreasingTheGroove),
   },
   {
+    path: 'nutrition',
+    canActivate: [authGuard],
+    loadComponent: () => import('./nutrition/nutrition').then((m) => m.Nutrition),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
