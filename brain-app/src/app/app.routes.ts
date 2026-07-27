@@ -35,6 +35,11 @@ export const routes: Routes = [
     loadComponent: () => import('./nutrition/nutrition').then((m) => m.Nutrition),
   },
   {
+    path: 'recipes',
+    canActivate: [authGuard],
+    loadComponent: () => import('./recipes/recipes').then((m) => m.Recipes),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),

@@ -1,0 +1,62 @@
+<div class="recipes-page">
+  <header><a routerLink="/" aria-label="Zurück">‹</a><h1>Rezepte</h1></header>
+  <main>
+    @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+    @if (!selected() && !editing()) {
+      <button class="add" type="button" (click)="newRecipe()">+ Rezept</button>
+      <input class="search" aria-label="Rezepte suchen" placeholder="Rezepte oder Zutaten suchen…" [ngModel]="query()" (ngModelChange)="query.set($event)" />
+      <nav aria-label="Rezeptfilter">
+        <button [class.active]="filter()==='all'" (click)="filter.set('all')">Alle</button>
+        <button [class.active]="filter()==='favourites'" (click)="filter.set('favourites')">Favoriten</button>
+        <button [class.active]="filter()==='meal-prep'" (click)="filter.set('meal-prep')">Meal Prep</button>
+      </nav>
+      <section class="grid">
+        @for (recipe of filtered(); track recipe.id) {
+          <article (click)="open(recipe)" tabindex="0">
+            <div class="image">
+              @if (recipe.image_url) { <img [src]="recipe.image_url" [alt]="recipe.name" (error)="imageFailed($event)" /> }
+              <span aria-hidden="true">🍳</span>
+            </div>
+            <div class="card-body"><h2>{{ recipe.name }}</h2>
+              <p>{{ recipe.prep_time ? recipe.prep_time + ' Min.' : 'Keine Zeitangabe' }} · {{ recipe.servings || 1 }} Portionen</p>
+              <div>@if (recipe.meal_prep) { <span>Meal Prep</span> } @if (recipe.rating) { <span>★ {{ recipe.rating }}/5</span> }</div>
+            </div>
+            <button type="button" class="star" [attr.aria-label]="recipe.is_favourite ? 'Favorit entfernen' : 'Als Favorit markieren'" (click)="favourite(recipe,$event)">{{ recipe.is_favourite ? '★' : '☆' }}</button>
+          </article>
+        } @empty { @if (!loading()) { <p class="empty">Keine passenden Rezepte.</p> } }
+      </section>
+    } @else if (editing()) {
+      <form (ngSubmit)="save()">
+        <h2>{{ selected() ? 'Rezept bearbeiten' : 'Rezept erstellen' }}</h2>
+        <label>Name<input required [ngModel]="draft().name" (ngModelChange)="update('name',$event)" name="name" /></label>
+        <label>Zutaten<textarea required [ngModel]="draft().ingredients" (ngModelChange)="update('ingredients',$event)" name="ingredients"></textarea></label>
+        <label>Zubereitung<textarea required [ngModel]="draft().preparation" (ngModelChange)="update('preparation',$event)" name="preparation"></textarea></label>
+        <div class="fields">
+          @for (item of [
+            {key:'servings',label:'Portionen'},{key:'prep_time',label:'Zubereitungszeit (Min.)'},
+            {key:'calories',label:'Kalorien'},{key:'protein',label:'Protein (g)'},
+            {key:'carbs',label:'Kohlenhydrate (g)'},{key:'fat',label:'Fett (g)'},
+            {key:'fiber',label:'Ballaststoffe (g)'},{key:'salt',label:'Salz (g)'},
+            {key:'rating',label:'Bewertung (1–5)'}]; track item.key) {
+            <label>{{ item.label }}<input type="number" min="0" [max]="item.key==='rating'?5:null" step="0.1" [ngModel]="$any(draft())[item.key]" (ngModelChange)="numeric($any(item.key),$event)" [name]="item.key" /></label>
+          }
+        </div>
+        <label>Bild-URL<input type="url" [ngModel]="draft().image_url" (ngModelChange)="update('image_url',$event||null)" name="image_url" /></label>
+        <label>Tipps<textarea [ngModel]="draft().tips" (ngModelChange)="update('tips',$event||null)" name="tips"></textarea></label>
+        <div class="checks"><label><input type="checkbox" [ngModel]="draft().meal_prep" (ngModelChange)="update('meal_prep',$event)" name="meal_prep" /> Meal Prep</label><label><input type="checkbox" [ngModel]="draft().is_favourite" (ngModelChange)="update('is_favourite',$event)" name="is_favourite" /> Favorit</label></div>
+        <div class="actions">@if(selected()){<button type="button" class="delete" (click)="remove()">Löschen</button>}<button type="button" (click)="editing.set(false); selected.set(null)">Abbrechen</button><button class="primary" [disabled]="saving()">Speichern</button></div>
+      </form>
+    } @else if (selected(); as recipe) {
+      <section class="detail">
+        <button type="button" (click)="selected.set(null)">← Zur Liste</button>
+        <div class="hero">@if(recipe.image_url){<img [src]="recipe.image_url" [alt]="recipe.name" (error)="imageFailed($event)" />}<span>🍳</span></div>
+        <h2>{{ recipe.name }}</h2><p>{{ recipe.prep_time || '–' }} Min. · {{ recipe.servings || 1 }} Portionen @if(recipe.rating){ · ★ {{recipe.rating}}/5 }</p>
+        <h3>Zutaten</h3><p class="multiline">{{ recipe.ingredients }}</p>
+        <h3>Zubereitung</h3><p class="multiline">{{ recipe.preparation }}</p>
+        <h3>Nährwerte</h3><p>{{ recipe.calories ?? '–' }} kcal · P {{ recipe.protein ?? '–' }} g · KH {{ recipe.carbs ?? '–' }} g · F {{ recipe.fat ?? '–' }} g · Ballaststoffe {{ recipe.fiber ?? '–' }} g · Salz {{ recipe.salt ?? '–' }} g</p>
+        @if(recipe.tips){<h3>Tipps</h3><p class="multiline">{{recipe.tips}}</p>}
+        <div class="actions"><button (click)="favourite(recipe)">{{recipe.is_favourite?'★ Favorit':'☆ Favorit'}}</button><button class="primary" (click)="edit(recipe)">Bearbeiten</button></div>
+      </section>
+    }
+  </main>
+</div>
