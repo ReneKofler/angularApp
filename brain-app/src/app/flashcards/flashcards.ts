@@ -41,6 +41,7 @@ export class Flashcards {
       const x = await this.service.load();
       this.categories.set(x.categories);
       this.cards.set(x.cards);
+      if (!this.selected() && x.categories[0]) this.selected.set(x.categories[0].id);
     } catch (e) {
       this.error.set(this.text(e));
     }
@@ -48,6 +49,8 @@ export class Flashcards {
   openCategory(id: string) {
     this.selected.set(id);
     this.query.set('');
+    this.editing.set(null);
+    this.form.set({ title: '', front: '', back: '', category_id: id });
   }
   closeCategory() {
     this.selected.set('');
@@ -57,22 +60,30 @@ export class Flashcards {
     return this.cards().filter((x) => x.category_id === id).length;
   }
   newCategory() {
-    this.categoryName.set('');
-    this.categoryEditor.set(true);
+    void this.saveCategory();
   }
   async saveCategory() {
     const name = this.categoryName().trim();
     if (!name) return;
     try {
       await this.service.saveCategory(name);
-      this.categoryEditor.set(false);
+      this.categoryName.set('');
       await this.load();
     } catch (e) {
       this.error.set(this.text(e));
     }
   }
-  async removeCategory() {
-    const id = this.selected();
+  async renameCategory(category: FlashcardCategory) {
+    const name = prompt('Neuer Kategoriename', category.name)?.trim();
+    if (!name || name === category.name) return;
+    try {
+      await this.service.saveCategory(name, category.id);
+      await this.load();
+    } catch (e) {
+      this.error.set(this.text(e));
+    }
+  }
+  async removeCategory(id = this.selected()) {
     if (id && confirm('Kategorie wirklich löschen?'))
       try {
         await this.service.removeCategory(id);
@@ -85,7 +96,7 @@ export class Flashcards {
   newCard() {
     this.editing.set(null);
     this.form.set({ title: '', front: '', back: '', category_id: this.selected() });
-    this.editor.set(true);
+    this.editor.set(false);
   }
   edit(x: Flashcard) {
     this.editing.set(x.id);
@@ -99,7 +110,10 @@ export class Flashcards {
     const f = this.form();
     if (!f.front.trim() || !f.back.trim()) return;
     try {
-      await this.service.saveCard(f, this.editing() ?? undefined);
+      await this.service.saveCard(
+        { ...f, category_id: f.category_id || this.selected() },
+        this.editing() ?? undefined,
+      );
       this.editor.set(false);
       this.message.set('Karte gespeichert.');
       await this.load();

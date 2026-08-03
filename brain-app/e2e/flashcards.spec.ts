@@ -24,7 +24,7 @@ test('filters cards and studies with reveal and keyboard navigation', async ({ p
   await page.getByLabel('Karten durchsuchen').fill('Begrüßung');
   await expect(page.getByText('Hallo')).toBeVisible();
   await page.getByLabel('Karten durchsuchen').fill('');
-  await page.getByRole('button', { name: 'Lernen' }).click();
+  await page.getByRole('button', { name: 'Lernen starten' }).click();
   const dialog = page.getByRole('dialog', { name: 'Lernmodus' });
   await expect(dialog.getByText('Hallo')).toBeVisible();
   await dialog.press(' ');
@@ -32,13 +32,11 @@ test('filters cards and studies with reveal and keyboard navigation', async ({ p
   await dialog.press('ArrowRight');
   await expect(dialog.getByText('Tschüss')).toBeVisible();
 });
-test('opens category and card editors with empty-safe controls', async ({ page }) => {
+test('shows inline category and card controls', async ({ page }) => {
   await page.goto('/flashcards');
-  await page.getByRole('button', { name: '+ Kategorie' }).click();
   await expect(page.getByLabel('Kategoriename')).toBeVisible();
-  await page.getByRole('button', { name: 'Abbrechen' }).click();
   await page.getByRole('button', { name: /Deutsch/ }).click();
-  await page.getByRole('button', { name: '+ Karte' }).click();
   await expect(page.getByLabel('Vorderseite')).toBeVisible();
   await expect(page.getByLabel('Rückseite')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Karte hinzufügen' })).toBeVisible();
 });
