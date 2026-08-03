@@ -46,33 +46,49 @@ export class FlagFootballService {
   private auth = inject(AuthService);
   async load() {
     const c = this.client(),
-      u = this.user(),
-      tables = [
-        'flag_football_formations',
-        'flag_football_routes',
-        'flag_football_plays',
-        'flag_football_playbook',
-      ];
-    const results = await Promise.all(
-      tables.map((t) =>
-        c
-          .from(t)
-          .select('*')
-          .eq('user_id', u)
-          .order(t.endsWith('playbook') ? 'position' : 'created_at'),
-      ),
-    );
-    const error = results.find((x) => x.error)?.error;
-    if (error) throw error;
+      u = this.user();
+    const routesResult = await c
+      .from('flag_football_routes')
+      .select('*')
+      .eq('user_id', u)
+      .order('created_at');
+    if (routesResult.error) throw routesResult.error;
+    const results = await Promise.all([
+      c.from('flag_football_formations').select('*').eq('user_id', u).order('created_at'),
+      c.from('flag_football_plays').select('*').eq('user_id', u).order('created_at'),
+      c.from('flag_football_playbook').select('*').eq('user_id', u).order('number'),
+    ]);
     return {
       formations: (results[0].data ?? []) as Formation[],
-      routes: (results[1].data ?? []) as Route[],
-      plays: (results[2].data ?? []) as Play[],
-      playbook: (results[3].data ?? []) as PlaybookEntry[],
+      routes: (routesResult.data ?? []).map((item: Record<string, unknown>) => ({
+        ...item,
+        aliases: item['alias'] ? [item['alias']] : [],
+      })) as Route[],
+      plays: (results[1].data ?? []).map((item: Record<string, unknown>) => ({
+        ...item,
+        assignments: item['route_assignments'] ?? [],
+      })) as Play[],
+      playbook: (results[2].data ?? []).map((item: Record<string, unknown>) => ({
+        ...item,
+        position: Number(item['number'] ?? 1) - 1,
+      })) as PlaybookEntry[],
     };
   }
   async save(table: string, value: object, id?: string) {
-    const data = { ...value, user_id: this.user() },
+    const translated = { ...value } as Record<string, unknown>;
+    if (table === 'flag_football_routes' && 'aliases' in translated) {
+      translated['alias'] = (translated['aliases'] as string[])[0] ?? '';
+      delete translated['aliases'];
+    }
+    if (table === 'flag_football_plays' && 'assignments' in translated) {
+      translated['route_assignments'] = translated['assignments'];
+      delete translated['assignments'];
+    }
+    if (table === 'flag_football_playbook' && 'position' in translated) {
+      translated['number'] = Number(translated['position']) + 1;
+      delete translated['position'];
+    }
+    const data = { ...translated, user_id: this.user() },
       r = id
         ? await this.client().from(table).update(data).eq('id', id).eq('user_id', this.user())
         : await this.client().from(table).insert(data);
@@ -92,12 +108,12 @@ export class FlagFootballService {
     if (table === 'flag_football_routes') {
       const plays = await this.client()
         .from('flag_football_plays')
-        .select('assignments')
+        .select('route_assignments')
         .eq('user_id', this.user());
       if (plays.error) throw plays.error;
       if (
-        (plays.data ?? []).some((p: { assignments?: Assignment[] }) =>
-          p.assignments?.some((a) => a.route_id === id),
+        (plays.data ?? []).some((p: { route_assignments?: Assignment[] }) =>
+          p.route_assignments?.some((a) => a.route_id === id),
         )
       )
         throw new Error('Route wird noch in einem Play verwendet.');
@@ -109,7 +125,7 @@ export class FlagFootballService {
     for (const [position, item] of items.entries()) {
       const r = await this.client()
         .from('flag_football_playbook')
-        .update({ position })
+        .update({ number: position + 1 })
         .eq('id', item.id)
         .eq('user_id', this.user());
       if (r.error) throw r.error;
