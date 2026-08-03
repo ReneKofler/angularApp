@@ -34,7 +34,11 @@
   @if (!selected()) {
     <section class="category-grid" aria-label="Ranking-Kategorien">
       @for (c of categories(); track c.id) {
-        <button class="category-tile" [style.background]="categoryBackground(c.color)" (click)="openCategory(c.id)">
+        <button
+          class="category-tile"
+          [style.background]="categoryBackground(c.color)"
+          (click)="openCategory(c.id)"
+        >
           <span>{{ c.icon }}</span
           ><strong>{{ c.name }}</strong
           ><small>{{ count(c.id) }} Einträge</small>
@@ -146,9 +150,12 @@
   </div>
 }
 @if (categoryEditor()) {
-  <div class="backdrop">
-    <form (ngSubmit)="saveCategory()">
-      <h2>{{ editingCategory() ? 'Kategorie bearbeiten' : 'Neue Kategorie' }}</h2>
+  <div class="backdrop category-backdrop">
+    <form class="category-sheet" (ngSubmit)="saveCategory()">
+      <div class="sheet-title">
+        <h2>{{ editingCategory() ? 'Kategorie bearbeiten' : 'Neue Kategorie' }}</h2>
+        <button type="button" aria-label="Schließen" (click)="categoryEditor.set(false)">×</button>
+      </div>
       <label
         >Name<input
           required
@@ -156,54 +163,75 @@
           (ngModelChange)="patchCategory('name', $event)"
           name="categoryName"
       /></label>
-      <div class="row">
-        <label
-          >Icon<input
-            [ngModel]="categoryForm().icon"
-            (ngModelChange)="patchCategory('icon', $event)"
-            name="icon" /></label
-        ><label
-          >Farbe<input
-            type="color"
-            [ngModel]="categoryForm().color"
-            (ngModelChange)="patchCategory('color', $event)"
-            name="color"
-        /></label>
-      </div>
       <label
-        >Ansicht<select
-          [ngModel]="categoryForm().view_mode"
-          (ngModelChange)="patchCategory('view_mode', $event)"
-          name="view"
-        >
-          <option value="grid">Kacheln</option>
-          <option value="list">Liste</option>
-        </select></label
-      >
-      @for (
-        f of [
-          { k: 'show_original_title', n: 'Originaltitel' },
-          { k: 'show_author', n: 'Autor/Regisseur' },
-          { k: 'show_year', n: 'Jahr' },
-          { k: 'show_plot', n: 'Beschreibung' },
-          { k: 'show_url', n: 'Link' },
-          { k: 'show_image_url', n: 'Bild' },
-          { k: 'show_brand', n: 'Marke' },
-          { k: 'show_episodes', n: 'Folgen' },
-          { k: 'show_seasons', n: 'Staffeln' },
-          { k: 'show_nutrition', n: 'Nährwerte' },
-        ];
-        track f.k
-      ) {
-        <label class="check"
-          ><input
-            type="checkbox"
-            [ngModel]="categoryForm()[f.k]"
-            (ngModelChange)="patchCategory(f.k, $event)"
-            [name]="f.k"
-          />{{ f.n }}</label
-        >
-      }
+        >Icon (Emoji)<input
+          class="emoji"
+          [ngModel]="categoryForm().icon"
+          (ngModelChange)="patchCategory('icon', $event)"
+          name="icon"
+      /></label>
+      <fieldset>
+        <legend>Farbe</legend>
+        <div class="color-palette">
+          @for (color of categoryColors; track color) {
+            <button
+              type="button"
+              [class.selected]="categoryForm().color === color"
+              [style.background]="categoryBackground(color)"
+              [attr.aria-label]="'Farbe ' + ($index + 1)"
+              (click)="patchCategory('color', color)"
+            ></button>
+          }
+        </div>
+      </fieldset>
+      <div class="category-preview" [style.background]="categoryBackground(categoryForm().color)">
+        {{ categoryForm().icon }} <strong>{{ categoryForm().name || 'Kategorie' }}</strong>
+      </div>
+      <fieldset>
+        <legend>Ansicht</legend>
+        <div class="view-toggle">
+          <button
+            type="button"
+            [class.active]="categoryForm().view_mode === 'list'"
+            (click)="patchCategory('view_mode', 'list')"
+          >
+            ☰ Liste</button
+          ><button
+            type="button"
+            [class.active]="categoryForm().view_mode !== 'list'"
+            (click)="patchCategory('view_mode', 'grid')"
+          >
+            ▦ Kacheln
+          </button>
+        </div>
+      </fieldset>
+      <fieldset class="visible-fields">
+        <legend>Sichtbare Felder</legend>
+        @for (
+          f of [
+            { k: 'show_original_title', n: 'Originaltitel (optional)' },
+            { k: 'show_author', n: 'Autor/Regisseur (optional)' },
+            { k: 'show_year', n: 'Jahr (optional)' },
+            { k: 'show_brand', n: 'Marke / Studio (optional)' },
+            { k: 'show_episodes', n: 'Hat Episoden' },
+            { k: 'show_seasons', n: 'Hat Staffeln' },
+            { k: 'show_plot', n: 'Plot (optional)' },
+            { k: 'show_url', n: 'URL (optional)' },
+            { k: 'show_image_url', n: 'Bild-URL (optional)' },
+            { k: 'show_nutrition', n: 'Nährwerte' },
+          ];
+          track f.k
+        ) {
+          <label class="switch-row"
+            ><span>{{ f.n }}</span
+            ><input
+              type="checkbox"
+              [ngModel]="categoryForm()[f.k]"
+              (ngModelChange)="patchCategory(f.k, $event)"
+              [name]="f.k" /><i></i
+          ></label>
+        }
+      </fieldset>
       <footer>
         @if (editingCategory()) {
           <button class="delete" type="button" (click)="removeCategory()">Löschen</button>

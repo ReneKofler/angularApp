@@ -11,6 +11,23 @@ import { Ranking, RankingCategory, RankingsService, ConsumedDate } from './ranki
 })
 export class Rankings {
   private service = inject(RankingsService);
+  readonly categoryColors = [
+    'amber',
+    'green',
+    'blue',
+    'purple',
+    'orange',
+    'teal',
+    'pink',
+    'indigo',
+    'red',
+    'cyan',
+    'lime',
+    'rose',
+    'violet',
+    'emerald',
+    'slate',
+  ].map((name) => `from-${name}-500 to-${name}-600`);
   readonly categories = signal<RankingCategory[]>([]);
   readonly items = signal<Ranking[]>([]);
   readonly history = signal<ConsumedDate[]>([]);
@@ -94,6 +111,12 @@ export class Rankings {
       cyan: ['#06b6d4', '#0891b2'],
       rose: ['#f43f5e', '#e11d48'],
       slate: ['#64748b', '#475569'],
+      orange: ['#f97316', '#ea580c'],
+      indigo: ['#6366f1', '#4f46e5'],
+      red: ['#ef4444', '#dc2626'],
+      lime: ['#84cc16', '#65a30d'],
+      violet: ['#8b5cf6', '#7c3aed'],
+      emerald: ['#10b981', '#059669'],
     };
     const name = Object.keys(palette).find((key) => color.includes(`-${key}-`)) ?? 'slate';
     return `linear-gradient(135deg, ${palette[name][0]}, ${palette[name][1]})`;
