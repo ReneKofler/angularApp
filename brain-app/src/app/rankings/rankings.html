@@ -12,15 +12,25 @@
   }
   <h1>{{ category()?.name || 'Rankings' }}</h1>
   @if (category()) {
-    <button class="icon-button" aria-label="Kategorie bearbeiten" (click)="editCategory()">
+    <button
+      class="icon-button category-edit"
+      aria-label="Kategorie bearbeiten"
+      (click)="editCategory()"
+    >
       ✎
     </button>
-    <button class="icon-button" aria-label="Listenansicht">▦</button>
+    <button class="icon-button category-actions" aria-label="Listenansicht">▦</button>
     <button class="icon-button" aria-label="Konsumverlauf">▤</button>
     <button class="icon-button" aria-label="Exportieren">↥</button>
     <button class="primary" (click)="newItem()">+ Ranking</button>
   } @else {
-    <button class="icon-button" aria-label="Einstellungen" (click)="openSettings()">⚙</button>
+    <button
+      class="icon-button overview-settings"
+      aria-label="Einstellungen"
+      (click)="openSettings()"
+    >
+      ⚙
+    </button>
     <button class="primary" (click)="newCategory()">+ Kategorie</button>
   }
 </header>

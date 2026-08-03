@@ -19,7 +19,11 @@ header a {
 }
 h1 {
   font-size: 1.25rem;
-  margin: 0 auto 0 0;
+  margin: 0;
+}
+.category-actions,
+.overview-settings {
+  margin-left: auto;
 }
 button {
   border: 1px solid #536177;
