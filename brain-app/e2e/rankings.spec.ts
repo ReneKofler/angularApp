@@ -69,3 +69,12 @@ test('opens category settings and exposes reorder controls', async ({ page }) =>
   await expect(page.getByRole('button', { name: 'Nach oben' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Nach unten' })).toBeVisible();
 });
+test('edits a focused tile without leaving the category overview', async ({ page }) => {
+  await page.goto('/rankings');
+  const tile = page.getByRole('button', { name: 'Filme öffnen' });
+  await tile.focus();
+  await page.getByRole('button', { name: 'Filme bearbeiten' }).click();
+  await expect(page.getByRole('heading', { name: 'Kategorie bearbeiten' })).toBeVisible();
+  await expect(page.locator('header').getByRole('heading', { name: 'Rankings' })).toBeVisible();
+  await expect(page.getByLabel('Rankings durchsuchen')).toHaveCount(0);
+});

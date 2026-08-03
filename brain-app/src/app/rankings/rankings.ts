@@ -224,7 +224,6 @@ export class Rankings {
     this.categoryEditor.set(true);
   }
   editCategoryFor(category: RankingCategory) {
-    this.selected.set(category.id);
     this.editingCategory.set(category.id);
     this.categoryForm.set({ ...category });
     this.categoryEditor.set(true);
