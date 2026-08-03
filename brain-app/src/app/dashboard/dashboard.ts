@@ -114,16 +114,16 @@ export class Dashboard {
   readonly saving = signal(false);
   readonly error = signal('');
   readonly draggedIndex = signal<number|null>(null);
-  readonly tileTheme = signal<'colorful'|'monochrome'>('colorful');
+  readonly tileStyle = signal<'colorful'|'uniform'>('colorful');
   readonly visibleModules = computed(()=>this.modules().filter(module=>(module as Module&{enabled?:boolean}).enabled!==false));
 
   constructor(){void this.loadSettings()}
   async loadSettings(){
     const client=this.auth.supabase;if(!client)return;
-    const result=await client.from('user_settings').select('dashboard_settings,preferences').maybeSingle();
+    const result=await client.from('user_settings').select('dashboard_settings,tile_style').maybeSingle();
     if(result.error){this.error.set(result.error.message);return}
     const stored=(result.data?.dashboard_settings??{}) as Record<string,{color?:string;enabled?:boolean;position?:number}>;
-    const preferences=(result.data?.preferences??{}) as Record<string,unknown>;this.tileTheme.set(preferences['tileTheme']==='monochrome'?'monochrome':'colorful');
+    this.tileStyle.set(result.data?.tile_style==='uniform'?'uniform':'colorful');
     this.modules.set(this.defaultModules.map((module,index)=>{
       const id=String(index+1),setting=stored[id];return {...module,id,color:setting?.color??module.color,enabled:setting?.enabled??true,position:setting?.position??index};
     }).sort((a:any,b:any)=>a.position-b.position));

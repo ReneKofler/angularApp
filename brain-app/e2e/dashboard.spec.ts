@@ -36,7 +36,7 @@ test('opens profile and shows account and global tile settings', async ({ page }
   await expect(page.getByRole('heading', { name: 'Profil' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'E-Mail-Adresse' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Dashboard-Kacheln' })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Schwarz-Weiß/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Einheitlich dunkel/ })).toBeVisible();
 });
 
 test('navigates to Greasing the Groove and back to the dashboard', async ({ page }) => {
