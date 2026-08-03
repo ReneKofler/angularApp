@@ -1,0 +1,159 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #0d1727;
+  color: #fff;
+}
+:host > header {
+  height: 58px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #1e2a3b;
+}
+:host > header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+button {
+  padding: 9px 13px;
+  border: 1px solid #526077;
+  border-radius: 7px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+.primary {
+  background: #9228e5;
+  border-color: #9228e5;
+}
+.danger {
+  color: #ff596b;
+}
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+}
+nav .active {
+  background: #9228e5;
+}
+main {
+  width: min(1000px, calc(100% - 32px));
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.error {
+  grid-column: 1/-1;
+  padding: 12px;
+  background: #4c1d2a;
+}
+.editor,
+.list,
+.playbook {
+  display: grid;
+  align-self: start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #1e2a3b;
+}
+.editor h2,
+.list h2,
+.playbook h2 {
+  margin: 0;
+}
+.editor label {
+  display: grid;
+  gap: 5px;
+}
+input,
+select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #526077;
+  border-radius: 7px;
+  background: #354154;
+  color: #fff;
+}
+.field,
+.mini-field {
+  position: relative;
+  height: 330px;
+  border: 2px solid #45647b;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #16733d 49%, #fff4 50%, #16733d 51%);
+}
+.player {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  background: #9228e5;
+}
+.mini-field {
+  height: 150px;
+}
+.mini-field i {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  background: #9228e5;
+  border-radius: 50%;
+  padding: 4px;
+  font-style: normal;
+}
+.list article {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #3d4b60;
+  border-radius: 8px;
+}
+.list small {
+  color: #9fb0c7;
+}
+svg {
+  height: 330px;
+  background: #16733d;
+  border-radius: 10px;
+}
+polyline {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 3;
+}
+.playbook {
+  grid-column: 1/-1;
+}
+.playbook article {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #3d4b60;
+  border-radius: 8px;
+}
+@media (max-width: 700px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+  .playbook {
+    grid-column: 1;
+  }
+  .playbook article {
+    grid-template-columns: 1fr auto;
+  }
+  .field,
+  svg {
+    height: 260px;
+  }
+}

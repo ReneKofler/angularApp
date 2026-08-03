@@ -36,7 +36,11 @@ test('shows the complete module grid and working modules', async ({ page }) => {
     '/stretching',
   );
   await expect(page.getByRole('link', { name: /Linedance/ })).toHaveAttribute('href', '/linedance');
-  await expect(page.locator('.module.unavailable')).toHaveCount(7);
+  await expect(page.getByRole('link', { name: /Flag Football/ })).toHaveAttribute(
+    'href',
+    '/flag-football',
+  );
+  await expect(page.locator('.module.unavailable')).toHaveCount(6);
 });
 
 test('opens dashboard settings with reorder, visibility, and color controls', async ({ page }) => {
