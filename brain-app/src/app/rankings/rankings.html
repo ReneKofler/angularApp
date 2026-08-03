@@ -79,9 +79,9 @@
         (ngModelChange)="query.set($event)"
       /><select aria-label="Status" [ngModel]="status()" (ngModelChange)="status.set($event)">
         <option value="">Alle Status</option>
-        <option>Erledigt</option>
-        <option>Dran</option>
-        <option>Geplant</option></select
+        <option value="done">Erledigt</option>
+        <option value="current">Dran</option>
+        <option value="planned">Geplant</option></select
       ><select aria-label="Sortierung" [ngModel]="sort()" (ngModelChange)="sort.set($event)">
         <option value="rating">Bewertung</option>
         <option value="name">Name</option>
@@ -314,9 +314,9 @@
             (ngModelChange)="patch('status', $event)"
             name="status"
           >
-            <option>Geplant</option>
-            <option>Begonnen</option>
-            <option>Abgeschlossen</option>
+            <option value="done">Erledigt</option>
+            <option value="current">Dran</option>
+            <option value="planned">Geplant</option>
           </select></label
         >
       </div>

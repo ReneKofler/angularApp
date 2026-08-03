@@ -49,7 +49,7 @@ export class Rankings {
   readonly form = signal<any>({
     name: '',
     rating: 0,
-    status: 'Geplant',
+    status: 'planned',
     priority: 0,
     watched_episodes: 0,
   });
@@ -74,7 +74,7 @@ export class Rankings {
           this.sort() === 'name'
             ? b.name.localeCompare(a.name)
             : this.sort() === 'created_at' || this.sort() === 'consumed_at'
-            ? Date.parse(String(b[this.sort()] ?? '')) - Date.parse(String(a[this.sort()] ?? ''))
+              ? Date.parse(String(b[this.sort()] ?? '')) - Date.parse(String(a[this.sort()] ?? ''))
               : Number(b[this.sort()] ?? 0) - Number(a[this.sort()] ?? 0);
         return this.ascending() ? -descending : descending;
       }),
@@ -181,7 +181,7 @@ export class Rankings {
       name: '',
       category_id: this.selected(),
       rating: 0,
-      status: 'Geplant',
+      status: 'planned',
       priority: 0,
       watched_episodes: 0,
     });
@@ -288,8 +288,8 @@ export class Rankings {
   }
   statusBadge(status?: string) {
     const normalized = status?.trim().toLocaleLowerCase('de');
-    if (normalized === 'dran') return 'Dran';
-    if (normalized === 'geplant') return 'Geplant';
+    if (normalized === 'current' || normalized === 'dran') return 'Dran';
+    if (normalized === 'planned' || normalized === 'geplant') return 'Geplant';
     return null;
   }
   private text(e: unknown) {

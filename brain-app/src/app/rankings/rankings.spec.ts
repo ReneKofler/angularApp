@@ -106,9 +106,9 @@ describe('Rankings', () => {
   });
   it('provides badges for Dran and Geplant statuses', () => {
     const f = TestBed.createComponent(Rankings);
-    expect(f.componentInstance.statusBadge('Dran')).toBe('Dran');
-    expect(f.componentInstance.statusBadge('Geplant')).toBe('Geplant');
-    expect(f.componentInstance.statusBadge('Abgeschlossen')).toBeNull();
+    expect(f.componentInstance.statusBadge('current')).toBe('Dran');
+    expect(f.componentInstance.statusBadge('planned')).toBe('Geplant');
+    expect(f.componentInstance.statusBadge('done')).toBeNull();
   });
   it('maps persisted gradient tokens to valid CSS', () => {
     const f = TestBed.createComponent(Rankings);

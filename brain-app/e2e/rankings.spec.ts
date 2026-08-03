@@ -30,11 +30,11 @@ test.beforeEach(async ({ page }) => {
               category_id: 'c',
               name: 'Film A',
               rating: 8,
-              status: 'Geplant',
+              status: 'planned',
               episodes: 10,
               watched_episodes: 4,
             },
-            { id: 'r2', category_id: 'c', name: 'Als Nächstes', rating: 9, status: 'Dran' },
+            { id: 'r2', category_id: 'c', name: 'Als Nächstes', rating: 9, status: 'current' },
           ],
         })
       : r.fulfill({ status: 201, json: {} }),
