@@ -51,6 +51,10 @@ test('opens a category, filters rankings and opens its editor', async ({ page })
   await expect(page.getByRole('button', { name: 'Filme bearbeiten' })).toHaveCSS('opacity', '1');
   await categoryTile.click();
   await expect(page.getByText('Film A')).toBeVisible();
+  await page.getByRole('button', { name: 'Absteigend; zu aufsteigend wechseln' }).click();
+  await expect(
+    page.getByRole('button', { name: 'Aufsteigend; zu absteigend wechseln' }),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Kategorie bearbeiten' }).click();
   await expect(page.getByRole('heading', { name: 'Kategorie bearbeiten' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Farbe 1', exact: true })).toBeVisible();

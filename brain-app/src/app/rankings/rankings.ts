@@ -35,6 +35,7 @@ export class Rankings {
   readonly query = signal('');
   readonly status = signal('');
   readonly visibleLimit = signal(24);
+  readonly ascending = signal(false);
   readonly sort = signal<'created_at' | 'rating' | 'name' | 'priority'>('created_at');
   readonly editor = signal(false);
   readonly categoryEditor = signal(false);
@@ -68,13 +69,15 @@ export class Rankings {
           (!this.status() || x.status === this.status()) &&
           x.name.toLowerCase().includes(this.query().toLowerCase()),
       )
-      .sort((a, b) =>
-        this.sort() === 'name'
-          ? a.name.localeCompare(b.name)
-          : this.sort() === 'created_at'
-            ? Date.parse(b.created_at ?? '') - Date.parse(a.created_at ?? '')
-            : Number(b[this.sort()] ?? 0) - Number(a[this.sort()] ?? 0),
-      ),
+      .sort((a, b) => {
+        const descending =
+          this.sort() === 'name'
+            ? b.name.localeCompare(a.name)
+            : this.sort() === 'created_at'
+              ? Date.parse(b.created_at ?? '') - Date.parse(a.created_at ?? '')
+              : Number(b[this.sort()] ?? 0) - Number(a[this.sort()] ?? 0);
+        return this.ascending() ? -descending : descending;
+      }),
   );
   readonly displayed = computed(() => this.visible().slice(0, this.visibleLimit()));
   readonly remaining = computed(() => Math.max(0, this.visible().length - this.visibleLimit()));
@@ -99,6 +102,10 @@ export class Rankings {
   }
   loadMore() {
     this.visibleLimit.update((value) => value + 24);
+  }
+  toggleSortDirection() {
+    this.ascending.update((value) => !value);
+    this.visibleLimit.set(24);
   }
   closeCategory() {
     this.selected.set('');

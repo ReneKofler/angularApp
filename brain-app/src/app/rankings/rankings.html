@@ -86,7 +86,17 @@
         <option value="created_at">Hinzugefügt</option>
         <option value="rating">Bewertung</option>
         <option value="name">Name</option></select
-      ><button aria-label="Sortierreihenfolge">↓</button>
+      ><button
+        [attr.aria-label]="
+          ascending()
+            ? 'Aufsteigend; zu absteigend wechseln'
+            : 'Absteigend; zu aufsteigend wechseln'
+        "
+        [attr.aria-pressed]="ascending()"
+        (click)="toggleSortDirection()"
+      >
+        {{ ascending() ? '↑' : '↓' }}
+      </button>
     </div>
     <section [class.list]="category()?.view_mode === 'list'">
       @for (x of displayed(); track x.id) {

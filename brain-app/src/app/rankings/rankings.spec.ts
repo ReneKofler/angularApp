@@ -46,6 +46,14 @@ describe('Rankings', () => {
     expect(f.componentInstance.sort()).toBe('created_at');
     expect(f.componentInstance.visible().map((x) => x.id)).toEqual(['2', '1']);
   });
+  it('toggles between descending and ascending order', async () => {
+    const f = TestBed.createComponent(Rankings);
+    await f.whenStable();
+    expect(f.componentInstance.visible().map((x) => x.id)).toEqual(['2', '1']);
+    f.componentInstance.toggleSortDirection();
+    expect(f.componentInstance.visible().map((x) => x.id)).toEqual(['1', '2']);
+    expect(f.componentInstance.visibleLimit()).toBe(24);
+  });
   it('shows 24 rankings initially and loads another page', async () => {
     const f = TestBed.createComponent(Rankings);
     await f.whenStable();
