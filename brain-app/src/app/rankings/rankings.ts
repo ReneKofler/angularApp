@@ -81,6 +81,23 @@ export class Rankings {
   count(id: string) {
     return this.items().filter((x) => x.category_id === id).length;
   }
+  categoryBackground(color?: string) {
+    if (!color) return '#475569';
+    if (!color.includes('from-')) return color;
+    const palette: Record<string, [string, string]> = {
+      amber: ['#f59e0b', '#d97706'],
+      pink: ['#ec4899', '#db2777'],
+      purple: ['#a855f7', '#9333ea'],
+      green: ['#22c55e', '#16a34a'],
+      blue: ['#3b82f6', '#2563eb'],
+      teal: ['#14b8a6', '#0d9488'],
+      cyan: ['#06b6d4', '#0891b2'],
+      rose: ['#f43f5e', '#e11d48'],
+      slate: ['#64748b', '#475569'],
+    };
+    const name = Object.keys(palette).find((key) => color.includes(`-${key}-`)) ?? 'slate';
+    return `linear-gradient(135deg, ${palette[name][0]}, ${palette[name][1]})`;
+  }
   openSettings() {
     this.draftCategories.set(this.categories().map((x) => ({ ...x })));
     this.settingsOpen.set(true);

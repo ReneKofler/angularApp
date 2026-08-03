@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
               id: 'c',
               name: 'Filme',
               icon: '🎬',
-              color: '#d9167b',
+              color: 'from-amber-500 to-amber-600',
               position: 0,
               view_mode: 'grid',
               show_year: true,
@@ -45,6 +45,10 @@ test.beforeEach(async ({ page }) => {
 test('opens a category, filters rankings and opens its editor', async ({ page }) => {
   await page.goto('/rankings');
   await expect(page.getByRole('button', { name: /Filme 1 Eintr/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Filme 1 Eintr/ })).toHaveCSS(
+    'background-image',
+    /linear-gradient/,
+  );
   await page.getByRole('button', { name: /Filme 1 Eintr/ }).click();
   await expect(page.getByText('Film A')).toBeVisible();
   await page.getByLabel('Rankings durchsuchen').fill('fehlt');

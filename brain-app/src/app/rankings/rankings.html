@@ -34,7 +34,7 @@
   @if (!selected()) {
     <section class="category-grid" aria-label="Ranking-Kategorien">
       @for (c of categories(); track c.id) {
-        <button class="category-tile" [style.background]="c.color" (click)="openCategory(c.id)">
+        <button class="category-tile" [style.background]="categoryBackground(c.color)" (click)="openCategory(c.id)">
           <span>{{ c.icon }}</span
           ><strong>{{ c.name }}</strong
           ><small>{{ count(c.id) }} Einträge</small>
@@ -134,7 +134,7 @@
             >
             <span>{{ c.icon }}</span
             ><strong>{{ c.name }}</strong
-            ><i [style.background]="c.color"></i>
+            ><i [style.background]="categoryBackground(c.color)"></i>
           </article>
         }
       </div>
