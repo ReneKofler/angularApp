@@ -16,7 +16,8 @@ test('shows the complete module grid and working modules', async ({ page }) => {
   await expect(page.getByRole('link', { name: /Ernährung/ })).toHaveAttribute('href', '/nutrition');
   await expect(page.getByRole('link', { name: /Rezepte/ })).toHaveAttribute('href', '/recipes');
   await expect(page.getByRole('link', { name: /Einkaufsliste/ })).toHaveAttribute('href', '/groceries');
-  await expect(page.locator('.module.unavailable')).toHaveCount(12);
+  await expect(page.getByRole('link', { name: /Journal/ })).toHaveAttribute('href', '/journal');
+  await expect(page.locator('.module.unavailable')).toHaveCount(11);
 });
 
 test('opens dashboard settings with reorder, visibility, and color controls', async ({ page }) => {

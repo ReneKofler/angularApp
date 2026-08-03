@@ -54,6 +54,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./groceries/groceries').then((m) => m.Groceries),
   },
+  {
+    path: 'journal',
+    canActivate: [authGuard],
+    loadComponent: () => import('./journal/journal').then((m) => m.Journal),
+  },
   { path: 'apps/body', redirectTo: 'body' },
   {
     path: '',
