@@ -40,6 +40,7 @@ export class Dashboard {
       name: 'Body Measurements',
       description: 'Gewicht & Körperfett tracken',
       color: '#2668e8',
+      route: '/body',
     },
     {
       icon: '⭐',
