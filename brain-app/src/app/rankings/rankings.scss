@@ -111,6 +111,15 @@ article p {
   color: #ffc400;
   opacity: 0.8;
 }
+.current-badge {
+  display: inline-block;
+  margin-top: 0.15rem;
+  padding: 0.18rem 0.4rem;
+  border-radius: 0.3rem;
+  color: #fff;
+  background: #2563eb;
+  font-weight: 700;
+}
 .history,
 small {
   color: #9fb0c7;

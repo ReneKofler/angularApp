@@ -89,6 +89,11 @@ describe('Rankings', () => {
     expect(f.componentInstance.stars(7).filter(Boolean)).toHaveLength(7);
     expect(f.componentInstance.stars(7)).toHaveLength(10);
   });
+  it('recognizes the Dran status for the card badge', () => {
+    const f = TestBed.createComponent(Rankings);
+    expect(f.componentInstance.isCurrent('Dran')).toBe(true);
+    expect(f.componentInstance.isCurrent('Abgeschlossen')).toBe(false);
+  });
   it('maps persisted gradient tokens to valid CSS', () => {
     const f = TestBed.createComponent(Rankings);
     expect(f.componentInstance.categoryBackground('from-amber-500 to-amber-600')).toContain(

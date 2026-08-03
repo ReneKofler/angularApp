@@ -34,6 +34,7 @@ test.beforeEach(async ({ page }) => {
               episodes: 10,
               watched_episodes: 4,
             },
+            { id: 'r2', category_id: 'c', name: 'Als Nächstes', rating: 9, status: 'Dran' },
           ],
         })
       : r.fulfill({ status: 201, json: {} }),
@@ -52,6 +53,7 @@ test('opens a category, filters rankings and opens its editor', async ({ page })
   await categoryTile.click();
   await expect(page.getByText('Film A')).toBeVisible();
   await expect(page.getByLabel('8 von 10 Sternen')).toContainText('★★★★★★★★☆☆');
+  await expect(page.getByText('Dran', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Absteigend; zu aufsteigend wechseln' }).click();
   await expect(
     page.getByRole('button', { name: 'Aufsteigend; zu absteigend wechseln' }),
