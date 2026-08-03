@@ -18,7 +18,7 @@ export class Body {
   readonly sortedMeasurements=computed(()=>[...this.measurements()].sort((a,b)=>this.sortDirection()==='desc'?b.measurement_date.localeCompare(a.measurement_date):a.measurement_date.localeCompare(b.measurement_date)));
   constructor(){void this.reload()}
   async reload(){this.loading.set(true);this.error.set('');try{const data=await this.service.load();this.measurements.set(data.measurements);this.goal.set(data.goal);this.history.set(data.history);this.milestones.set(data.milestones);this.preferences.set(data.preferences)}catch(error){this.error.set(this.message(error))}finally{this.loading.set(false)}}
-  newMeasurement(){this.editingId.set(null);this.measurementDraft.set({weight_kg:this.latest()?.weight_kg??0,body_fat_percent:null,measurement_date:this.localDate(new Date())});this.editor.set('measurement')}
+  newMeasurement(){this.editingId.set(null);this.measurementDraft.set({weight_kg:0,body_fat_percent:null,measurement_date:this.localDate(new Date())});this.editor.set('measurement')}
   editMeasurement(item:BodyMeasurement){this.editingId.set(item.id);this.measurementDraft.set({weight_kg:item.weight_kg,body_fat_percent:item.body_fat_percent,measurement_date:item.measurement_date});this.editor.set('measurement')}
   updateMeasurement<K extends keyof MeasurementDraft>(key:K,value:MeasurementDraft[K]){this.measurementDraft.update(d=>({...d,[key]:value}))}
   async saveMeasurement(){const d=this.measurementDraft();if(!d.measurement_date||d.weight_kg<=0){this.error.set('Datum und Gewicht sind erforderlich.');return}await this.run(async()=>{await this.service.saveMeasurement(d,this.editingId()??undefined);this.editor.set(null);await this.reload()})}

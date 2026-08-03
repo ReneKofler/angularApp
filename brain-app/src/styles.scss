@@ -403,3 +403,9 @@ input {
 .macro-fields { display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem }
 .editor-delete { margin:1rem auto 0;padding:.5rem;border:0;color:#ff334c;background:transparent }
 @media(max-width:600px){.macro-fields,.editor-fields{grid-template-columns:1fr}.recipe-editor{padding-inline:.5rem}}
+
+.measurement-capture{animation:measurement-slide .24s ease-out;transform-origin:top}
+.measurement-capture output{display:flex;align-items:center;min-height:2.65rem;padding:.65rem .8rem;border:1px solid #4b5a70;border-radius:.45rem;color:#cbd5e1;background:#0d1727}
+.measurement-capture .save-measurement{width:100%;margin-top:.15rem}
+@keyframes measurement-slide{from{opacity:0;transform:translateY(-1rem) scaleY(.96)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.measurement-capture{animation:none}}
