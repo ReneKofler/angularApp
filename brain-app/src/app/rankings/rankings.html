@@ -34,15 +34,28 @@
   @if (!selected()) {
     <section class="category-grid" aria-label="Ranking-Kategorien">
       @for (c of categories(); track c.id) {
-        <button
+        <article
           class="category-tile"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="c.name + ' öffnen'"
           [style.background]="categoryBackground(c.color)"
           (click)="openCategory(c.id)"
+          (keydown.enter)="openCategory(c.id)"
+          (keydown.space)="openCategory(c.id); $event.preventDefault()"
         >
+          <button
+            class="tile-edit"
+            type="button"
+            [attr.aria-label]="c.name + ' bearbeiten'"
+            (click)="$event.stopPropagation(); editCategoryFor(c)"
+          >
+            ✎
+          </button>
           <span>{{ c.icon }}</span
           ><strong>{{ c.name }}</strong
           ><small>{{ count(c.id) }} Einträge</small>
-        </button>
+        </article>
       } @empty {
         <p class="empty">Noch keine Kategorien.</p>
       }

@@ -223,6 +223,12 @@ export class Rankings {
     this.categoryForm.set({ ...current });
     this.categoryEditor.set(true);
   }
+  editCategoryFor(category: RankingCategory) {
+    this.selected.set(category.id);
+    this.editingCategory.set(category.id);
+    this.categoryForm.set({ ...category });
+    this.categoryEditor.set(true);
+  }
   async saveCategory() {
     try {
       await this.service.saveCategory(this.categoryForm(), this.editingCategory() ?? undefined);

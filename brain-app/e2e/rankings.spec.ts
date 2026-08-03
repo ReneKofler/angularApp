@@ -44,12 +44,12 @@ test.beforeEach(async ({ page }) => {
 });
 test('opens a category, filters rankings and opens its editor', async ({ page }) => {
   await page.goto('/rankings');
-  await expect(page.getByRole('button', { name: /Filme 1 Eintr/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Filme 1 Eintr/ })).toHaveCSS(
-    'background-image',
-    /linear-gradient/,
-  );
-  await page.getByRole('button', { name: /Filme 1 Eintr/ }).click();
+  const categoryTile = page.getByRole('button', { name: 'Filme öffnen' });
+  await expect(categoryTile).toBeVisible();
+  await expect(categoryTile).toHaveCSS('background-image', /linear-gradient/);
+  await categoryTile.focus();
+  await expect(page.getByRole('button', { name: 'Filme bearbeiten' })).toHaveCSS('opacity', '1');
+  await categoryTile.click();
   await expect(page.getByText('Film A')).toBeVisible();
   await page.getByRole('button', { name: 'Kategorie bearbeiten' }).click();
   await expect(page.getByRole('heading', { name: 'Kategorie bearbeiten' })).toBeVisible();
