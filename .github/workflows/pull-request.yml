@@ -53,6 +53,12 @@ jobs:
       - name: Generate local Angular environment
         run: npm run prestart
 
+      - name: Check changed-file formatting
+        run: npm run lint
+
+      - name: Check TypeScript types
+        run: npm run typecheck
+
       - name: Run unit tests
         run: npm test -- --watch=false
 
