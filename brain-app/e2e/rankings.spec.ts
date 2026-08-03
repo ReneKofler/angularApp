@@ -54,6 +54,7 @@ test('opens a category, filters rankings and opens its editor', async ({ page })
   await expect(page.getByText('Film A')).toBeVisible();
   await expect(page.locator('.status-badge', { hasText: 'Geplant' })).toBeVisible();
   await expect(page.locator('.status-badge.current', { hasText: 'Dran' })).toBeVisible();
+  await expect(page.locator('.ranking-card h2')).toHaveText(['Als Nächstes', 'Film A']);
   await expect(page.getByLabel('Status').locator('option')).toHaveText([
     'Alle Status',
     'Erledigt',
@@ -71,6 +72,7 @@ test('opens a category, filters rankings and opens its editor', async ({ page })
   await expect(
     page.getByRole('button', { name: 'Aufsteigend; zu absteigend wechseln' }),
   ).toBeVisible();
+  await expect(page.locator('.ranking-card h2')).toHaveText(['Als Nächstes', 'Film A']);
   await page.getByRole('button', { name: 'Kategorie bearbeiten' }).click();
   await expect(page.getByRole('heading', { name: 'Kategorie bearbeiten' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Farbe 1', exact: true })).toBeVisible();

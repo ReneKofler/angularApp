@@ -70,6 +70,9 @@ export class Rankings {
           x.name.toLowerCase().includes(this.query().toLowerCase()),
       )
       .sort((a, b) => {
+        const aPlanned = a.status?.trim().toLowerCase() === 'planned';
+        const bPlanned = b.status?.trim().toLowerCase() === 'planned';
+        if (aPlanned !== bPlanned) return aPlanned ? 1 : -1;
         const descending =
           this.sort() === 'name'
             ? b.name.localeCompare(a.name)

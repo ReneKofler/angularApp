@@ -69,6 +69,36 @@ describe('Rankings', () => {
     f.componentInstance.sort.set('consumed_at');
     expect(f.componentInstance.visible()[0].consumed_at).toBe('2026-02-01');
   });
+  it('keeps planned rankings last in both sort directions', async () => {
+    const f = TestBed.createComponent(Rankings);
+    await f.whenStable();
+    f.componentInstance.items.set([
+      {
+        id: 'planned',
+        category_id: 'c',
+        name: 'Planned',
+        status: 'planned',
+        created_at: '2026-12-01',
+      } as any,
+      {
+        id: 'done',
+        category_id: 'c',
+        name: 'Done',
+        status: 'done',
+        created_at: '2026-01-01',
+      } as any,
+      {
+        id: 'current',
+        category_id: 'c',
+        name: 'Current',
+        status: 'current',
+        created_at: '2026-02-01',
+      } as any,
+    ]);
+    expect(f.componentInstance.visible().at(-1)?.id).toBe('planned');
+    f.componentInstance.toggleSortDirection();
+    expect(f.componentInstance.visible().at(-1)?.id).toBe('planned');
+  });
   it('shows 24 rankings initially and loads another page', async () => {
     const f = TestBed.createComponent(Rankings);
     await f.whenStable();
