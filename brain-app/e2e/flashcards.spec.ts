@@ -30,10 +30,17 @@ test('filters cards and studies with reveal and keyboard navigation', async ({ p
   await expect(dialog.getByText('Hallo')).toBeVisible();
   await dialog.press(' ');
   await expect(dialog.getByText('Hello')).toBeVisible();
-  await dialog.getByRole('button', { name: 'Richtig' }).click();
+  await dialog.getByRole('button', { name: 'Falsch' }).click();
+  await expect(dialog.getByText('0 / 2 richtig')).toBeVisible();
+  await expect(dialog.getByText('Tschüss')).toBeVisible();
+  await dialog.press('Enter');
+  await dialog.press('r');
   await expect(dialog.getByText('1 / 2 richtig')).toBeVisible();
   await expect(dialog.getByText('1 Karten in dieser Runde offen')).toBeVisible();
-  await expect(dialog.getByText('Tschüss')).toBeVisible();
+  await expect(dialog.getByText('Hallo')).toBeVisible();
+  await dialog.press(' ');
+  await dialog.press('2');
+  await expect(page.getByRole('heading', { name: 'Merkkarten' })).toBeVisible();
 });
 test('shows inline category and card controls', async ({ page }) => {
   await page.goto('/flashcards');
