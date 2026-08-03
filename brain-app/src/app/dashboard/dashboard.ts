@@ -24,6 +24,7 @@ export class Dashboard {
   readonly auth = inject(AuthService);
   readonly defaultModules: Module[] = [
     {
+      id: '1', position: 0,
       icon: '🏃',
       name: 'Sport Tracking',
       description: 'Workouts schnell erfassen',
@@ -31,14 +32,16 @@ export class Dashboard {
       route: '/workouts',
     },
     {
+      id: '11', position: 10,
       icon: '🏋️',
       name: 'CrossFit',
       description: 'WODs loggen & tracken',
       color: '#e60046',
       route: '/crossfit',
     },
-    { icon: '✅', name: 'Habit Tracking', description: 'Gewohnheiten aufbauen', color: '#08ad4b' },
+    { id: '2', position: 1, icon: '✅', name: 'Habit Tracking', description: 'Gewohnheiten aufbauen', color: '#08ad4b' },
     {
+      id: '3', position: 2,
       icon: '📊',
       name: 'Body Measurements',
       description: 'Gewicht & Körperfett tracken',
@@ -46,12 +49,14 @@ export class Dashboard {
       route: '/body',
     },
     {
+      id: '7', position: 6,
       icon: '⭐',
       name: 'Rankings',
       description: 'Filme, Serien & mehr bewerten',
       color: '#d9167b',
     },
     {
+      id: '4', position: 3,
       icon: '📝',
       name: 'Notizen',
       description: 'Schnelle Notizen & Ideen',
@@ -59,6 +64,7 @@ export class Dashboard {
       route: '/notes',
     },
     {
+      id: '14', position: 12,
       icon: '🥗',
       name: 'Ernährung',
       description: 'Mahlzeiten & Makros',
@@ -66,22 +72,25 @@ export class Dashboard {
       route: '/nutrition',
     },
     {
+      id: '10', position: 9,
       icon: '🍳',
       name: 'Rezepte',
       description: 'Rezepte sammeln & kochen',
       color: '#e70e22',
       route: '/recipes',
     },
-    { icon: '🔄', name: 'Einheiten', description: 'Einheiten umrechnen', color: '#ed4d00' },
-    { icon: '🗓️', name: 'Kalender', description: 'Übersicht aller Aktivitäten', color: '#079b91' },
-    { icon: '📖', name: 'Journal', description: 'Tagebuch & Gedanken', color: '#4b45e7' },
+    { id: '5', position: 4, icon: '🔄', name: 'Einheiten', description: 'Einheiten umrechnen', color: '#ed4d00' },
+    { id: '6', position: 5, icon: '🗓️', name: 'Kalender', description: 'Übersicht aller Aktivitäten', color: '#079b91' },
+    { id: '8', position: 7, icon: '📖', name: 'Journal', description: 'Tagebuch & Gedanken', color: '#4b45e7' },
     {
+      id: '9', position: 8,
       icon: '🛒',
       name: 'Einkaufsliste',
       description: 'Einkäufe planen & tracken',
       color: '#55ad00',
     },
     {
+      id: '13', position: 11,
       icon: '💪',
       name: 'Übungen',
       description: 'Übungen verwalten',
@@ -89,26 +98,28 @@ export class Dashboard {
       route: '/training',
     },
     {
+      id: '22', position: 20,
       icon: '🔁',
       name: 'Greasing the Groove',
       description: 'Tägliche Wiederholungen sammeln',
       color: '#0f9f82',
       route: '/greasing-the-groove',
     },
-    { icon: '🏢', name: 'GYM', description: 'Trainingseinheiten tracken', color: '#54657d' },
-    { icon: '🎮', name: 'Games', description: 'Spiele & Challenges', color: '#0497b7' },
-    { icon: '🏈', name: 'Flag Football', description: 'Plays & Routes planen', color: '#9228e5' },
-    { icon: '🧘', name: 'Stretching', description: 'Routinen & Übungen', color: '#00a477' },
-    { icon: '🕺', name: 'Linedance', description: 'Taenze, Songs & Schritte', color: '#c900d4' },
-    { icon: '⏱️', name: 'Timer', description: 'For Time, AMRAP, EMOM / Tabata', color: '#078cca' },
+    { id: '15', position: 13, icon: '🏢', name: 'GYM', description: 'Trainingseinheiten tracken', color: '#54657d' },
+    { id: '16', position: 14, icon: '🎮', name: 'Games', description: 'Spiele & Challenges', color: '#0497b7' },
+    { id: '17', position: 15, icon: '🏈', name: 'Flag Football', description: 'Plays & Routes planen', color: '#9228e5' },
+    { id: '18', position: 16, icon: '🧘', name: 'Stretching', description: 'Routinen & Übungen', color: '#00a477' },
+    { id: '19', position: 17, icon: '🕺', name: 'Linedance', description: 'Taenze, Songs & Schritte', color: '#c900d4' },
+    { id: '20', position: 18, icon: '⏱️', name: 'Timer', description: 'For Time, AMRAP, EMOM / Tabata', color: '#078cca' },
     {
+      id: '21', position: 19,
       icon: '🗂️',
       name: 'Merkkarten',
       description: 'Karten lernen & wiederholen',
       color: '#5049e7',
     },
   ];
-  readonly modules = signal<Module[]>(this.defaultModules.map((module,index)=>({...module,id:String(index+1)})));
+  readonly modules = signal<Module[]>([...this.defaultModules].sort((a,b)=>(a.position??0)-(b.position??0)));
   readonly draftModules = signal<Module[]>([]);
   readonly settingsOpen = signal(false);
   readonly saving = signal(false);
@@ -125,7 +136,7 @@ export class Dashboard {
     const stored=(result.data?.dashboard_settings??{}) as Record<string,{color?:string;enabled?:boolean;position?:number}>;
     this.tileStyle.set(result.data?.tile_style==='uniform'?'uniform':'colorful');
     this.modules.set(this.defaultModules.map((module,index)=>{
-      const id=String(index+1),setting=stored[id];return {...module,id,color:setting?.color??module.color,enabled:setting?.enabled??true,position:setting?.position??index};
+      const id=module.id!,setting=stored[id];return {...module,color:setting?.color??module.color,enabled:setting?.enabled??true,position:setting?.position??module.position??index};
     }).sort((a:any,b:any)=>a.position-b.position));
   }
   openSettings(){this.draftModules.set(this.modules().map(module=>({...module})));this.settingsOpen.set(true)}
