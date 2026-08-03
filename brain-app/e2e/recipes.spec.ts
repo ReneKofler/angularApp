@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { signIn } from './helpers';
 test.beforeEach(async({page})=>signIn(page));
-test('loads recipe search and filters',async({page})=>{
+test('loads the recipe library and search',async({page})=>{
   await page.goto('/recipes');
   await expect(page.getByRole('heading',{name:'Rezepte'})).toBeVisible();
   await expect(page.getByLabel('Rezepte suchen')).toBeVisible();
-  await expect(page.getByRole('navigation',{name:'Rezeptfilter'})).toBeVisible();
+  await expect(page.getByRole('button',{name:'+ Rezept'})).toBeVisible();
 });
 test('opens and cancels recipe creation without writing data',async({page})=>{
   await page.goto('/recipes');await page.getByRole('button',{name:'+ Rezept'}).click();
