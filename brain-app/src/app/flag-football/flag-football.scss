@@ -81,6 +81,22 @@ main {
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
+.route-library {
+  grid-column: 1/-1;
+  display: grid;
+  gap: 12px;
+}
+.route-library h2 {
+  margin: 0;
+}
+.empty-routes {
+  grid-column: 1/-1;
+  text-align: center;
+  color: #8194ad;
+  padding: 35px;
+  background: #1e2a3b;
+  border-radius: 10px;
+}
 .cards article {
   display: grid;
   gap: 7px;

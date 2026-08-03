@@ -56,6 +56,9 @@ export class FlagFootball {
       .map((point) => `${point.x},${point.y}`)
       .join(' ');
   }
+  segmentPointString(route: Route) {
+    return (route.segments ?? []).map((point) => `${point.x},${point.y}`).join(' ');
+  }
   playName(id: string) {
     return this.plays().find((play) => play.id === id)?.name ?? 'Unbekanntes Play';
   }

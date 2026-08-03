@@ -50,28 +50,25 @@
         <circle [attr.cx]="routePoints()[0].x" [attr.cy]="routePoints()[0].y" r="2" /></svg
       ><button class="primary" (click)="addRoute()">Route zeichnen</button>
     </section>
-    <section class="cards route-cards">
-      @for (item of routes(); track item.id; let number = $index) {
-        <article>
-          <svg viewBox="0 0 100 100">
-            <polyline
-              [attr.points]="
-                item.segments[0].x +
-                ',' +
-                item.segments[0].y +
-                ' ' +
-                item.segments[item.segments.length - 1].x +
-                ',' +
-                item.segments[item.segments.length - 1].y
-              "
-            /></svg
-          ><strong>{{ number + 1 }}</strong
-          ><b>{{ item.name }}</b
-          ><small>{{ item.aliases.join(', ') }}</small
-          ><span>{{ item.segments.length }} Segmente</span><button>Bearbeiten</button
-          ><button class="danger" (click)="remove('flag_football_routes', item.id)">Löschen</button>
-        </article>
-      }
+    <section class="route-library">
+      <h2>Gespeicherte Routes</h2>
+      <div class="cards route-cards">
+        @for (item of routes(); track item.id; let number = $index) {
+          <article>
+            <svg viewBox="0 0 100 100">
+              <polyline [attr.points]="segmentPointString(item)" /></svg
+            ><strong>{{ number + 1 }}</strong
+            ><b>{{ item.name }}</b
+            ><small>{{ item.aliases.join(', ') }}</small
+            ><span>{{ item.segments.length }} Segmente</span><button>Bearbeiten</button
+            ><button class="danger" (click)="remove('flag_football_routes', item.id)">
+              Löschen
+            </button>
+          </article>
+        } @empty {
+          <p class="empty-routes">Noch keine Routes gespeichert.</p>
+        }
+      </div>
     </section>
   }
   @if (tab() === 'formations') {

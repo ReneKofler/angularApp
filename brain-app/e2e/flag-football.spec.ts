@@ -16,6 +16,15 @@ test.beforeEach(async ({ page }) => {
           { x: 20, y: 10 },
         ],
       },
+      {
+        id: 'r2',
+        name: 'Slant',
+        aliases: ['Quick'],
+        segments: [
+          { x: 50, y: 80 },
+          { x: 25, y: 30 },
+        ],
+      },
     ],
     flag_football_plays: [
       {
@@ -43,8 +52,10 @@ test('places formation players on the field', async ({ page }) => {
 });
 test('shows routes, assignments, and ordered playbook controls', async ({ page }) => {
   await page.goto('/flag-football');
-  await page.getByRole('button', { name: 'Routes' }).click();
+  await expect(page.getByRole('button', { name: 'Routes' })).toHaveClass(/active/);
   await expect(page.getByText('Fly')).toBeVisible();
+  await expect(page.getByText('Slant', { exact: true })).toBeVisible();
+  await expect(page.locator('.route-cards article')).toHaveCount(2);
   await page.getByRole('button', { name: 'Plays' }).click();
   await expect(page.getByText(/1 Routen/)).toBeVisible();
   await page.getByRole('button', { name: 'Playbook', exact: true }).click();
