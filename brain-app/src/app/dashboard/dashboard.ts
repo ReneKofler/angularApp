@@ -186,6 +186,7 @@ export class Dashboard {
       name: 'Linedance',
       description: 'Taenze, Songs & Schritte',
       color: '#c900d4',
+      route: '/linedance',
     },
     {
       id: '20',

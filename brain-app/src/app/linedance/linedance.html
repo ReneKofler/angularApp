@@ -1,0 +1,203 @@
+<header>
+  <button routerLink="/" aria-label="Zurück">‹</button>
+  <h1>Linedance</h1>
+  <button class="primary" (click)="resetDance()">+ Tanz</button>
+</header>
+<main>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  <section class="catalog">
+    <input
+      aria-label="Tänze durchsuchen"
+      placeholder="Tänze durchsuchen..."
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event)"
+    />
+    <form class="dance-form" (ngSubmit)="saveDance()">
+      <h2>{{ editingDance() ? 'Tanz bearbeiten' : 'Neuer Tanz' }}</h2>
+      <div>
+        <label
+          >Name *<input
+            aria-label="Tanzname"
+            required
+            [ngModel]="danceForm().name"
+            (ngModelChange)="patchDance('name', $event)"
+            name="name" /></label
+        ><label
+          >Song<input
+            aria-label="Song"
+            [ngModel]="danceForm().song"
+            (ngModelChange)="patchDance('song', $event)"
+            name="song" /></label
+        ><label
+          >Interpret<input
+            aria-label="Interpret"
+            [ngModel]="danceForm().artist"
+            (ngModelChange)="patchDance('artist', $event)"
+            name="artist" /></label
+        ><label
+          >YouTube-URL<input
+            aria-label="YouTube-URL"
+            [ngModel]="danceForm().youtube_url"
+            (ngModelChange)="patchDance('youtube_url', $event)"
+            name="youtube" /></label
+        ><label
+          >Counts<input
+            aria-label="Counts"
+            type="number"
+            min="1"
+            [ngModel]="danceForm().counts"
+            (ngModelChange)="patchDance('counts', $event)"
+            name="counts" /></label
+        ><label
+          >Wände<input
+            aria-label="Wände"
+            type="number"
+            min="1"
+            [ngModel]="danceForm().walls"
+            (ngModelChange)="patchDance('walls', $event)"
+            name="walls" /></label
+        ><label
+          >Schwierigkeit<select
+            aria-label="Schwierigkeit"
+            [ngModel]="danceForm().difficulty"
+            (ngModelChange)="patchDance('difficulty', $event)"
+            name="difficulty"
+          >
+            <option>Anfänger</option>
+            <option>Mittel</option>
+            <option>Fortgeschritten</option>
+          </select></label
+        >
+      </div>
+      <label
+        >Notizen<textarea
+          aria-label="Tanznotizen"
+          [ngModel]="danceForm().notes"
+          (ngModelChange)="patchDance('notes', $event)"
+          name="notes"
+        ></textarea>
+      </label>
+      <footer>
+        @if (editingDance()) {
+          <button type="button" (click)="resetDance()">Abbrechen</button>
+        }
+        <button class="primary">Speichern</button>
+      </footer>
+    </form>
+    <section class="dance-list">
+      @for (item of visible(); track item.id) {
+        <article [class.active]="selected() === item.id" (click)="selected.set(item.id)">
+          <span>💃</span>
+          <div>
+            <h3>{{ item.name }}</h3>
+            <p>
+              {{ item.song }}
+              @if (item.artist) {
+                – {{ item.artist }}
+              }
+            </p>
+            <small>{{ item.counts }} Counts · {{ item.walls }} Wände · {{ item.difficulty }}</small>
+          </div>
+          <footer>
+            <button (click)="$event.stopPropagation(); editDance(item)">Bearbeiten</button
+            ><button class="danger" (click)="$event.stopPropagation(); removeDance(item)">
+              Löschen
+            </button>
+          </footer>
+        </article>
+      } @empty {
+        <p>Keine Tänze gefunden.</p>
+      }
+    </section>
+  </section>
+  <section class="sheet">
+    @if (dance()) {
+      <section class="dance-heading">
+        <div>
+          <h2>{{ dance()?.name }}</h2>
+          <p>{{ dance()?.song }} · {{ dance()?.artist }}</p>
+        </div>
+        @if (dance()?.youtube_url) {
+          <a [href]="dance()?.youtube_url" target="_blank" rel="noopener noreferrer"
+            >Video öffnen ↗</a
+          >
+        }
+      </section>
+      <form class="step-form" (ngSubmit)="saveStep()">
+        <h2>{{ editingStep() ? 'Schritt bearbeiten' : 'Schritt hinzufügen' }}</h2>
+        <div>
+          <label
+            >Counts<input
+              aria-label="Schritt-Counts"
+              [ngModel]="stepForm().counts"
+              (ngModelChange)="patchStep('counts', $event)"
+              name="step-counts" /></label
+          ><label
+            >Fuß<select
+              aria-label="Fuß"
+              [ngModel]="stepForm().foot"
+              (ngModelChange)="patchStep('foot', $event)"
+              name="foot"
+            >
+              <option value="">–</option>
+              <option>Links</option>
+              <option>Rechts</option>
+              <option>Beide</option>
+            </select></label
+          >
+        </div>
+        <label
+          >Anweisung *<input
+            aria-label="Anweisung"
+            required
+            [ngModel]="stepForm().instruction"
+            (ngModelChange)="patchStep('instruction', $event)"
+            name="instruction" /></label
+        ><label
+          >Fuß-Annotation<input
+            aria-label="Fuß-Annotation"
+            placeholder="z.B. Gewicht auf rechts"
+            [ngModel]="stepForm().annotation"
+            (ngModelChange)="patchStep('annotation', $event)"
+            name="annotation"
+        /></label>
+        <footer>
+          @if (editingStep()) {
+            <button type="button" (click)="resetStep()">Abbrechen</button>
+          }
+          <button class="primary">{{ editingStep() ? 'Speichern' : 'Hinzufügen' }}</button>
+        </footer>
+      </form>
+      <ol>
+        @for (step of danceSteps(); track step.id) {
+          <li>
+            <div class="order">
+              <button aria-label="Nach oben" (click)="move(step, -1)">↑</button
+              ><button aria-label="Nach unten" (click)="move(step, 1)">↓</button>
+            </div>
+            <strong>{{ step.counts }}</strong>
+            <div>
+              <b>{{ step.instruction }}</b
+              ><small
+                >{{ step.foot }}
+                @if (step.annotation) {
+                  · {{ step.annotation }}
+                }
+              </small>
+            </div>
+            <footer>
+              <button (click)="editStep(step)">Bearbeiten</button
+              ><button class="danger" (click)="removeStep(step)">Löschen</button>
+            </footer>
+          </li>
+        } @empty {
+          <p>Noch keine Schritte.</p>
+        }
+      </ol>
+    } @else {
+      <p>Wähle einen Tanz aus.</p>
+    }
+  </section>
+</main>
