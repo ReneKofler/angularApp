@@ -46,6 +46,26 @@ describe('Rankings', () => {
     expect(f.componentInstance.sort()).toBe('created_at');
     expect(f.componentInstance.visible().map((x) => x.id)).toEqual(['2', '1']);
   });
+  it('shows 24 rankings initially and loads another page', async () => {
+    const f = TestBed.createComponent(Rankings);
+    await f.whenStable();
+    f.componentInstance.items.set(
+      Array.from(
+        { length: 30 },
+        (_, i) =>
+          ({
+            id: `${i}`,
+            category_id: 'c',
+            name: `Item ${i}`,
+            created_at: `2026-01-${String((i % 28) + 1).padStart(2, '0')}`,
+          }) as any,
+      ),
+    );
+    expect(f.componentInstance.displayed()).toHaveLength(24);
+    expect(f.componentInstance.remaining()).toBe(6);
+    f.componentInstance.loadMore();
+    expect(f.componentInstance.displayed()).toHaveLength(30);
+  });
   it('filters and sorts category entries', async () => {
     const f = TestBed.createComponent(Rankings);
     await f.whenStable();

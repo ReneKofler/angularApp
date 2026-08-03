@@ -273,6 +273,11 @@ main.category-page > section {
   grid-template-columns: repeat(4, 1fr);
   gap: 0.75rem;
 }
+.load-more {
+  width: 100%;
+  color: #ef2b91;
+  background: #1e2a3b;
+}
 .ranking-card {
   position: relative;
   display: block;

@@ -34,6 +34,7 @@ export class Rankings {
   readonly selected = signal('');
   readonly query = signal('');
   readonly status = signal('');
+  readonly visibleLimit = signal(24);
   readonly sort = signal<'created_at' | 'rating' | 'name' | 'priority'>('created_at');
   readonly editor = signal(false);
   readonly categoryEditor = signal(false);
@@ -75,6 +76,8 @@ export class Rankings {
             : Number(b[this.sort()] ?? 0) - Number(a[this.sort()] ?? 0),
       ),
   );
+  readonly displayed = computed(() => this.visible().slice(0, this.visibleLimit()));
+  readonly remaining = computed(() => Math.max(0, this.visible().length - this.visibleLimit()));
   constructor() {
     void this.load();
   }
@@ -92,6 +95,10 @@ export class Rankings {
     this.selected.set(id);
     this.query.set('');
     this.status.set('');
+    this.visibleLimit.set(24);
+  }
+  loadMore() {
+    this.visibleLimit.update((value) => value + 24);
   }
   closeCategory() {
     this.selected.set('');

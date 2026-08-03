@@ -83,13 +83,13 @@
         <option>Begonnen</option>
         <option>Abgeschlossen</option></select
       ><select aria-label="Sortierung" [ngModel]="sort()" (ngModelChange)="sort.set($event)">
-      <option value="created_at">Hinzugefügt</option>
+        <option value="created_at">Hinzugefügt</option>
         <option value="rating">Bewertung</option>
         <option value="name">Name</option></select
       ><button aria-label="Sortierreihenfolge">↓</button>
     </div>
     <section [class.list]="category()?.view_mode === 'list'">
-      @for (x of visible(); track x.id) {
+      @for (x of displayed(); track x.id) {
         <article class="ranking-card" (click)="edit(x)" tabindex="0">
           <div class="media">
             @if (x.image_url) {
@@ -140,6 +140,9 @@
         <p class="empty">Keine Einträge gefunden.</p>
       }
     </section>
+    @if (remaining()) {
+      <button class="load-more" (click)="loadMore()">+{{ remaining() }} weitere anzeigen</button>
+    }
   }
 </main>
 @if (settingsOpen()) {
