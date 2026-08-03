@@ -18,7 +18,7 @@ import {
 })
 export class FlagFootball {
   private service = inject(FlagFootballService);
-  readonly tab = signal<'formations' | 'routes' | 'plays' | 'playbook'>('formations');
+  readonly tab = signal<'formations' | 'routes' | 'plays' | 'playbook'>('routes');
   readonly formations = signal<Formation[]>([]);
   readonly routes = signal<Route[]>([]);
   readonly plays = signal<Play[]>([]);
@@ -32,6 +32,10 @@ export class FlagFootball {
     { x: 10, y: 80 },
     { x: 50, y: 20 },
   ]);
+  readonly playerType = signal('WR-X');
+  readonly selectedPlay = signal('');
+  readonly playbookNumber = signal(1);
+  readonly playbookFlipped = signal(false);
   readonly players = signal([
     { id: 'p1', label: 'C', x: 50, y: 75 },
     { id: 'p2', label: 'QB', x: 50, y: 90 },
@@ -55,6 +59,9 @@ export class FlagFootball {
   playName(id: string) {
     return this.plays().find((play) => play.id === id)?.name ?? 'Unbekanntes Play';
   }
+  formationForPlay(play: Play) {
+    return this.formations().find((formation) => formation.id === play.formation_id);
+  }
   async load() {
     try {
       const d = await this.service.load();
@@ -76,6 +83,24 @@ export class FlagFootball {
           : p,
       ),
     );
+  }
+  placePlayer(event: MouseEvent) {
+    if (this.players().length >= 5) return;
+    const target = event.currentTarget as HTMLElement;
+    const bounds = target.getBoundingClientRect();
+    const label = this.playerType();
+    this.players.update((items) => [
+      ...items,
+      {
+        id: `${label}-${items.length}`,
+        label,
+        x: ((event.clientX - bounds.left) / bounds.width) * 100,
+        y: ((event.clientY - bounds.top) / bounds.height) * 100,
+      },
+    ]);
+  }
+  removePlayer(id: string) {
+    this.players.update((items) => items.filter((item) => item.id !== id));
   }
   flipPlayers(players = this.players()) {
     return players.map((p) => ({ ...p, x: 100 - p.x }));
@@ -122,6 +147,21 @@ export class FlagFootball {
         play_id: play.id,
         position: this.playbook().length,
         flipped: false,
+      }),
+    );
+  }
+  async assignPlaybook() {
+    const play = this.plays().find((item) => item.id === this.selectedPlay());
+    if (!play) return;
+    if (this.playbook().some((item) => item.position === this.playbookNumber() - 1)) {
+      this.error.set('Diese Playbook-Nummer ist bereits vergeben.');
+      return;
+    }
+    await this.run(() =>
+      this.service.save('flag_football_playbook', {
+        play_id: play.id,
+        position: Math.max(0, this.playbookNumber() - 1),
+        flipped: this.playbookFlipped(),
       }),
     );
   }

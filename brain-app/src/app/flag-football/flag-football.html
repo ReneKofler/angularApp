@@ -1,103 +1,140 @@
 <header>
-  <button routerLink="/" aria-label="Zurück">‹</button>
+  <button routerLink="/" aria-label="Zurück">‹</button><span>🏈</span>
   <h1>Flag Football</h1>
 </header>
 <nav>
   @for (
     item of [
-      ['formations', 'Formationen'],
-      ['routes', 'Routen'],
+      ['routes', 'Routes'],
+      ['formations', 'Formations'],
       ['plays', 'Plays'],
       ['playbook', 'Playbook'],
     ];
     track item[0]
   ) {
-    <button [class.active]="tab() === item[0]" (click)="setTab(item[0])">
-      {{ item[1] }}
-    </button>
+    <button [class.active]="tab() === item[0]" (click)="setTab(item[0])">{{ item[1] }}</button>
   }
 </nav>
 <main>
   @if (error()) {
     <p role="alert" class="error">{{ error() }}</p>
   }
+  @if (tab() === 'routes') {
+    <section class="editor route-editor">
+      <h2>Neue Route</h2>
+      <label
+        >Team-Name (intern)<input
+          aria-label="Name der Route"
+          placeholder="z.B. Zug, Rakete, Blitz ..."
+          [ngModel]="name()"
+          (ngModelChange)="name.set($event)" /></label
+      ><label
+        >Alias (Football-Begriff)<input
+          aria-label="Routen-Aliase"
+          placeholder="z.B. Post, Slant, Go Route, Hitch ..."
+          [ngModel]="routeAliases()"
+          (ngModelChange)="routeAliases.set($event)"
+      /></label>
+      <h3>Segmente</h3>
+      <div class="segment">
+        1.
+        <select aria-label="Richtung">
+          <option>↑ Upfield</option>
+          <option>↗ Slant</option>
+          <option>→ Out</option></select
+        ><input aria-label="Yards" type="number" value="5" /><span>yd</span>
+      </div>
+      <button class="add-segment">+ Segment hinzufügen</button
+      ><svg class="route-preview" viewBox="0 0 100 100" aria-label="Routenverlauf">
+        <polyline [attr.points]="routePointString()" />
+        <circle [attr.cx]="routePoints()[0].x" [attr.cy]="routePoints()[0].y" r="2" /></svg
+      ><button class="primary" (click)="addRoute()">Route zeichnen</button>
+    </section>
+    <section class="cards route-cards">
+      @for (item of routes(); track item.id; let number = $index) {
+        <article>
+          <svg viewBox="0 0 100 100">
+            <polyline
+              [attr.points]="
+                item.segments[0].x +
+                ',' +
+                item.segments[0].y +
+                ' ' +
+                item.segments[item.segments.length - 1].x +
+                ',' +
+                item.segments[item.segments.length - 1].y
+              "
+            /></svg
+          ><strong>{{ number + 1 }}</strong
+          ><b>{{ item.name }}</b
+          ><small>{{ item.aliases.join(', ') }}</small
+          ><span>{{ item.segments.length }} Segmente</span><button>Bearbeiten</button
+          ><button class="danger" (click)="remove('flag_football_routes', item.id)">Löschen</button>
+        </article>
+      }
+    </section>
+  }
   @if (tab() === 'formations') {
-    <section class="editor">
-      <h2>Formation erstellen</h2>
+    <section class="editor formation-editor">
+      <h2>Neue Formation</h2>
       <label
         >Name<input
           aria-label="Name der Formation"
+          placeholder="z.B. Shotgun, Trips Right, Empty ..."
           [ngModel]="name()"
           (ngModelChange)="name.set($event)"
       /></label>
-      <div class="field">
+      <div class="placement">
+        <span>Spieler platzieren</span><b>{{ players().length }}/5</b>
+        @for (type of ['C', 'QB', 'WR-X', 'WR-Y', 'WR-Z', 'RB']; track type) {
+          <button [class.selected]="playerType() === type" (click)="playerType.set(type)">
+            {{ type }}
+          </button>
+        }
+      </div>
+      <p class="hint">
+        Tippe auf das Feld, um Spieler zu setzen · Tippe auf einen Spieler, um ihn zu entfernen
+      </p>
+      <div class="field" (click)="placePlayer($event)">
+        <span class="yard y20">20</span><span class="yard y15">15</span
+        ><span class="yard y10">10</span><span class="yard y5">5</span><span class="los">LOS</span>
         @for (player of players(); track player.id) {
           <button
             class="player"
             [style.left.%]="player.x"
             [style.top.%]="player.y"
-            (click)="movePlayer(player.id, 100 - player.x, player.y)"
+            (click)="$event.stopPropagation(); removePlayer(player.id)"
           >
             {{ player.label }}
           </button>
         }
       </div>
-      <button (click)="players.set(flipPlayers())">Formation spiegeln</button
-      ><button class="primary" (click)="addFormation()">Speichern</button>
+      <button class="primary" (click)="addFormation()">Formation speichern</button>
     </section>
-    <section class="list">
-      <h2>Formationen</h2>
+    <section class="cards">
       @for (item of formations(); track item.id) {
         <article>
-          <strong>{{ item.name }}</strong>
           <div class="mini-field">
             @for (player of item.players; track player.id) {
               <i [style.left.%]="player.x" [style.top.%]="player.y">{{ player.label }}</i>
             }
           </div>
-          <button class="danger" (click)="remove('flag_football_formations', item.id)">
+          <strong>{{ item.name }}</strong
+          ><button>Bearbeiten</button
+          ><button class="danger" (click)="remove('flag_football_formations', item.id)">
             Löschen
           </button>
         </article>
       }
     </section>
   }
-  @if (tab() === 'routes') {
-    <section class="editor">
-      <h2>Route erstellen</h2>
-      <label
-        >Name<input
-          aria-label="Name der Route"
-          [ngModel]="name()"
-          (ngModelChange)="name.set($event)" /></label
-      ><label
-        >Aliase<input
-          aria-label="Routen-Aliase"
-          placeholder="Go, Fly"
-          [ngModel]="routeAliases()"
-          (ngModelChange)="routeAliases.set($event)" /></label
-      ><svg viewBox="0 0 100 100" aria-label="Routenverlauf">
-        <polyline [attr.points]="routePointString()" /></svg
-      ><button (click)="routePoints.set(flipRoute())">Route spiegeln</button
-      ><button class="primary" (click)="addRoute()">Speichern</button>
-    </section>
-    <section class="list">
-      <h2>Routen</h2>
-      @for (item of routes(); track item.id) {
-        <article>
-          <strong>{{ item.name }}</strong
-          ><small>{{ item.aliases.join(', ') }}</small
-          ><button class="danger" (click)="remove('flag_football_routes', item.id)">Löschen</button>
-        </article>
-      }
-    </section>
-  }
   @if (tab() === 'plays') {
     <section class="editor">
-      <h2>Play erstellen</h2>
+      <h2>Neuer Play</h2>
       <label
         >Name<input
           aria-label="Name des Plays"
+          placeholder="Leer lassen für Auto-Name (Formation + Routen)"
           [ngModel]="name()"
           (ngModelChange)="name.set($event)" /></label
       ><label
@@ -106,6 +143,7 @@
           [ngModel]="selectedFormation()"
           (ngModelChange)="selectedFormation.set($event)"
         >
+          <option value="">— Formation wählen —</option>
           @for (item of formations(); track item.id) {
             <option [value]="item.id">{{ item.name }}</option>
           }
@@ -125,23 +163,53 @@
           </select></label
         >
       }
-      <button class="primary" (click)="addPlay()">Speichern</button>
+      <button class="primary" (click)="addPlay()">Play speichern</button>
     </section>
-    <section class="list">
-      <h2>Plays</h2>
+    <section class="cards play-cards">
       @for (item of plays(); track item.id) {
         <article>
+          <div class="mini-field play-field">
+            @for (player of formationForPlay(item)?.players || []; track player.id) {
+              <i [style.left.%]="player.x" [style.top.%]="player.y">{{ player.label }}</i>
+            }
+          </div>
           <strong>{{ item.name }}</strong
-          ><small>{{ item.assignments.length }} Zuweisungen</small
-          ><button (click)="addToPlaybook(item)">Zum Playbook</button
+          ><small>{{ formationForPlay(item)?.name }} · {{ item.assignments.length }} Routen</small
+          ><button>▶</button><button>Bearbeiten</button
           ><button class="danger" (click)="remove('flag_football_plays', item.id)">Löschen</button>
         </article>
       }
     </section>
   }
   @if (tab() === 'playbook') {
+    <section class="editor playbook-editor">
+      <h2>Play zuweisen</h2>
+      <label
+        >Nummer<input
+          aria-label="Playbook-Nummer"
+          type="number"
+          min="1"
+          [ngModel]="playbookNumber()"
+          (ngModelChange)="playbookNumber.set($event)" /></label
+      ><label
+        >Play<select
+          aria-label="Playbook-Play"
+          [ngModel]="selectedPlay()"
+          (ngModelChange)="selectedPlay.set($event)"
+        >
+          <option value="">— Play wählen —</option>
+          @for (play of plays(); track play.id) {
+            <option [value]="play.id">{{ play.name }}</option>
+          }
+        </select></label
+      ><label class="switch"
+        >Gespiegelt<input
+          type="checkbox"
+          [ngModel]="playbookFlipped()"
+          (ngModelChange)="playbookFlipped.set($event)" /></label
+      ><button class="primary" (click)="assignPlaybook()">Zuweisen</button>
+    </section>
     <section class="playbook">
-      <h2>Playbook</h2>
       @for (entry of playbook(); track entry.id; let number = $index) {
         <article>
           <strong>{{ number + 1 }}. {{ playName(entry.play_id) }}</strong
@@ -151,7 +219,11 @@
           ><button aria-label="Nach unten" (click)="move(entry, 1)">↓</button>
         </article>
       } @empty {
-        <p>Das Playbook ist leer.</p>
+        <div class="empty">
+          <b>📋</b>
+          <p>Playbook ist leer</p>
+          <small>Weise Plays einer Nummer zu.</small>
+        </div>
       }
     </section>
   }

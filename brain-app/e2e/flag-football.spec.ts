@@ -32,22 +32,23 @@ test.beforeEach(async ({ page }) => {
       r.request().method() === 'GET' ? r.fulfill({ json }) : r.fulfill({ status: 201, json: {} }),
     );
 });
-test('manages formations and deterministic field flipping', async ({ page }) => {
+test('places formation players on the field', async ({ page }) => {
   await page.goto('/flag-football');
+  await page.getByRole('button', { name: 'Formations' }).click();
   await expect(page.getByText('Trips')).toBeVisible();
-  const player = page.locator('.player').filter({ hasText: 'WR' }).first();
-  await expect(player).toHaveAttribute('style', /left: 20%/);
-  await page.getByRole('button', { name: 'Formation spiegeln' }).click();
-  await expect(player).toHaveAttribute('style', /left: 80%/);
+  await expect(page.locator('.player')).toHaveCount(4);
+  await page.getByRole('button', { name: 'RB', exact: true }).click();
+  await page.locator('.field').click({ position: { x: 300, y: 150 } });
+  await expect(page.locator('.player')).toHaveCount(5);
 });
 test('shows routes, assignments, and ordered playbook controls', async ({ page }) => {
   await page.goto('/flag-football');
-  await page.getByRole('button', { name: 'Routen' }).click();
+  await page.getByRole('button', { name: 'Routes' }).click();
   await expect(page.getByText('Fly')).toBeVisible();
   await page.getByRole('button', { name: 'Plays' }).click();
-  await expect(page.getByText('1 Zuweisungen')).toBeVisible();
+  await expect(page.getByText(/1 Routen/)).toBeVisible();
   await page.getByRole('button', { name: 'Playbook', exact: true }).click();
   await expect(page.getByText('1. Trips Go')).toBeVisible();
   await page.getByRole('button', { name: 'Spiegeln' }).click();
-  await expect(page.getByText('Gespiegelt')).toBeVisible();
+  await expect(page.getByRole('article').getByText('Gespiegelt')).toBeVisible();
 });

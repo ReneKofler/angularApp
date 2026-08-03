@@ -33,12 +33,19 @@ button {
 }
 nav {
   display: flex;
-  justify-content: center;
-  gap: 8px;
-  padding: 16px;
+  background: #1e2a3b;
+}
+nav button {
+  flex: 1;
+  border: 0;
+  border-radius: 0;
+  padding: 15px;
+  color: #9fb0c7;
+  border-bottom: 2px solid transparent;
 }
 nav .active {
-  background: #9228e5;
+  color: #b13cff;
+  border-bottom-color: #b13cff;
 }
 main {
   width: min(1000px, calc(100% - 32px));
@@ -61,6 +68,128 @@ main {
   padding: 16px;
   border-radius: 10px;
   background: #1e2a3b;
+}
+.editor {
+  grid-column: 1/-1;
+  width: min(800px, 100%);
+  box-sizing: border-box;
+  justify-self: center;
+}
+.cards {
+  grid-column: 1/-1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.cards article {
+  display: grid;
+  gap: 7px;
+  padding: 0 12px 12px;
+  border-radius: 10px;
+  background: #1e2a3b;
+  overflow: hidden;
+}
+.cards svg,
+.cards .mini-field {
+  width: calc(100% + 24px);
+  margin-left: -12px;
+  height: 260px;
+  background: #155c31;
+}
+.route-preview {
+  width: 120px;
+  height: 156px;
+  justify-self: center;
+}
+.segment {
+  display: grid;
+  grid-template-columns: auto 1fr 45px auto;
+  gap: 8px;
+  align-items: center;
+}
+.add-segment {
+  border-style: dashed;
+}
+.placement {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.placement > span {
+  width: calc(100% - 45px);
+}
+.placement > b {
+  margin-left: auto;
+}
+.placement .selected {
+  background: #f1b51c;
+}
+.hint {
+  color: #8194ad;
+  font-size: 12px;
+}
+.yard,
+.los {
+  position: absolute;
+  left: 10px;
+  color: #a7c6b0;
+  font-weight: bold;
+}
+.y20 {
+  top: 3%;
+}
+.y15 {
+  top: 20%;
+}
+.y10 {
+  top: 38%;
+}
+.y5 {
+  top: 56%;
+}
+.los {
+  top: 73%;
+}
+.field:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 75%;
+  border-top: 2px dashed #b9d5c2;
+}
+.switch {
+  display: flex !important;
+  grid-template-columns: 70px auto !important;
+  align-items: center;
+}
+.switch input {
+  width: 44px;
+}
+.playbook .empty {
+  text-align: center;
+  padding: 70px;
+  color: #8194ad;
+}
+.playbook .empty b {
+  font-size: 42px;
+}
+.route-cards polyline {
+  fill: none;
+  stroke: #b13cff;
+  stroke-width: 2;
+}
+.route-cards small {
+  color: #b13cff;
+}
+.play-cards article {
+  grid-template-columns: 1fr auto auto;
+}
+.play-cards .mini-field,
+.play-cards strong,
+.play-cards small {
+  grid-column: 1/-1;
 }
 .editor h2,
 .list h2,
@@ -155,5 +284,11 @@ polyline {
   .field,
   svg {
     height: 260px;
+  }
+  .cards {
+    grid-template-columns: 1fr;
+  }
+  .editor {
+    width: 100%;
   }
 }
