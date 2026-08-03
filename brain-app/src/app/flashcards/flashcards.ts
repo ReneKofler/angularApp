@@ -1,0 +1,182 @@
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { Flashcard, FlashcardCategory, FlashcardsService } from './flashcards.service';
+@Component({
+  selector: 'app-flashcards',
+  imports: [FormsModule, RouterLink],
+  templateUrl: './flashcards.html',
+  styleUrl: './flashcards.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class Flashcards {
+  private service = inject(FlashcardsService);
+  readonly categories = signal<FlashcardCategory[]>([]);
+  readonly cards = signal<Flashcard[]>([]);
+  readonly selected = signal('');
+  readonly query = signal('');
+  readonly editor = signal(false);
+  readonly categoryEditor = signal(false);
+  readonly study = signal(false);
+  readonly revealed = signal(false);
+  readonly studyIndex = signal(0);
+  readonly studyCards = signal<Flashcard[]>([]);
+  readonly correct = signal(0);
+  readonly editing = signal<string | null>(null);
+  readonly categoryName = signal('');
+  readonly error = signal('');
+  readonly message = signal('');
+  readonly form = signal({ title: '', front: '', back: '', category_id: '' });
+  readonly visible = computed(() =>
+    this.cards().filter(
+      (x) =>
+        (!this.selected() || x.category_id === this.selected()) &&
+        `${x.title} ${x.front} ${x.back}`.toLowerCase().includes(this.query().toLowerCase()),
+    ),
+  );
+  readonly current = computed(() => this.studyCards()[this.studyIndex()]);
+  constructor() {
+    void this.load();
+  }
+  async load() {
+    try {
+      const x = await this.service.load();
+      this.categories.set(x.categories);
+      this.cards.set(x.cards);
+      if (!this.selected() && x.categories[0]) this.selected.set(x.categories[0].id);
+    } catch (e) {
+      this.error.set(this.text(e));
+    }
+  }
+  openCategory(id: string) {
+    this.selected.set(id);
+    this.query.set('');
+    this.editing.set(null);
+    this.form.set({ title: '', front: '', back: '', category_id: id });
+  }
+  closeCategory() {
+    this.selected.set('');
+    this.study.set(false);
+  }
+  count(id: string) {
+    return this.cards().filter((x) => x.category_id === id).length;
+  }
+  newCategory() {
+    void this.saveCategory();
+  }
+  async saveCategory() {
+    const name = this.categoryName().trim();
+    if (!name) return;
+    try {
+      await this.service.saveCategory(name);
+      this.categoryName.set('');
+      await this.load();
+    } catch (e) {
+      this.error.set(this.text(e));
+    }
+  }
+  async renameCategory(category: FlashcardCategory) {
+    const name = prompt('Neuer Kategoriename', category.name)?.trim();
+    if (!name || name === category.name) return;
+    try {
+      await this.service.saveCategory(name, category.id);
+      await this.load();
+    } catch (e) {
+      this.error.set(this.text(e));
+    }
+  }
+  async removeCategory(id = this.selected()) {
+    if (id && confirm('Kategorie wirklich löschen?'))
+      try {
+        await this.service.removeCategory(id);
+        this.closeCategory();
+        await this.load();
+      } catch (e) {
+        this.error.set(this.text(e));
+      }
+  }
+  newCard() {
+    this.editing.set(null);
+    this.form.set({ title: '', front: '', back: '', category_id: this.selected() });
+    this.editor.set(false);
+  }
+  edit(x: Flashcard) {
+    this.editing.set(x.id);
+    this.form.set({ title: x.title, front: x.front, back: x.back, category_id: x.category_id });
+    this.editor.set(true);
+  }
+  patch(k: string, v: string) {
+    this.form.update((x) => ({ ...x, [k]: v }));
+  }
+  async saveCard() {
+    const f = this.form();
+    if (!f.front.trim() || !f.back.trim()) return;
+    try {
+      await this.service.saveCard(
+        { ...f, category_id: f.category_id || this.selected() },
+        this.editing() ?? undefined,
+      );
+      this.editor.set(false);
+      this.message.set('Karte gespeichert.');
+      await this.load();
+    } catch (e) {
+      this.error.set(this.text(e));
+    }
+  }
+  async removeCard() {
+    const id = this.editing();
+    if (id && confirm('Karte wirklich löschen?'))
+      try {
+        await this.service.removeCard(id);
+        this.editor.set(false);
+        await this.load();
+      } catch (e) {
+        this.error.set(this.text(e));
+      }
+  }
+  startStudy() {
+    if (!this.visible().length) return;
+    this.studyCards.set([...this.visible()]);
+    this.correct.set(0);
+    this.studyIndex.set(0);
+    this.revealed.set(false);
+    this.study.set(true);
+  }
+  toggleReveal() {
+    this.revealed.update((x) => !x);
+  }
+  next(delta: number) {
+    const n = this.studyCards().length;
+    if (!n) return;
+    this.studyIndex.update((i) => (i + delta + n) % n);
+    this.revealed.set(false);
+  }
+  answer(isCorrect: boolean) {
+    const cards = [...this.studyCards()];
+    if (!cards.length) return;
+    const index = this.studyIndex();
+    const [card] = cards.splice(index, 1);
+    if (isCorrect) this.correct.update((value) => value + 1);
+    else cards.push(card);
+    this.studyCards.set(cards);
+    this.studyIndex.set(cards.length ? index % cards.length : 0);
+    this.revealed.set(false);
+    if (!cards.length) this.study.set(false);
+  }
+  handleStudyKey(e: KeyboardEvent) {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      this.toggleReveal();
+    }
+    if (e.key === 'ArrowRight') this.next(1);
+    if (e.key === 'ArrowLeft') this.next(-1);
+    if (this.revealed() && (e.key === '1' || e.key.toLowerCase() === 'f')) this.answer(false);
+    if (this.revealed() && (e.key === '2' || e.key.toLowerCase() === 'r')) this.answer(true);
+  }
+  category() {
+    return this.categories().find((x) => x.id === this.selected());
+  }
+  private text(e: unknown) {
+    return e instanceof Error ? e.message : 'Etwas ist schiefgelaufen.';
+  }
+}

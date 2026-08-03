@@ -119,6 +119,7 @@ export class Dashboard {
       name: 'Merkkarten',
       description: 'Karten lernen & wiederholen',
       color: '#5049e7',
+      route: '/flashcards',
     },
   ];
   readonly modules = signal<Module[]>([...this.defaultModules].sort((a,b)=>(a.position??0)-(b.position??0)));

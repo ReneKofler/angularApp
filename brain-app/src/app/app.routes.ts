@@ -64,6 +64,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./rankings/rankings').then((m) => m.Rankings),
   },
+  {
+    path: 'flashcards',
+    canActivate: [authGuard],
+    loadComponent: () => import('./flashcards/flashcards').then((m) => m.Flashcards),
+  },
   { path: 'apps/body', redirectTo: 'body' },
   {
     path: '',
