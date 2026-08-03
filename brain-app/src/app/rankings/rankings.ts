@@ -16,9 +16,13 @@ export class Rankings {
   readonly history = signal<ConsumedDate[]>([]);
   readonly selected = signal('');
   readonly query = signal('');
+  readonly status = signal('');
   readonly sort = signal<'rating' | 'name' | 'priority'>('rating');
   readonly editor = signal(false);
   readonly categoryEditor = signal(false);
+  readonly settingsOpen = signal(false);
+  readonly draftCategories = signal<RankingCategory[]>([]);
+  readonly draggedIndex = signal<number | null>(null);
   readonly editingCategory = signal<string | null>(null);
   readonly editing = signal<string | null>(null);
   readonly error = signal('');
@@ -43,6 +47,7 @@ export class Rankings {
       .filter(
         (x) =>
           (!this.selected() || x.category_id === this.selected()) &&
+          (!this.status() || x.status === this.status()) &&
           x.name.toLowerCase().includes(this.query().toLowerCase()),
       )
       .sort((a, b) =>
@@ -60,7 +65,56 @@ export class Rankings {
       this.categories.set(x.categories);
       this.items.set(x.rankings);
       this.history.set(x.history);
-      if (!this.selected() && x.categories[0]) this.selected.set(x.categories[0].id);
+    } catch (e) {
+      this.error.set(this.text(e));
+    }
+  }
+  openCategory(id: string) {
+    this.selected.set(id);
+    this.query.set('');
+    this.status.set('');
+  }
+  closeCategory() {
+    this.selected.set('');
+    this.editor.set(false);
+  }
+  count(id: string) {
+    return this.items().filter((x) => x.category_id === id).length;
+  }
+  openSettings() {
+    this.draftCategories.set(this.categories().map((x) => ({ ...x })));
+    this.settingsOpen.set(true);
+  }
+  startDrag(index: number, event: DragEvent) {
+    this.draggedIndex.set(index);
+    event.dataTransfer?.setData('text/plain', String(index));
+  }
+  dropCategory(index: number, event: DragEvent) {
+    event.preventDefault();
+    const from = this.draggedIndex();
+    if (from === null || from === index) return;
+    this.draftCategories.update((items) => {
+      const next = [...items];
+      const [item] = next.splice(from, 1);
+      next.splice(index, 0, item);
+      return next;
+    });
+    this.draggedIndex.set(null);
+  }
+  moveCategory(index: number, delta: number) {
+    const target = index + delta;
+    if (target < 0 || target >= this.draftCategories().length) return;
+    this.draftCategories.update((items) => {
+      const next = [...items];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }
+  async saveOrder() {
+    try {
+      await this.service.saveCategoryOrder(this.draftCategories());
+      this.categories.set(this.draftCategories());
+      this.settingsOpen.set(false);
     } catch (e) {
       this.error.set(this.text(e));
     }

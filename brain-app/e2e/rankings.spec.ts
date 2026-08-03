@@ -1,1 +1,62 @@
-import{test,expect}from'@playwright/test';import{signIn}from'./helpers';test.beforeEach(async({page})=>{await signIn(page);await page.route('**/rest/v1/ranking_categories**',r=>r.request().method()==='GET'?r.fulfill({json:[{id:'c',name:'Filme',icon:'🎬',color:'#d9167b',position:0,view_mode:'grid',show_year:true,show_image_url:true,show_episodes:true}]}):r.fulfill({status:201,json:{}}));await page.route('**/rest/v1/rankings**',r=>r.request().method()==='GET'?r.fulfill({json:[{id:'r',category_id:'c',name:'Film A',rating:8,status:'Geplant',episodes:10,watched_episodes:4}]}):r.fulfill({status:201,json:{}}));await page.route('**/rest/v1/ranking_consumed_dates**',r=>r.request().method()==='GET'?r.fulfill({json:[]}):r.fulfill({status:201,json:{}}))});test('filters rankings and opens category-driven editor',async({page})=>{await page.goto('/rankings');await expect(page.getByText('Film A')).toBeVisible();await expect(page.getByText('Folgen 4/10')).toBeVisible();await page.getByLabel('Rankings durchsuchen').fill('fehlt');await expect(page.getByText('Keine Einträge gefunden.')).toBeVisible();await page.getByRole('button',{name:'+ Eintrag'}).click();await expect(page.getByLabel('Jahr')).toBeVisible();await expect(page.getByLabel('Folgen')).toBeVisible()});
+import { test, expect } from '@playwright/test';
+import { signIn } from './helpers';
+test.beforeEach(async ({ page }) => {
+  await signIn(page);
+  await page.route('**/rest/v1/ranking_categories**', (r) =>
+    r.request().method() === 'GET'
+      ? r.fulfill({
+          json: [
+            {
+              id: 'c',
+              name: 'Filme',
+              icon: '🎬',
+              color: '#d9167b',
+              position: 0,
+              view_mode: 'grid',
+              show_year: true,
+              show_image_url: true,
+              show_episodes: true,
+            },
+          ],
+        })
+      : r.fulfill({ status: 201, json: {} }),
+  );
+  await page.route('**/rest/v1/rankings**', (r) =>
+    r.request().method() === 'GET'
+      ? r.fulfill({
+          json: [
+            {
+              id: 'r',
+              category_id: 'c',
+              name: 'Film A',
+              rating: 8,
+              status: 'Geplant',
+              episodes: 10,
+              watched_episodes: 4,
+            },
+          ],
+        })
+      : r.fulfill({ status: 201, json: {} }),
+  );
+  await page.route('**/rest/v1/ranking_consumed_dates**', (r) =>
+    r.request().method() === 'GET' ? r.fulfill({ json: [] }) : r.fulfill({ status: 201, json: {} }),
+  );
+});
+test('opens a category, filters rankings and opens its editor', async ({ page }) => {
+  await page.goto('/rankings');
+  await expect(page.getByRole('button', { name: /Filme 1 Eintr/ })).toBeVisible();
+  await page.getByRole('button', { name: /Filme 1 Eintr/ }).click();
+  await expect(page.getByText('Film A')).toBeVisible();
+  await page.getByLabel('Rankings durchsuchen').fill('fehlt');
+  await expect(page.getByText('Keine Einträge gefunden.')).toBeVisible();
+  await page.getByRole('button', { name: '+ Ranking' }).click();
+  await expect(page.getByLabel('Jahr')).toBeVisible();
+  await expect(page.getByLabel('Folgen')).toBeVisible();
+});
+test('opens category settings and exposes reorder controls', async ({ page }) => {
+  await page.goto('/rankings');
+  await page.getByRole('button', { name: 'Einstellungen' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Nach oben' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Nach unten' })).toBeVisible();
+});

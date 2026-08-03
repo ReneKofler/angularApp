@@ -1,93 +1,150 @@
 <header>
-  <a routerLink="/" aria-label="Zurück">‹</a>
-  <h1>Rankings</h1>
-  <button (click)="newCategory()">+ Kategorie</button
-  ><button class="primary" (click)="newItem()" [disabled]="!selected()">+ Eintrag</button>
+  <button
+    class="back"
+    aria-label="Zurück"
+    (click)="selected() ? closeCategory() : null"
+    [routerLink]="selected() ? null : '/'"
+  >
+    ‹
+  </button>
+  @if (category()) {
+    <span class="title-icon">{{ category()?.icon }}</span>
+  }
+  <h1>{{ category()?.name || 'Rankings' }}</h1>
+  @if (category()) {
+    <button class="icon-button" aria-label="Kategorie bearbeiten" (click)="editCategory()">
+      ✎
+    </button>
+    <button class="icon-button" aria-label="Listenansicht">▦</button>
+    <button class="icon-button" aria-label="Konsumverlauf">▤</button>
+    <button class="icon-button" aria-label="Exportieren">↥</button>
+    <button class="primary" (click)="newItem()">+ Ranking</button>
+  } @else {
+    <button class="icon-button" aria-label="Einstellungen" (click)="openSettings()">⚙</button>
+    <button class="primary" (click)="newCategory()">+ Kategorie</button>
+  }
 </header>
-<main>
+<main [class.category-page]="selected()">
   @if (error()) {
     <p role="alert" class="error">{{ error() }}</p>
   }
   @if (message()) {
     <p role="status" class="success">{{ message() }}</p>
   }
-  <nav aria-label="Ranking-Kategorien">
-    @for (c of categories(); track c.id) {
-      <button
-        [class.active]="selected() === c.id"
-        [style.--color]="c.color"
-        (click)="selected.set(c.id)"
-      >
-        {{ c.icon }} {{ c.name }}
-      </button>
-    } @empty {
-      <p>Noch keine Kategorien.</p>
-    }
-    @if (category()) {
-      <button aria-label="Kategorie bearbeiten" (click)="editCategory()">⚙</button>
-    }
-  </nav>
-  <div class="tools">
-    <input
-      aria-label="Rankings durchsuchen"
-      placeholder="Einträge durchsuchen..."
-      [ngModel]="query()"
-      (ngModelChange)="query.set($event)"
-    /><select aria-label="Sortierung" [ngModel]="sort()" (ngModelChange)="sort.set($event)">
-      <option value="rating">Bewertung</option>
-      <option value="priority">Priorität</option>
-      <option value="name">Name</option>
-    </select>
-  </div>
-  <section [class.list]="category()?.view_mode === 'list'">
-    @for (x of visible(); track x.id) {
-      <article (click)="edit(x)" tabindex="0">
-        <div class="media">
-          @if (x.image_url) {
-            <img [src]="x.image_url" alt="" (error)="$any($event.target).style.display = 'none'" />
-          } @else {
-            <span>{{ category()?.icon }}</span>
-          }
-        </div>
-        <div>
-          <h2>{{ x.name }}</h2>
-          @if (category()?.show_original_title && x.original_title) {
-            <small>{{ x.original_title }}</small>
-          }
-          <p class="stars" [attr.aria-label]="x.rating + ' von 10'">★ {{ x.rating }}/10</p>
-          @if (category()?.show_author && x.creator) {
-            <p>{{ x.creator }}</p>
-          }
-          @if (category()?.show_year && x.year) {
-            <p>{{ x.year }}</p>
-          }
-          @if (category()?.show_brand && x.brand) {
-            <p>{{ x.brand }}</p>
-          }
-          @if (category()?.show_plot && x.plot) {
-            <p>{{ x.plot }}</p>
-          }
-          @if (category()?.show_episodes && x.episodes) {
-            <label
-              >Folgen {{ x.watched_episodes || 0 }}/{{ x.episodes
-              }}<progress [value]="progress(x)" max="100"></progress
-            ></label>
-          }
-          @if (category()?.show_nutrition) {
-            <p>
-              {{ x.nutrition_kcal_100g || 0 }} kcal · {{ x.nutrition_protein_100g || 0 }} g Protein
-              / 100 g
-            </p>
-          }
-          <p class="history">Konsumiert: {{ dates(x.id).length }}×</p>
-          <button (click)="$event.stopPropagation(); consume(x)">Heute konsumiert</button>
-        </div>
-      </article>
-    } @empty {
-      <p class="empty">Keine Einträge gefunden.</p>
-    }
-  </section>
+  @if (!selected()) {
+    <section class="category-grid" aria-label="Ranking-Kategorien">
+      @for (c of categories(); track c.id) {
+        <button class="category-tile" [style.background]="c.color" (click)="openCategory(c.id)">
+          <span>{{ c.icon }}</span
+          ><strong>{{ c.name }}</strong
+          ><small>{{ count(c.id) }} Einträge</small>
+        </button>
+      } @empty {
+        <p class="empty">Noch keine Kategorien.</p>
+      }
+    </section>
+  } @else {
+    <div class="tools">
+      <input
+        aria-label="Rankings durchsuchen"
+        placeholder="Einträge durchsuchen..."
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)"
+      /><select aria-label="Status" [ngModel]="status()" (ngModelChange)="status.set($event)">
+        <option value="">Alle Status</option>
+        <option>Geplant</option>
+        <option>Begonnen</option>
+        <option>Abgeschlossen</option></select
+      ><select aria-label="Sortierung" [ngModel]="sort()" (ngModelChange)="sort.set($event)">
+        <option value="priority">Hinzugefügt</option>
+        <option value="rating">Bewertung</option>
+        <option value="name">Name</option></select
+      ><button aria-label="Sortierreihenfolge">↓</button>
+    </div>
+    <section [class.list]="category()?.view_mode === 'list'">
+      @for (x of visible(); track x.id) {
+        <article class="ranking-card" (click)="edit(x)" tabindex="0">
+          <div class="media">
+            @if (x.image_url) {
+              <img
+                [src]="x.image_url"
+                alt=""
+                (error)="$any($event.target).style.display = 'none'"
+              />
+            } @else {
+              <span>{{ category()?.icon }}</span>
+            }
+          </div>
+          <div>
+            <h2>{{ x.name }}</h2>
+            @if (category()?.show_original_title && x.original_title) {
+              <small>{{ x.original_title }}</small>
+            }
+            <p class="stars" [attr.aria-label]="x.rating + ' von 10'">★ {{ x.rating }}/10</p>
+            @if (category()?.show_author && x.creator) {
+              <p>{{ x.creator }}</p>
+            }
+            @if (category()?.show_year && x.year) {
+              <p>{{ x.year }}</p>
+            }
+            @if (category()?.show_brand && x.brand) {
+              <p>{{ x.brand }}</p>
+            }
+            @if (category()?.show_plot && x.plot) {
+              <p>{{ x.plot }}</p>
+            }
+            @if (category()?.show_episodes && x.episodes) {
+              <label
+                >Folgen {{ x.watched_episodes || 0 }}/{{ x.episodes
+                }}<progress [value]="progress(x)" max="100"></progress
+              ></label>
+            }
+            @if (category()?.show_nutrition) {
+              <p>
+                {{ x.nutrition_kcal_100g || 0 }} kcal · {{ x.nutrition_protein_100g || 0 }} g
+                Protein / 100 g
+              </p>
+            }
+            <p class="history">Konsumiert: {{ dates(x.id).length }}×</p>
+            <button (click)="$event.stopPropagation(); consume(x)">Heute konsumiert</button>
+          </div>
+        </article>
+      } @empty {
+        <p class="empty">Keine Einträge gefunden.</p>
+      }
+    </section>
+  }
 </main>
+@if (settingsOpen()) {
+  <div class="backdrop">
+    <section class="settings-panel" role="dialog" aria-labelledby="settings-title">
+      <h2 id="settings-title">Einstellungen</h2>
+      <div class="settings-list">
+        @for (c of draftCategories(); track c.id; let i = $index) {
+          <article
+            class="settings-row"
+            draggable="true"
+            (dragstart)="startDrag(i, $event)"
+            (dragover)="$event.preventDefault()"
+            (drop)="dropCategory(i, $event)"
+          >
+            <span class="moves"
+              ><button aria-label="Nach oben" (click)="moveCategory(i, -1)">⌃</button
+              ><button aria-label="Nach unten" (click)="moveCategory(i, 1)">⌄</button></span
+            >
+            <span>{{ c.icon }}</span
+            ><strong>{{ c.name }}</strong
+            ><i [style.background]="c.color"></i>
+          </article>
+        }
+      </div>
+      <footer>
+        <button (click)="settingsOpen.set(false)">Abbrechen</button
+        ><button class="done" (click)="saveOrder()">Fertig</button>
+      </footer>
+    </section>
+  </div>
+}
 @if (categoryEditor()) {
   <div class="backdrop">
     <form (ngSubmit)="saveCategory()">
