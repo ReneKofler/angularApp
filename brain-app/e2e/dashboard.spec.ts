@@ -15,7 +15,19 @@ test('shows the complete module grid and working modules', async ({ page }) => {
   );
   await expect(page.getByRole('link', { name: /Ernährung/ })).toHaveAttribute('href', '/nutrition');
   await expect(page.getByRole('link', { name: /Rezepte/ })).toHaveAttribute('href', '/recipes');
-  await expect(page.locator('.module.unavailable')).toHaveCount(14);
+  await expect(page.locator('.module.unavailable')).toHaveCount(13);
+});
+
+test('opens dashboard settings with reorder, visibility, and color controls', async ({ page }) => {
+  await page.getByRole('button', { name: 'Settings' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Einstellungen' });
+  await expect(dialog).toBeVisible();
+  const rows = dialog.locator('.settings-row');
+  await expect(rows).toHaveCount(21);
+  await expect(rows.first().locator('input[type="color"]')).toBeAttached();
+  await expect(rows.first().getByRole('button', { name: /ausblenden/ })).toBeVisible();
+  await dialog.getByRole('button', { name: 'Abbrechen' }).click();
+  await expect(dialog).toBeHidden();
 });
 
 test('navigates to Greasing the Groove and back to the dashboard', async ({ page }) => {
