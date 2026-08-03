@@ -54,6 +54,21 @@ describe('Rankings', () => {
     expect(f.componentInstance.visible().map((x) => x.id)).toEqual(['1', '2']);
     expect(f.componentInstance.visibleLimit()).toBe(24);
   });
+  it('sorts by year and consumed date', async () => {
+    const f = TestBed.createComponent(Rankings);
+    await f.whenStable();
+    f.componentInstance.items.update((items) =>
+      items.map((item, index) => ({
+        ...item,
+        year: 2000 + index,
+        consumed_at: `2026-0${index + 1}-01`,
+      })),
+    );
+    f.componentInstance.sort.set('year');
+    expect(f.componentInstance.visible()[0].year).toBe(2001);
+    f.componentInstance.sort.set('consumed_at');
+    expect(f.componentInstance.visible()[0].consumed_at).toBe('2026-02-01');
+  });
   it('shows 24 rankings initially and loads another page', async () => {
     const f = TestBed.createComponent(Rankings);
     await f.whenStable();

@@ -53,7 +53,20 @@ test('opens a category, filters rankings and opens its editor', async ({ page })
   await categoryTile.click();
   await expect(page.getByText('Film A')).toBeVisible();
   await expect(page.locator('.status-badge', { hasText: 'Geplant' })).toBeVisible();
-  await expect(page.getByText('Dran', { exact: true })).toBeVisible();
+  await expect(page.locator('.status-badge.current', { hasText: 'Dran' })).toBeVisible();
+  await expect(page.getByLabel('Status').locator('option')).toHaveText([
+    'Alle Status',
+    'Erledigt',
+    'Dran',
+    'Geplant',
+  ]);
+  await expect(page.getByLabel('Sortierung').locator('option')).toHaveText([
+    'Bewertung',
+    'Name',
+    'Jahr',
+    'Gesehen am',
+    'Hinzugefügt',
+  ]);
   await page.getByRole('button', { name: 'Absteigend; zu aufsteigend wechseln' }).click();
   await expect(
     page.getByRole('button', { name: 'Aufsteigend; zu absteigend wechseln' }),

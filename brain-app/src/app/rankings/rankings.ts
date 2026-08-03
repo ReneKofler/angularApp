@@ -36,7 +36,7 @@ export class Rankings {
   readonly status = signal('');
   readonly visibleLimit = signal(24);
   readonly ascending = signal(false);
-  readonly sort = signal<'created_at' | 'rating' | 'name' | 'priority'>('created_at');
+  readonly sort = signal<'created_at' | 'consumed_at' | 'rating' | 'name' | 'year'>('created_at');
   readonly editor = signal(false);
   readonly categoryEditor = signal(false);
   readonly settingsOpen = signal(false);
@@ -73,8 +73,8 @@ export class Rankings {
         const descending =
           this.sort() === 'name'
             ? b.name.localeCompare(a.name)
-            : this.sort() === 'created_at'
-              ? Date.parse(b.created_at ?? '') - Date.parse(a.created_at ?? '')
+            : this.sort() === 'created_at' || this.sort() === 'consumed_at'
+            ? Date.parse(String(b[this.sort()] ?? '')) - Date.parse(String(a[this.sort()] ?? ''))
               : Number(b[this.sort()] ?? 0) - Number(a[this.sort()] ?? 0);
         return this.ascending() ? -descending : descending;
       }),
