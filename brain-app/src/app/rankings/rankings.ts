@@ -282,6 +282,10 @@ export class Rankings {
       ? Math.min(100, Math.round(((x.watched_episodes ?? 0) / x.episodes) * 100))
       : 0;
   }
+  stars(rating: number) {
+    const filled = Math.max(0, Math.min(10, Math.round(rating || 0)));
+    return Array.from({ length: 10 }, (_, index) => index < filled);
+  }
   private text(e: unknown) {
     return e instanceof Error ? e.message : 'Etwas ist schiefgelaufen.';
   }

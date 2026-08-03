@@ -104,6 +104,12 @@ article p {
 }
 .stars {
   color: #ffc400;
+  white-space: nowrap;
+  letter-spacing: -0.08rem;
+}
+.stars .empty {
+  color: #ffc400;
+  opacity: 0.8;
 }
 .history,
 small {

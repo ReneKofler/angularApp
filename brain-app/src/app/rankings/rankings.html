@@ -117,7 +117,11 @@
             @if (category()?.show_original_title && x.original_title) {
               <small>{{ x.original_title }}</small>
             }
-            <p class="stars" [attr.aria-label]="x.rating + ' von 10'">★ {{ x.rating }}/10</p>
+            <p class="stars" [attr.aria-label]="x.rating + ' von 10 Sternen'">
+              @for (filled of stars(x.rating); track $index) {
+                <span [class.empty]="!filled">{{ filled ? '★' : '☆' }}</span>
+              }
+            </p>
             @if (category()?.show_author && x.creator) {
               <p>{{ x.creator }}</p>
             }

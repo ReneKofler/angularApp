@@ -84,6 +84,11 @@ describe('Rankings', () => {
     const f = TestBed.createComponent(Rankings);
     expect(f.componentInstance.progress({ episodes: 10, watched_episodes: 12 } as any)).toBe(100);
   });
+  it('renders ratings as ten filled or empty stars', () => {
+    const f = TestBed.createComponent(Rankings);
+    expect(f.componentInstance.stars(7).filter(Boolean)).toHaveLength(7);
+    expect(f.componentInstance.stars(7)).toHaveLength(10);
+  });
   it('maps persisted gradient tokens to valid CSS', () => {
     const f = TestBed.createComponent(Rankings);
     expect(f.componentInstance.categoryBackground('from-amber-500 to-amber-600')).toContain(
