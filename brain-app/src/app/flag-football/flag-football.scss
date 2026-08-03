@@ -196,6 +196,29 @@ main {
   stroke: #b13cff;
   stroke-width: 2;
 }
+.route-cards {
+  grid-template-columns: repeat(auto-fill, 272px);
+  justify-content: start;
+}
+.route-cards article {
+  grid-template-columns: 1fr 1fr;
+  box-sizing: border-box;
+  width: 272px;
+}
+.route-cards svg {
+  grid-column: 1 / -1;
+  width: 200px;
+  height: 260px;
+}
+.route-cards strong,
+.route-cards b,
+.route-cards small,
+.route-cards span {
+  grid-column: 1 / -1;
+}
+.route-cards button {
+  width: 100%;
+}
 .route-cards small {
   color: #b13cff;
 }
@@ -303,6 +326,9 @@ polyline {
   }
   .cards {
     grid-template-columns: 1fr;
+  }
+  .route-cards {
+    grid-template-columns: 272px;
   }
   .editor {
     width: 100%;

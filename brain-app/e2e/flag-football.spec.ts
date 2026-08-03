@@ -60,6 +60,13 @@ test('shows routes, assignments, and ordered playbook controls', async ({ page }
   await expect(page.getByText('Fly')).toBeVisible();
   await expect(page.getByText('Slant', { exact: true })).toBeVisible();
   await expect(page.locator('.route-cards article')).toHaveCount(2);
+  const firstRoute = page.locator('.route-cards article').first();
+  await expect(firstRoute).toHaveCSS('width', '272px');
+  await expect(firstRoute.locator('svg')).toHaveCSS('width', '200px');
+  const actions = await firstRoute
+    .locator('button')
+    .evaluateAll((buttons) => buttons.map((button) => button.getBoundingClientRect().top));
+  expect(actions[0]).toBe(actions[1]);
   await page.getByRole('button', { name: 'Plays' }).click();
   await expect(page.getByText(/1 Routen/)).toBeVisible();
   await page.getByRole('button', { name: 'Playbook', exact: true }).click();
