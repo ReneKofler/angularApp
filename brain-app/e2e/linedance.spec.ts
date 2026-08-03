@@ -53,19 +53,25 @@ test('filters dances and shows complete step labels', async ({ page }) => {
   await page.getByLabel('Tänze durchsuchen').fill('Boogie');
   await expect(page.getByRole('heading', { name: 'Electric Slide' }).first()).toBeVisible();
   await expect(page.getByText('Grapevine rechts')).toBeVisible();
-  await expect(page.getByText(/Rechts.*Gewicht rechts/)).toBeVisible();
-  await expect(page.getByRole('link', { name: /Video öffnen/ })).toHaveAttribute(
-    'rel',
-    'noopener noreferrer',
+  await expect(page.getByText(/Gewicht rechts/)).toBeVisible();
+  await expect(page.getByTitle('Linedance Video')).toHaveAttribute(
+    'src',
+    /youtube\.com\/embed\/test/,
   );
 });
-test('creates, edits and reorders steps', async ({ page }) => {
+test('creates and edits compact step rows', async ({ page }) => {
   await page.goto('/linedance');
   await page.getByLabel('Anweisung').fill('Kick');
-  await page.getByLabel('Fuß', { exact: true }).selectOption('Rechts');
-  await page.getByLabel('Fuß-Annotation').fill('Ferse');
-  await page.getByRole('button', { name: 'Hinzufügen' }).click();
-  await page.getByRole('button', { name: 'Nach oben' }).nth(1).click();
+  await page.getByLabel('Fuß', { exact: true }).selectOption('R');
+  await page.getByRole('button', { name: 'Schritt hinzufügen' }).click();
   await page.getByRole('button', { name: 'Bearbeiten' }).last().click();
-  await expect(page.getByRole('button', { name: 'Speichern' }).last()).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Schritt speichern' })).toBeVisible();
+});
+
+test('opens and closes the slide-down dance editor', async ({ page }) => {
+  await page.goto('/linedance');
+  await page.getByRole('button', { name: '+ Tanz' }).click();
+  await expect(page.getByLabel('Tanzname')).toBeVisible();
+  await page.getByRole('button', { name: 'Abbrechen' }).click();
+  await expect(page.getByLabel('Tanzname')).toBeHidden();
 });

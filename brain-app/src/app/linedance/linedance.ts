@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Dance, DanceStep, LinedanceService } from './linedance.service';
 @Component({
   selector: 'app-linedance',
@@ -11,11 +12,13 @@ import { Dance, DanceStep, LinedanceService } from './linedance.service';
 })
 export class Linedance {
   private service = inject(LinedanceService);
+  private sanitizer = inject(DomSanitizer);
   readonly dances = signal<Dance[]>([]);
   readonly steps = signal<DanceStep[]>([]);
   readonly selected = signal('');
   readonly query = signal('');
   readonly editingDance = signal<string | null>(null);
+  readonly showDanceForm = signal(false);
   readonly editingStep = signal<string | null>(null);
   readonly error = signal('');
   readonly danceForm = signal({
@@ -61,6 +64,7 @@ export class Linedance {
   }
   editDance(x: Dance) {
     this.editingDance.set(x.id);
+    this.showDanceForm.set(true);
     this.danceForm.set({
       name: x.name,
       song: x.song,
@@ -85,6 +89,14 @@ export class Linedance {
       notes: '',
     });
   }
+  newDance() {
+    this.resetDance();
+    this.showDanceForm.set(true);
+  }
+  cancelDance() {
+    this.resetDance();
+    this.showDanceForm.set(false);
+  }
   async saveDance() {
     const f = this.danceForm();
     if (!f.name.trim()) return;
@@ -94,6 +106,7 @@ export class Linedance {
         this.editingDance() ?? undefined,
       );
       this.resetDance();
+      this.showDanceForm.set(false);
       await this.load();
     } catch (e) {
       this.fail(e);
@@ -170,5 +183,20 @@ export class Linedance {
   }
   private fail(e: unknown) {
     this.error.set(e instanceof Error ? e.message : 'Etwas ist schiefgelaufen.');
+  }
+  youtubeEmbed(url: string): SafeResourceUrl | null {
+    if (!url) return null;
+    try {
+      const parsed = new URL(url);
+      const id =
+        parsed.hostname === 'youtu.be' ? parsed.pathname.slice(1) : parsed.searchParams.get('v');
+      return id
+        ? this.sanitizer.bypassSecurityTrustResourceUrl(
+            `https://www.youtube.com/embed/${encodeURIComponent(id)}`,
+          )
+        : null;
+    } catch {
+      return null;
+    }
   }
 }
