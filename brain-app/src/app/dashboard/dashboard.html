@@ -1,4 +1,4 @@
-<div class="dashboard">
+<div class="dashboard" [class.uniform]="tileStyle()==='uniform'">
   <header>
     <div class="identity">
       <span class="logo">🧠</span>
@@ -6,14 +6,14 @@
     </div>
     <div class="account-actions">
       <span class="version">ⓘ v3.12.0</span>
-      <button type="button" aria-label="Profile">◎</button>
-      <button type="button" aria-label="Settings">⚙</button>
+      <a routerLink="/profile" aria-label="Profile">◎</a>
+      <button type="button" aria-label="Settings" (click)="openSettings()">⚙</button>
       <button class="logout" type="button" (click)="auth.signOut()">Abmelden</button>
     </div>
   </header>
   <main>
     <section class="modules" aria-label="BrainApp modules">
-      @for (module of modules; track module.name) {
+      @for (module of visibleModules(); track module.id) {
         @if (module.route) {
           <a class="module" [routerLink]="module.route" [style.background]="module.color">
             <span class="icon">{{ module.icon }}</span>
@@ -30,4 +30,24 @@
       }
     </section>
   </main>
+  @if(settingsOpen()){
+    <div class="settings-backdrop" role="presentation">
+      <section class="dashboard-settings" role="dialog" aria-labelledby="dashboard-settings-title">
+        <h2 id="dashboard-settings-title">Einstellungen</h2>
+        @if(error()){<p class="settings-error" role="alert">{{error()}}</p>}
+        <div class="settings-list">
+          @for(module of draftModules();track module.id;let index=$index){
+            <article class="settings-row" draggable="true" tabindex="0" [class.dragging]="draggedIndex()===index"
+              [attr.aria-label]="module.name+' verschieben. Alt und Pfeiltasten verwenden.'"
+              (dragstart)="startDrag(index,$event)" (dragend)="draggedIndex.set(null)" (dragover)="$event.preventDefault()" (drop)="dropModule(index,$event)" (keydown)="handleMoveKey(index,$event)">
+              <span class="reorder" aria-hidden="true">⋮⋮</span><span class="module-icon">{{module.icon}}</span><strong>{{module.name}}</strong>
+              <label class="color-control" [attr.aria-label]="'Farbe für '+module.name"><input type="color" [value]="module.color" (input)="setColor(index,$any($event.target).value)" /><span [style.background]="module.color"></span></label>
+              <button class="visibility" type="button" [class.active]="module.enabled!==false" [attr.aria-label]="module.name+(module.enabled!==false?' ausblenden':' einblenden')" (click)="toggleModule(index)"><span></span></button>
+            </article>
+          }
+        </div>
+        <div class="settings-actions"><button type="button" (click)="settingsOpen.set(false)">Abbrechen</button><button class="done" type="button" [disabled]="saving()" (click)="saveSettings()">Fertig</button></div>
+      </section>
+    </div>
+  }
 </div>

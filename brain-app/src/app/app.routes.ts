@@ -40,6 +40,17 @@ export const routes: Routes = [
     loadComponent: () => import('./recipes/recipes').then((m) => m.Recipes),
   },
   {
+    path: 'body',
+    canActivate: [authGuard],
+    loadComponent: () => import('./body/body').then((m) => m.Body),
+  },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () => import('./profile/profile').then((m) => m.Profile),
+  },
+  { path: 'apps/body', redirectTo: 'body' },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
