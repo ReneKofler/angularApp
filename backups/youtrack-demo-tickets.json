@@ -15,6 +15,21 @@
         {
           "type": "Subtask",
           "direction": "OUTWARD",
+          "target": "DEMO-50"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-65"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
+          "target": "DEMO-66"
+        },
+        {
+          "type": "Subtask",
+          "direction": "OUTWARD",
           "target": "DEMO-45"
         },
         {
@@ -36,11 +51,6 @@
           "type": "Subtask",
           "direction": "OUTWARD",
           "target": "DEMO-49"
-        },
-        {
-          "type": "Subtask",
-          "direction": "OUTWARD",
-          "target": "DEMO-50"
         },
         {
           "type": "Subtask",
@@ -115,12 +125,12 @@
         {
           "type": "Subtask",
           "direction": "OUTWARD",
-          "target": "DEMO-65"
+          "target": "DEMO-67"
         },
         {
           "type": "Subtask",
           "direction": "OUTWARD",
-          "target": "DEMO-66"
+          "target": "DEMO-68"
         }
       ]
     },
@@ -131,7 +141,7 @@
       "fields": {
         "Priority": "Major",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -142,7 +152,7 @@
       "fields": {
         "Priority": "Critical",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -153,7 +163,7 @@
       "fields": {
         "Priority": "Critical",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -164,7 +174,7 @@
       "fields": {
         "Priority": "Major",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -175,7 +185,7 @@
       "fields": {
         "Priority": "Major",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -197,7 +207,7 @@
       "fields": {
         "Priority": "Critical",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -208,7 +218,7 @@
       "fields": {
         "Priority": "Major",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -219,7 +229,7 @@
       "fields": {
         "Priority": "Major",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -230,7 +240,7 @@
       "fields": {
         "Priority": "Normal",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -241,7 +251,7 @@
       "fields": {
         "Priority": "Major",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -252,7 +262,7 @@
       "fields": {
         "Priority": "Major",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -263,7 +273,7 @@
       "fields": {
         "Priority": "Major",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -274,7 +284,7 @@
       "fields": {
         "Priority": "Major",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -285,7 +295,7 @@
       "fields": {
         "Priority": "Normal",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -296,7 +306,7 @@
       "fields": {
         "Priority": "Major",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -307,7 +317,7 @@
       "fields": {
         "Priority": "Normal",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -318,7 +328,7 @@
       "fields": {
         "Priority": "Normal",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -329,7 +339,7 @@
       "fields": {
         "Priority": "Normal",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -340,7 +350,7 @@
       "fields": {
         "Priority": "Major",
         "Type": "Task",
-        "State": "To do"
+        "State": "Done"
       },
       "links": []
     },
@@ -351,7 +361,7 @@
       "fields": {
         "Priority": "Critical",
         "Type": "Task",
-        "State": "To do"
+        "State": "In Review"
       },
       "links": []
     },
@@ -363,6 +373,28 @@
         "Priority": "Major",
         "Type": "Task",
         "State": "To do"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-67",
+      "summary": "Match frontend themes and visual design to the original BrainApp",
+      "description": "Goal: bring the Angular frontend into close visual and interaction parity with the original BrainApp at https://brainappweb.vercel.app/ across authenticated desktop and mobile views.\n\nScope:\n- Capture a privacy-safe reference inventory for light and dark themes at representative desktop and mobile widths.\n- Compare and align design tokens: colors, typography, spacing, radii, borders, shadows, icons, focus rings, motion and elevation.\n- Align the login page, navigation shell, dashboard cards, forms, dialogs, notifications and settings screens.\n- Cover default, hover, focus, active, disabled, loading, empty, validation, error and success states.\n- Persist the selected theme, respect the system preference when selected and prevent a theme flash during startup.\n- Keep layouts usable with keyboard navigation, zoom and reduced-motion preferences.\n\nAcceptance criteria:\n- A route/component parity checklist and privacy-safe desktop/mobile references are committed.\n- Light, dark and system modes closely match the original on all implemented routes.\n- Theme colors meet WCAG AA contrast for normal text and interactive controls.\n- Keyboard focus is visible and reduced-motion preferences are honored.\n- Responsive checks cover at least 375 px mobile, 768 px tablet and 1440 px desktop widths.\n- Automated visual or component tests cover critical theme states and prevent obvious regressions.\n- No credentials, private user content or privileged Supabase keys are committed.",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "Done"
+      },
+      "links": []
+    },
+    {
+      "key": "DEMO-68",
+      "summary": "Implement Playwright frontend end-to-end tests",
+      "description": "Goal: add a reliable Playwright test suite for BrainApp frontend journeys and visual behavior, complementing the broader automated-quality work in DEMO-65.\n\nScope:\n- Install and configure Playwright for the Angular development/preview server.\n- Add reusable page objects or fixtures for authentication and core navigation.\n- Cover successful login, invalid login, protected-route redirects, session restoration and logout.\n- Cover dashboard navigation, settings persistence, theme selection and responsive navigation.\n- Add representative desktop and mobile projects using Chromium, with Firefox/WebKit where practical.\n- Add accessibility smoke checks and deterministic screenshots for critical light/dark states.\n- Provide safe test-data setup and cleanup with no production accounts or privileged keys.\n- Run Playwright in CI and retain traces/screenshots/videos only on failure.\n\nAcceptance criteria:\n- `npm run e2e` runs the suite locally from a clean checkout after documented configuration.\n- Tests wait on observable UI/network states and contain no arbitrary sleeps.\n- Authentication and currently implemented critical journeys have stable E2E coverage.\n- At least 375 px mobile and 1440 px desktop viewports are covered.\n- Failed CI runs publish a Playwright report and diagnostic trace.\n- Secrets are supplied through ignored local configuration or CI secret storage.\n- Fixtures, screenshots, videos, traces and reports contain no real private user data.\n- The README documents installation, required environment variables and debugging commands.\n\nRelated: DEMO-65 (overall automated parity, security and accessibility tests) and DEMO-67 (visual theme parity).",
+      "fields": {
+        "Priority": "Major",
+        "Type": "Task",
+        "State": "Done"
       },
       "links": []
     }
