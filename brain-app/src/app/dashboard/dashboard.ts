@@ -88,6 +88,7 @@ export class Dashboard {
       name: 'Einkaufsliste',
       description: 'Einkäufe planen & tracken',
       color: '#55ad00',
+      route: '/groceries',
     },
     {
       id: '13', position: 11,
