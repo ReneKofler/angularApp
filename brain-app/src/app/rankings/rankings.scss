@@ -111,14 +111,17 @@ article p {
   color: #ffc400;
   opacity: 0.8;
 }
-.current-badge {
+.status-badge {
   display: inline-block;
   margin-top: 0.15rem;
   padding: 0.18rem 0.4rem;
   border-radius: 0.3rem;
   color: #fff;
-  background: #2563eb;
+  background: #64748b;
   font-weight: 700;
+}
+.status-badge.current {
+  background: #2563eb;
 }
 .history,
 small {

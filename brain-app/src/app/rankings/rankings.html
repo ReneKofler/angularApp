@@ -117,8 +117,8 @@
             @if (category()?.show_original_title && x.original_title) {
               <small>{{ x.original_title }}</small>
             }
-            @if (isCurrent(x.status)) {
-              <span class="current-badge">Dran</span>
+            @if (statusBadge(x.status); as badge) {
+              <span class="status-badge" [class.current]="badge === 'Dran'">{{ badge }}</span>
             } @else {
               <p class="stars" [attr.aria-label]="x.rating + ' von 10 Sternen'">
                 @for (filled of stars(x.rating); track $index) {

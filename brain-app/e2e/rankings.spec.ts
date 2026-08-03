@@ -52,7 +52,7 @@ test('opens a category, filters rankings and opens its editor', async ({ page })
   await expect(page.getByRole('button', { name: 'Filme bearbeiten' })).toHaveCSS('opacity', '1');
   await categoryTile.click();
   await expect(page.getByText('Film A')).toBeVisible();
-  await expect(page.getByLabel('8 von 10 Sternen')).toContainText('★★★★★★★★☆☆');
+  await expect(page.locator('.status-badge', { hasText: 'Geplant' })).toBeVisible();
   await expect(page.getByText('Dran', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Absteigend; zu aufsteigend wechseln' }).click();
   await expect(

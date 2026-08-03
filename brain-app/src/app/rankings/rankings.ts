@@ -286,8 +286,11 @@ export class Rankings {
     const filled = Math.max(0, Math.min(10, Math.round(rating || 0)));
     return Array.from({ length: 10 }, (_, index) => index < filled);
   }
-  isCurrent(status?: string) {
-    return status?.trim().toLocaleLowerCase('de') === 'dran';
+  statusBadge(status?: string) {
+    const normalized = status?.trim().toLocaleLowerCase('de');
+    if (normalized === 'dran') return 'Dran';
+    if (normalized === 'geplant') return 'Geplant';
+    return null;
   }
   private text(e: unknown) {
     return e instanceof Error ? e.message : 'Etwas ist schiefgelaufen.';
