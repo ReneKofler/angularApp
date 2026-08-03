@@ -1,0 +1,137 @@
+<header>
+  <button
+    class="back"
+    [routerLink]="selected() ? null : '/'"
+    (click)="selected() ? closeCategory() : null"
+    aria-label="Zurück"
+  >
+    ‹
+  </button>
+  <h1>{{ category()?.name || 'Merkkarten' }}</h1>
+  @if (selected()) {
+    <button (click)="removeCategory()" aria-label="Kategorie löschen">♲</button
+    ><button (click)="startStudy()" [disabled]="!visible().length">Lernen</button
+    ><button class="primary" (click)="newCard()">+ Karte</button>
+  } @else {
+    <button class="primary" (click)="newCategory()">+ Kategorie</button>
+  }
+</header>
+<main>
+  @if (error()) {
+    <p role="alert" class="error">{{ error() }}</p>
+  }
+  @if (message()) {
+    <p role="status" class="success">{{ message() }}</p>
+  }
+  @if (!selected()) {
+    <section class="categories">
+      @for (c of categories(); track c.id) {
+        <button (click)="openCategory(c.id)">
+          <span>🗂️</span><strong>{{ c.name }}</strong
+          ><small>{{ count(c.id) }} Karten</small>
+        </button>
+      } @empty {
+        <p>Keine Kategorien vorhanden.</p>
+      }
+    </section>
+  } @else {
+    <input
+      aria-label="Karten durchsuchen"
+      placeholder="Karten durchsuchen..."
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event)"
+    />
+    <section class="cards">
+      @for (card of visible(); track card.id) {
+        <button (click)="edit(card)">
+          <strong>{{ card.title || card.front }}</strong
+          ><span>{{ card.front }}</span
+          ><small>{{ card.back }}</small>
+        </button>
+      } @empty {
+        <p>Keine Karten gefunden.</p>
+      }
+    </section>
+  }
+</main>
+@if (categoryEditor()) {
+  <div class="backdrop">
+    <form (ngSubmit)="saveCategory()">
+      <h2>Neue Kategorie</h2>
+      <label
+        >Name<input
+          aria-label="Kategoriename"
+          required
+          [ngModel]="categoryName()"
+          (ngModelChange)="categoryName.set($event)"
+          name="category"
+      /></label>
+      <footer>
+        <button type="button" (click)="categoryEditor.set(false)">Abbrechen</button
+        ><button class="primary">Speichern</button>
+      </footer>
+    </form>
+  </div>
+}
+@if (editor()) {
+  <div class="backdrop">
+    <form (ngSubmit)="saveCard()">
+      <h2>{{ editing() ? 'Karte bearbeiten' : 'Neue Karte' }}</h2>
+      <label
+        >Titel<input
+          [ngModel]="form().title"
+          (ngModelChange)="patch('title', $event)"
+          name="title" /></label
+      ><label
+        >Vorderseite<textarea
+          required
+          [ngModel]="form().front"
+          (ngModelChange)="patch('front', $event)"
+          name="front"
+        ></textarea></label
+      ><label
+        >Rückseite<textarea
+          required
+          [ngModel]="form().back"
+          (ngModelChange)="patch('back', $event)"
+          name="back"
+        ></textarea></label
+      ><label
+        >Kategorie<select
+          [ngModel]="form().category_id"
+          (ngModelChange)="patch('category_id', $event)"
+          name="category"
+        >
+          @for (c of categories(); track c.id) {
+            <option [value]="c.id">{{ c.name }}</option>
+          }
+        </select></label
+      >
+      <footer>
+        @if (editing()) {
+          <button class="delete" type="button" (click)="removeCard()">Löschen</button>
+        }
+        <button type="button" (click)="editor.set(false)">Abbrechen</button
+        ><button class="primary">Speichern</button>
+      </footer>
+    </form>
+  </div>
+}
+@if (study() && current()) {
+  <div class="backdrop study">
+    <section role="dialog" aria-label="Lernmodus" tabindex="0" (keydown)="handleStudyKey($event)">
+      <header>
+        <strong>{{ studyIndex() + 1 }} / {{ visible().length }}</strong
+        ><button aria-label="Lernmodus schließen" (click)="study.set(false)">×</button>
+      </header>
+      <button class="study-card" (click)="toggleReveal()">
+        <small>{{ revealed() ? 'Rückseite' : 'Vorderseite' }}</small
+        ><span>{{ revealed() ? current().back : current().front }}</span
+        ><em>Tippen oder Leertaste zum Umdrehen</em>
+      </button>
+      <footer>
+        <button (click)="next(-1)">← Zurück</button><button (click)="next(1)">Weiter →</button>
+      </footer>
+    </section>
+  </div>
+}

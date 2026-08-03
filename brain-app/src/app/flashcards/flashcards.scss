@@ -1,0 +1,169 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  color: #fff;
+  background: #0d1727;
+}
+header {
+  height: 3.75rem;
+  padding: 0 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: #1e2a3b;
+}
+h1 {
+  margin: 0 auto 0 0;
+  font-size: 1.25rem;
+}
+button {
+  padding: 0.65rem 1rem;
+  border: 1px solid #536177;
+  border-radius: 0.45rem;
+  color: #fff;
+  background: transparent;
+  cursor: pointer;
+}
+.back {
+  border: 0;
+  font-size: 2rem;
+  padding: 0;
+}
+.primary {
+  border-color: #6256ee;
+  background: #6256ee;
+}
+main {
+  width: min(58rem, calc(100% - 2rem));
+  margin: 2rem auto;
+  display: grid;
+  gap: 1rem;
+}
+input,
+textarea,
+select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #536177;
+  border-radius: 0.45rem;
+  color: #fff;
+  background: #354154;
+  font: inherit;
+}
+.categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 1rem;
+}
+.categories button {
+  min-height: 10rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: #5049e7;
+}
+.categories span {
+  font-size: 2.5rem;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+.cards button {
+  min-height: 11rem;
+  display: grid;
+  align-content: center;
+  gap: 0.7rem;
+  text-align: left;
+  background: #1e2a3b;
+}
+.cards small {
+  color: #9fb0c7;
+}
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: #000b;
+}
+.backdrop form,
+.study > section {
+  width: min(34rem, 100%);
+  max-height: 85vh;
+  overflow: auto;
+  display: grid;
+  gap: 1rem;
+  box-sizing: border-box;
+  padding: 1.4rem;
+  border-radius: 0.7rem;
+  background: #1e2a3b;
+}
+.backdrop label {
+  display: grid;
+  gap: 0.4rem;
+}
+.backdrop footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+.delete {
+  margin-right: auto;
+  background: #7f1d2d;
+}
+.error,
+.success {
+  padding: 0.7rem;
+  border-radius: 0.4rem;
+}
+.error {
+  background: #4c1d2a;
+}
+.success {
+  background: #064e3b;
+}
+.study > section {
+  height: min(36rem, 90vh);
+  grid-template-rows: auto 1fr auto;
+}
+.study section header {
+  padding: 0;
+  height: auto;
+}
+.study-card {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  text-align: center;
+  background: #354154;
+  font-size: 1.4rem;
+}
+.study-card small,
+.study-card em {
+  color: #9fb0c7;
+  font-size: 0.8rem;
+}
+.study-card em {
+  font-style: normal;
+}
+@media (max-width: 600px) {
+  header {
+    padding-inline: 0.7rem;
+  }
+  .categories,
+  .cards {
+    grid-template-columns: 1fr 1fr;
+  }
+  .study > section {
+    height: 100%;
+  }
+}
