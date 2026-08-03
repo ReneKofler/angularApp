@@ -1,0 +1,160 @@
+@if (!guided()) {
+  <header>
+    <button routerLink="/" aria-label="Zurück">‹</button>
+    <h1>Stretching</h1>
+  </header>
+  <main>
+    @if (error()) {
+      <p role="alert" class="error">{{ error() }}</p>
+    }
+    <aside>
+      <h2>Routinen</h2>
+      <form (ngSubmit)="addRoutine()">
+        <input
+          aria-label="Routine"
+          placeholder="Neue Routine"
+          [ngModel]="routineForm().name"
+          (ngModelChange)="patchRoutine('name', $event)"
+          name="routine"
+        /><button class="primary" aria-label="Routine hinzufügen">+</button>
+      </form>
+      @for (routine of routines(); track routine.id) {
+        <button
+          class="routine"
+          [class.active]="selected() === routine.id"
+          (click)="selected.set(routine.id)"
+        >
+          <span>{{ routine.emoji }}</span
+          ><strong>{{ routine.name }}</strong
+          ><small
+            >{{ exercises().filter((x) => x.routine_id === routine.id).length }} Übungen</small
+          >
+        </button>
+      }
+    </aside>
+    <section class="content">
+      @if (selectedRoutine()) {
+        <section class="heading">
+          <div>
+            <h2>{{ selectedRoutine()?.emoji }} {{ selectedRoutine()?.name }}</h2>
+            <span>{{ items().length }} Übungen</span>
+          </div>
+          <div>
+            <button class="danger" (click)="deleteRoutine()">Löschen</button
+            ><button class="primary" [disabled]="!items().length" (click)="start()">
+              Routine starten
+            </button>
+          </div>
+        </section>
+        <form class="editor" (ngSubmit)="save()">
+          <h2>{{ editing() ? 'Übung bearbeiten' : 'Neue Übung' }}</h2>
+          <div class="short">
+            <label
+              >Emoji<input
+                aria-label="Emoji"
+                [ngModel]="form().emoji"
+                (ngModelChange)="patch('emoji', $event)"
+                name="emoji" /></label
+            ><label
+              >Name<input
+                aria-label="Name"
+                required
+                [ngModel]="form().name"
+                (ngModelChange)="patch('name', $event)"
+                name="name" /></label
+            ><label
+              >Dauer (Sek.)<input
+                aria-label="Dauer"
+                type="number"
+                min="1"
+                [ngModel]="form().duration_seconds"
+                (ngModelChange)="patch('duration_seconds', $event)"
+                name="duration"
+            /></label>
+          </div>
+          <label
+            >Bild-URL<input
+              aria-label="Bild-URL"
+              [ngModel]="form().image_url"
+              (ngModelChange)="patch('image_url', $event)"
+              name="image" /></label
+          ><label
+            >Notizen<textarea
+              aria-label="Notizen"
+              [ngModel]="form().notes"
+              (ngModelChange)="patch('notes', $event)"
+              name="notes"
+            ></textarea>
+          </label>
+          <footer>
+            @if (editing()) {
+              <button type="button" (click)="reset()">Abbrechen</button>
+            }
+            <button class="primary">{{ editing() ? 'Speichern' : 'Übung hinzufügen' }}</button>
+          </footer>
+        </form>
+        <section class="list">
+          @for (item of items(); track item.id) {
+            <article>
+              <div class="order">
+                <button aria-label="Nach oben" (click)="move(item, -1)">↑</button
+                ><button aria-label="Nach unten" (click)="move(item, 1)">↓</button>
+              </div>
+              <span class="emoji">{{ item.emoji }}</span>
+              <div>
+                <h3>{{ item.name }}</h3>
+                <small>{{ item.duration_seconds }} Sekunden</small>
+                <p>{{ item.notes }}</p>
+              </div>
+              @if (item.image_url) {
+                <img
+                  [src]="item.image_url"
+                  alt=""
+                  (error)="$any($event.target).style.display = 'none'"
+                />
+              }
+              <footer>
+                <button (click)="edit(item)">Bearbeiten</button
+                ><button class="danger" (click)="remove(item)">Löschen</button>
+              </footer>
+            </article>
+          }
+        </section>
+      } @else {
+        <p>Lege zuerst eine Routine an.</p>
+      }
+    </section>
+  </main>
+} @else if (current()) {
+  <section class="guided">
+    <header>
+      <button aria-label="Routine beenden" (click)="close()">←</button>
+      <div>
+        <strong>{{ selectedRoutine()?.name }}</strong
+        ><small>Geführtes Stretching</small>
+      </div>
+      <span>{{ index() + 1 }} / {{ items().length }}</span>
+    </header>
+    <main>
+      <p>Nächste Übung</p>
+      <section class="exercise">
+        <span class="big-emoji">{{ current().emoji }}</span>
+        <h1>{{ current().name }}</h1>
+        @if (current().image_url && !imageFailed()) {
+          <img [src]="current().image_url" alt="Übungsbild" (error)="imageFailed.set(true)" />
+        } @else if (current().image_url) {
+          <p class="media-error">Bild nicht verfügbar</p>
+        }
+        <p>{{ current().notes }}</p>
+        <strong class="timer">{{ remaining() }} s</strong
+        ><button class="primary" (click)="toggleTimer()">
+          {{ running() ? 'Pause' : 'Timer starten' }}
+        </button>
+      </section>
+      <footer>
+        <button [disabled]="index() === 0" (click)="navigate(-1)">← Zurück</button
+        ><button [disabled]="index() === items().length - 1" (click)="navigate(1)">Weiter →</button>
+      </footer>
+    </main>
+  </section>
+}
