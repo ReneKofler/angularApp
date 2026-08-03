@@ -1,0 +1,428 @@
+<header>
+  <button
+    class="back"
+    aria-label="Zurück"
+    (click)="selected() ? closeCategory() : null"
+    [routerLink]="selected() ? null : '/'"
+  >
+    ‹
+  </button>
+  @if (category()) {
+    <span class="title-icon">{{ category()?.icon }}</span>
+  }
+  <h1>{{ category()?.name || 'Rankings' }}</h1>
+  @if (category()) {
+    <button
+      class="icon-button category-edit"
+      aria-label="Kategorie bearbeiten"
+      (click)="editCategory()"
+    >
+      ✎
+    </button>
+    <button class="icon-button category-actions" aria-label="Listenansicht">▦</button>
+    <button class="icon-button" aria-label="Konsumverlauf">▤</button>
+    <button class="icon-button" aria-label="Exportieren">↥</button>
+    <button class="primary" (click)="newItem()">+ Ranking</button>
+  } @else {
+    <button
+      class="icon-button overview-settings"
+      aria-label="Einstellungen"
+      (click)="openSettings()"
+    >
+      ⚙
+    </button>
+    <button class="primary" (click)="newCategory()">+ Kategorie</button>
+  }
+</header>
+<main [class.category-page]="selected()">
+  @if (error()) {
+    <p role="alert" class="error">{{ error() }}</p>
+  }
+  @if (message()) {
+    <p role="status" class="success">{{ message() }}</p>
+  }
+  @if (!selected()) {
+    <section class="category-grid" aria-label="Ranking-Kategorien">
+      @for (c of categories(); track c.id) {
+        <article
+          class="category-tile"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="c.name + ' öffnen'"
+          [style.background]="categoryBackground(c.color)"
+          (click)="openCategory(c.id)"
+          (keydown.enter)="openCategory(c.id)"
+          (keydown.space)="openCategory(c.id); $event.preventDefault()"
+        >
+          <button
+            class="tile-edit"
+            type="button"
+            [attr.aria-label]="c.name + ' bearbeiten'"
+            (click)="$event.stopPropagation(); editCategoryFor(c)"
+          >
+            ✎
+          </button>
+          <span>{{ c.icon }}</span
+          ><strong>{{ c.name }}</strong
+          ><small>{{ count(c.id) }} Einträge</small>
+        </article>
+      } @empty {
+        <p class="empty">Noch keine Kategorien.</p>
+      }
+    </section>
+  } @else {
+    <div class="tools">
+      <input
+        aria-label="Rankings durchsuchen"
+        placeholder="Einträge durchsuchen..."
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)"
+      /><select aria-label="Status" [ngModel]="status()" (ngModelChange)="status.set($event)">
+        <option value="">Alle Status</option>
+        <option value="done">Erledigt</option>
+        <option value="current">Dran</option>
+        <option value="planned">Geplant</option></select
+      ><select aria-label="Sortierung" [ngModel]="sort()" (ngModelChange)="sort.set($event)">
+        <option value="rating">Bewertung</option>
+        <option value="name">Name</option>
+        <option value="year">Jahr</option>
+        <option value="consumed_at">Gesehen am</option>
+        <option value="created_at">Hinzugefügt</option></select
+      ><button
+        [attr.aria-label]="
+          ascending()
+            ? 'Aufsteigend; zu absteigend wechseln'
+            : 'Absteigend; zu aufsteigend wechseln'
+        "
+        [attr.aria-pressed]="ascending()"
+        (click)="toggleSortDirection()"
+      >
+        {{ ascending() ? '↑' : '↓' }}
+      </button>
+    </div>
+    <section [class.list]="category()?.view_mode === 'list'">
+      @for (x of displayed(); track x.id) {
+        <article class="ranking-card" (click)="edit(x)" tabindex="0">
+          <div class="media">
+            @if (x.image_url) {
+              <img
+                [src]="x.image_url"
+                alt=""
+                (error)="$any($event.target).style.display = 'none'"
+              />
+            } @else {
+              <span>{{ category()?.icon }}</span>
+            }
+          </div>
+          <div>
+            <h2>{{ x.name }}</h2>
+            @if (category()?.show_original_title && x.original_title) {
+              <small>{{ x.original_title }}</small>
+            }
+            @if (statusBadge(x.status); as badge) {
+              <span class="status-badge" [class.current]="badge === 'Dran'">{{ badge }}</span>
+            } @else {
+              <p class="stars" [attr.aria-label]="x.rating + ' von 10 Sternen'">
+                @for (filled of stars(x.rating); track $index) {
+                  <span [class.empty]="!filled">{{ filled ? '★' : '☆' }}</span>
+                }
+              </p>
+            }
+            @if (category()?.show_author && x.creator) {
+              <p>{{ x.creator }}</p>
+            }
+            @if (category()?.show_year && x.year) {
+              <p>{{ x.year }}</p>
+            }
+            @if (category()?.show_brand && x.brand) {
+              <p>{{ x.brand }}</p>
+            }
+            @if (category()?.show_plot && x.plot) {
+              <p>{{ x.plot }}</p>
+            }
+            @if (category()?.show_episodes && x.episodes) {
+              <label
+                >Folgen {{ x.watched_episodes || 0 }}/{{ x.episodes
+                }}<progress [value]="progress(x)" max="100"></progress
+              ></label>
+            }
+            @if (category()?.show_nutrition) {
+              <p>
+                {{ x.nutrition_kcal_100g || 0 }} kcal · {{ x.nutrition_protein_100g || 0 }} g
+                Protein / 100 g
+              </p>
+            }
+            <p class="history">Konsumiert: {{ dates(x.id).length }}×</p>
+            <button (click)="$event.stopPropagation(); consume(x)">Heute konsumiert</button>
+          </div>
+        </article>
+      } @empty {
+        <p class="empty">Keine Einträge gefunden.</p>
+      }
+    </section>
+    @if (remaining()) {
+      <button class="load-more" (click)="loadMore()">+{{ remaining() }} weitere anzeigen</button>
+    }
+  }
+</main>
+@if (settingsOpen()) {
+  <div class="backdrop">
+    <section class="settings-panel" role="dialog" aria-labelledby="settings-title">
+      <h2 id="settings-title">Einstellungen</h2>
+      <div class="settings-list">
+        @for (c of draftCategories(); track c.id; let i = $index) {
+          <article
+            class="settings-row"
+            draggable="true"
+            (dragstart)="startDrag(i, $event)"
+            (dragover)="$event.preventDefault()"
+            (drop)="dropCategory(i, $event)"
+          >
+            <span class="moves"
+              ><button aria-label="Nach oben" (click)="moveCategory(i, -1)">⌃</button
+              ><button aria-label="Nach unten" (click)="moveCategory(i, 1)">⌄</button></span
+            >
+            <span>{{ c.icon }}</span
+            ><strong>{{ c.name }}</strong
+            ><i [style.background]="categoryBackground(c.color)"></i>
+          </article>
+        }
+      </div>
+      <footer>
+        <button (click)="settingsOpen.set(false)">Abbrechen</button
+        ><button class="done" (click)="saveOrder()">Fertig</button>
+      </footer>
+    </section>
+  </div>
+}
+@if (categoryEditor()) {
+  <div class="backdrop category-backdrop">
+    <form class="category-sheet" (ngSubmit)="saveCategory()">
+      <div class="sheet-title">
+        <h2>{{ editingCategory() ? 'Kategorie bearbeiten' : 'Neue Kategorie' }}</h2>
+        <button type="button" aria-label="Schließen" (click)="categoryEditor.set(false)">×</button>
+      </div>
+      <label
+        >Name<input
+          required
+          [ngModel]="categoryForm().name"
+          (ngModelChange)="patchCategory('name', $event)"
+          name="categoryName"
+      /></label>
+      <label
+        >Icon (Emoji)<input
+          class="emoji"
+          [ngModel]="categoryForm().icon"
+          (ngModelChange)="patchCategory('icon', $event)"
+          name="icon"
+      /></label>
+      <fieldset>
+        <legend>Farbe</legend>
+        <div class="color-palette">
+          @for (color of categoryColors; track color) {
+            <button
+              type="button"
+              [class.selected]="categoryForm().color === color"
+              [style.background]="categoryBackground(color)"
+              [attr.aria-label]="'Farbe ' + ($index + 1)"
+              (click)="patchCategory('color', color)"
+            ></button>
+          }
+        </div>
+      </fieldset>
+      <div class="category-preview" [style.background]="categoryBackground(categoryForm().color)">
+        {{ categoryForm().icon }} <strong>{{ categoryForm().name || 'Kategorie' }}</strong>
+      </div>
+      <fieldset>
+        <legend>Ansicht</legend>
+        <div class="view-toggle">
+          <button
+            type="button"
+            [class.active]="categoryForm().view_mode === 'list'"
+            (click)="patchCategory('view_mode', 'list')"
+          >
+            ☰ Liste</button
+          ><button
+            type="button"
+            [class.active]="categoryForm().view_mode !== 'list'"
+            (click)="patchCategory('view_mode', 'grid')"
+          >
+            ▦ Kacheln
+          </button>
+        </div>
+      </fieldset>
+      <fieldset class="visible-fields">
+        <legend>Sichtbare Felder</legend>
+        @for (
+          f of [
+            { k: 'show_original_title', n: 'Originaltitel (optional)' },
+            { k: 'show_author', n: 'Autor/Regisseur (optional)' },
+            { k: 'show_year', n: 'Jahr (optional)' },
+            { k: 'show_brand', n: 'Marke / Studio (optional)' },
+            { k: 'show_episodes', n: 'Hat Episoden' },
+            { k: 'show_seasons', n: 'Hat Staffeln' },
+            { k: 'show_plot', n: 'Plot (optional)' },
+            { k: 'show_url', n: 'URL (optional)' },
+            { k: 'show_image_url', n: 'Bild-URL (optional)' },
+            { k: 'show_nutrition', n: 'Nährwerte' },
+          ];
+          track f.k
+        ) {
+          <label class="switch-row"
+            ><span>{{ f.n }}</span
+            ><input
+              type="checkbox"
+              [ngModel]="categoryForm()[f.k]"
+              (ngModelChange)="patchCategory(f.k, $event)"
+              [name]="f.k" /><i></i
+          ></label>
+        }
+      </fieldset>
+      <footer>
+        @if (editingCategory()) {
+          <button class="delete" type="button" (click)="removeCategory()">Löschen</button>
+        }
+        <button type="button" (click)="categoryEditor.set(false)">Abbrechen</button
+        ><button class="primary">Speichern</button>
+      </footer>
+    </form>
+  </div>
+}
+@if (editor()) {
+  <div class="backdrop">
+    <form (ngSubmit)="save()">
+      <h2>{{ editing() ? 'Eintrag bearbeiten' : 'Neuer Eintrag' }}</h2>
+      <label
+        >Name<input
+          required
+          [ngModel]="form().name"
+          (ngModelChange)="patch('name', $event)"
+          name="name"
+      /></label>
+      <div class="row">
+        <label
+          >Bewertung (0–10)<input
+            type="number"
+            min="0"
+            max="10"
+            [ngModel]="form().rating"
+            (ngModelChange)="patch('rating', +$event)"
+            name="rating" /></label
+        ><label
+          >Status<select
+            [ngModel]="form().status"
+            (ngModelChange)="patch('status', $event)"
+            name="status"
+          >
+            <option value="done">Erledigt</option>
+            <option value="current">Dran</option>
+            <option value="planned">Geplant</option>
+          </select></label
+        >
+      </div>
+      @if (category()?.show_original_title) {
+        <label
+          >Originaltitel<input
+            [ngModel]="form().original_title"
+            (ngModelChange)="patch('original_title', $event)"
+            name="original"
+        /></label>
+      }
+      @if (category()?.show_author) {
+        <label
+          >Autor/Regisseur<input
+            [ngModel]="form().creator"
+            (ngModelChange)="patch('creator', $event)"
+            name="creator"
+        /></label>
+      }
+      @if (category()?.show_year) {
+        <label
+          >Jahr<input
+            type="number"
+            [ngModel]="form().year"
+            (ngModelChange)="patch('year', +$event)"
+            name="year"
+        /></label>
+      }
+      @if (category()?.show_plot) {
+        <label
+          >Beschreibung<textarea
+            [ngModel]="form().plot"
+            (ngModelChange)="patch('plot', $event)"
+            name="plot"
+          ></textarea>
+        </label>
+      }
+      @if (category()?.show_image_url) {
+        <label
+          >Bild-URL<input
+            type="url"
+            [ngModel]="form().image_url"
+            (ngModelChange)="patch('image_url', $event)"
+            name="image"
+        /></label>
+      }
+      @if (category()?.show_url) {
+        <label
+          >URL<input
+            type="url"
+            [ngModel]="form().url"
+            (ngModelChange)="patch('url', $event)"
+            name="url"
+        /></label>
+      }
+      @if (category()?.show_brand) {
+        <label
+          >Marke<input
+            [ngModel]="form().brand"
+            (ngModelChange)="patch('brand', $event)"
+            name="brand"
+        /></label>
+      }
+      @if (category()?.show_episodes) {
+        <div class="row">
+          <label
+            >Folgen<input
+              type="number"
+              min="0"
+              [ngModel]="form().episodes"
+              (ngModelChange)="patch('episodes', +$event)"
+              name="episodes" /></label
+          ><label
+            >Gesehen<input
+              type="number"
+              min="0"
+              [ngModel]="form().watched_episodes"
+              (ngModelChange)="patch('watched_episodes', +$event)"
+              name="watched"
+          /></label>
+        </div>
+      }
+      @if (category()?.show_nutrition) {
+        <div class="row">
+          <label
+            >kcal / 100 g<input
+              type="number"
+              [ngModel]="form().nutrition_kcal_100g"
+              (ngModelChange)="patch('nutrition_kcal_100g', +$event)"
+              name="kcal" /></label
+          ><label
+            >Protein / 100 g<input
+              type="number"
+              [ngModel]="form().nutrition_protein_100g"
+              (ngModelChange)="patch('nutrition_protein_100g', +$event)"
+              name="protein"
+          /></label>
+        </div>
+      }
+      <footer>
+        @if (editing()) {
+          <button class="delete" type="button" (click)="remove()">Löschen</button>
+        }
+        <button type="button" (click)="editor.set(false)">Abbrechen</button
+        ><button class="primary">Speichern</button>
+      </footer>
+    </form>
+  </div>
+}

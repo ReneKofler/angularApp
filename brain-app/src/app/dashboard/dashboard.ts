@@ -54,6 +54,7 @@ export class Dashboard {
       name: 'Rankings',
       description: 'Filme, Serien & mehr bewerten',
       color: '#d9167b',
+      route: '/rankings',
     },
     {
       id: '4', position: 3,
