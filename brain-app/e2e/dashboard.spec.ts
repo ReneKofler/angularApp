@@ -5,22 +5,38 @@ test.beforeEach(async ({ page }) => signIn(page));
 
 test('shows the complete module grid and working modules', async ({ page }) => {
   await expect(page.locator('.module')).toHaveCount(21);
-  await expect(page.getByRole('link', { name: /Sport Tracking/ })).toHaveAttribute('href', '/workouts');
+  await expect(page.getByRole('link', { name: /Sport Tracking/ })).toHaveAttribute(
+    'href',
+    '/workouts',
+  );
   await expect(page.getByRole('link', { name: /CrossFit/ })).toHaveAttribute('href', '/crossfit');
   await expect(page.getByRole('link', { name: /Notizen/ })).toHaveAttribute('href', '/notes');
-  await expect(page.getByRole('link', { name: /^💪 Übungen / })).toHaveAttribute('href', '/training');
+  await expect(page.getByRole('link', { name: /^💪 Übungen / })).toHaveAttribute(
+    'href',
+    '/training',
+  );
   await expect(page.getByRole('link', { name: /Greasing the Groove/ })).toHaveAttribute(
     'href',
     '/greasing-the-groove',
   );
   await expect(page.getByRole('link', { name: /Ernährung/ })).toHaveAttribute('href', '/nutrition');
   await expect(page.getByRole('link', { name: /Rezepte/ })).toHaveAttribute('href', '/recipes');
-  await expect(page.getByRole('link', { name: /Einkaufsliste/ })).toHaveAttribute('href', '/groceries');
+  await expect(page.getByRole('link', { name: /Einkaufsliste/ })).toHaveAttribute(
+    'href',
+    '/groceries',
+  );
   await expect(page.getByRole('link', { name: /Journal/ })).toHaveAttribute('href', '/journal');
   await expect(page.getByRole('link', { name: /Rankings/ })).toHaveAttribute('href', '/rankings');
-  await expect(page.getByRole('link', { name: /Merkkarten/ })).toHaveAttribute('href', '/flashcards');
-  await expect(page.getByRole('link', { name: /Stretching/ })).toHaveAttribute('href', '/stretching');
-  await expect(page.locator('.module.unavailable')).toHaveCount(8);
+  await expect(page.getByRole('link', { name: /Merkkarten/ })).toHaveAttribute(
+    'href',
+    '/flashcards',
+  );
+  await expect(page.getByRole('link', { name: /Stretching/ })).toHaveAttribute(
+    'href',
+    '/stretching',
+  );
+  await expect(page.getByRole('link', { name: /Linedance/ })).toHaveAttribute('href', '/linedance');
+  await expect(page.locator('.module.unavailable')).toHaveCount(7);
 });
 
 test('opens dashboard settings with reorder, visibility, and color controls', async ({ page }) => {
