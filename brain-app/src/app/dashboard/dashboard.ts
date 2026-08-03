@@ -81,7 +81,7 @@ export class Dashboard {
     },
     { id: '5', position: 4, icon: '🔄', name: 'Einheiten', description: 'Einheiten umrechnen', color: '#ed4d00' },
     { id: '6', position: 5, icon: '🗓️', name: 'Kalender', description: 'Übersicht aller Aktivitäten', color: '#079b91' },
-    { id: '8', position: 7, icon: '📖', name: 'Journal', description: 'Tagebuch & Gedanken', color: '#4b45e7' },
+    { id: '8', position: 7, icon: '📖', name: 'Journal', description: 'Tagebuch & Gedanken', color: '#4b45e7', route: '/journal' },
     {
       id: '9', position: 8,
       icon: '🛒',
