@@ -44,6 +44,16 @@ describe('Flashcards', () => {
     expect(f.componentInstance.current()?.id).toBe('2');
     expect(f.componentInstance.revealed()).toBe(false);
   });
+  it('removes correctly answered cards and tracks the score', async () => {
+    const f = TestBed.createComponent(Flashcards);
+    await f.whenStable();
+    f.componentInstance.openCategory('c');
+    f.componentInstance.startStudy();
+    f.componentInstance.answer(true);
+    expect(f.componentInstance.correct()).toBe(1);
+    expect(f.componentInstance.studyCards().map((card) => card.id)).toEqual(['2']);
+    expect(f.componentInstance.current()?.id).toBe('2');
+  });
   it('saves front and back content', async () => {
     const f = TestBed.createComponent(Flashcards);
     await f.whenStable();

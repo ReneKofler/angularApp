@@ -20,6 +20,8 @@ export class Flashcards {
   readonly study = signal(false);
   readonly revealed = signal(false);
   readonly studyIndex = signal(0);
+  readonly studyCards = signal<Flashcard[]>([]);
+  readonly correct = signal(0);
   readonly editing = signal<string | null>(null);
   readonly categoryName = signal('');
   readonly error = signal('');
@@ -32,7 +34,7 @@ export class Flashcards {
         `${x.title} ${x.front} ${x.back}`.toLowerCase().includes(this.query().toLowerCase()),
     ),
   );
-  readonly current = computed(() => this.visible()[this.studyIndex()]);
+  readonly current = computed(() => this.studyCards()[this.studyIndex()]);
   constructor() {
     void this.load();
   }
@@ -134,6 +136,8 @@ export class Flashcards {
   }
   startStudy() {
     if (!this.visible().length) return;
+    this.studyCards.set([...this.visible()]);
+    this.correct.set(0);
     this.studyIndex.set(0);
     this.revealed.set(false);
     this.study.set(true);
@@ -142,10 +146,22 @@ export class Flashcards {
     this.revealed.update((x) => !x);
   }
   next(delta: number) {
-    const n = this.visible().length;
+    const n = this.studyCards().length;
     if (!n) return;
     this.studyIndex.update((i) => (i + delta + n) % n);
     this.revealed.set(false);
+  }
+  answer(isCorrect: boolean) {
+    const cards = [...this.studyCards()];
+    if (!cards.length) return;
+    const index = this.studyIndex();
+    const [card] = cards.splice(index, 1);
+    if (isCorrect) this.correct.update((value) => value + 1);
+    else cards.push(card);
+    this.studyCards.set(cards);
+    this.studyIndex.set(cards.length ? index % cards.length : 0);
+    this.revealed.set(false);
+    if (!cards.length) this.study.set(false);
   }
   handleStudyKey(e: KeyboardEvent) {
     if (e.key === ' ' || e.key === 'Enter') {
@@ -154,6 +170,8 @@ export class Flashcards {
     }
     if (e.key === 'ArrowRight') this.next(1);
     if (e.key === 'ArrowLeft') this.next(-1);
+    if (this.revealed() && (e.key === '1' || e.key.toLowerCase() === 'f')) this.answer(false);
+    if (this.revealed() && (e.key === '2' || e.key.toLowerCase() === 'r')) this.answer(true);
   }
   category() {
     return this.categories().find((x) => x.id === this.selected());

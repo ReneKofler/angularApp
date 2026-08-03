@@ -26,10 +26,13 @@ test('filters cards and studies with reveal and keyboard navigation', async ({ p
   await page.getByLabel('Karten durchsuchen').fill('');
   await page.getByRole('button', { name: 'Lernen starten' }).click();
   const dialog = page.getByRole('dialog', { name: 'Lernmodus' });
+  await expect(dialog.getByText('0 / 2 richtig')).toBeVisible();
   await expect(dialog.getByText('Hallo')).toBeVisible();
   await dialog.press(' ');
   await expect(dialog.getByText('Hello')).toBeVisible();
-  await dialog.press('ArrowRight');
+  await dialog.getByRole('button', { name: 'Richtig' }).click();
+  await expect(dialog.getByText('1 / 2 richtig')).toBeVisible();
+  await expect(dialog.getByText('1 Karten in dieser Runde offen')).toBeVisible();
   await expect(dialog.getByText('Tschüss')).toBeVisible();
 });
 test('shows inline category and card controls', async ({ page }) => {
