@@ -30,6 +30,15 @@ test('opens dashboard settings with reorder, visibility, and color controls', as
   await expect(dialog).toBeHidden();
 });
 
+test('opens profile and shows account and global tile settings', async ({ page }) => {
+  await page.getByRole('link', { name: 'Profile' }).click();
+  await expect(page).toHaveURL(/\/profile/);
+  await expect(page.getByRole('heading', { name: 'Profil' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'E-Mail-Adresse' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Dashboard-Kacheln' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Schwarz-Weiß/ })).toBeVisible();
+});
+
 test('navigates to Greasing the Groove and back to the dashboard', async ({ page }) => {
   await page.getByRole('link', { name: /Greasing the Groove/ }).click();
   await expect(page).toHaveURL(/\/greasing-the-groove/);

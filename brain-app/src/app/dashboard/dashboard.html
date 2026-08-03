@@ -1,4 +1,4 @@
-<div class="dashboard">
+<div class="dashboard" [class.monochrome]="tileTheme()==='monochrome'">
   <header>
     <div class="identity">
       <span class="logo">🧠</span>
@@ -6,7 +6,7 @@
     </div>
     <div class="account-actions">
       <span class="version">ⓘ v3.12.0</span>
-      <button type="button" aria-label="Profile">◎</button>
+      <a routerLink="/profile" aria-label="Profile">◎</a>
       <button type="button" aria-label="Settings" (click)="openSettings()">⚙</button>
       <button class="logout" type="button" (click)="auth.signOut()">Abmelden</button>
     </div>
