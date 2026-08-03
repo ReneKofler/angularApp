@@ -6,6 +6,8 @@
     "prestart": "node scripts/sync-environment.mjs",
     "start": "ng serve",
     "build": "ng build",
+    "lint": "node scripts/check-changed-format.mjs",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:e2e": "playwright test"
@@ -28,6 +30,7 @@
     "@angular/build": "^21.2.19",
     "@angular/cli": "^21.2.19",
     "@angular/compiler-cli": "^21.2.0",
+    "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.61.1",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
