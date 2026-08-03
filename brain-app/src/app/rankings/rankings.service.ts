@@ -45,6 +45,7 @@ export interface Ranking {
   nutrition_fiber_100g?: number;
   nutrition_salt_100g?: number;
   consumed_at?: string;
+  created_at?: string;
 }
 export interface ConsumedDate {
   id: string;

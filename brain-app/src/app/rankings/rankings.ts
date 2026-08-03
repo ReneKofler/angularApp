@@ -34,7 +34,7 @@ export class Rankings {
   readonly selected = signal('');
   readonly query = signal('');
   readonly status = signal('');
-  readonly sort = signal<'rating' | 'name' | 'priority'>('rating');
+  readonly sort = signal<'created_at' | 'rating' | 'name' | 'priority'>('created_at');
   readonly editor = signal(false);
   readonly categoryEditor = signal(false);
   readonly settingsOpen = signal(false);
@@ -70,7 +70,9 @@ export class Rankings {
       .sort((a, b) =>
         this.sort() === 'name'
           ? a.name.localeCompare(b.name)
-          : Number(b[this.sort()] ?? 0) - Number(a[this.sort()] ?? 0),
+          : this.sort() === 'created_at'
+            ? Date.parse(b.created_at ?? '') - Date.parse(a.created_at ?? '')
+            : Number(b[this.sort()] ?? 0) - Number(a[this.sort()] ?? 0),
       ),
   );
   constructor() {

@@ -16,8 +16,22 @@ describe('Rankings', () => {
     service.load.mockResolvedValue({
       categories: [{ id: 'c', name: 'Filme', position: 0 }],
       rankings: [
-        { id: '1', category_id: 'c', name: 'B', rating: 5, priority: 1 },
-        { id: '2', category_id: 'c', name: 'A', rating: 9, priority: 2 },
+        {
+          id: '1',
+          category_id: 'c',
+          name: 'B',
+          rating: 5,
+          priority: 1,
+          created_at: '2026-01-01T00:00:00Z',
+        },
+        {
+          id: '2',
+          category_id: 'c',
+          name: 'A',
+          rating: 9,
+          priority: 2,
+          created_at: '2026-02-01T00:00:00Z',
+        },
       ],
       history: [],
     });
@@ -25,6 +39,12 @@ describe('Rankings', () => {
       imports: [Rankings],
       providers: [provideRouter([]), { provide: RankingsService, useValue: service }],
     }).compileComponents();
+  });
+  it('sorts newly added rankings first by default', async () => {
+    const f = TestBed.createComponent(Rankings);
+    await f.whenStable();
+    expect(f.componentInstance.sort()).toBe('created_at');
+    expect(f.componentInstance.visible().map((x) => x.id)).toEqual(['2', '1']);
   });
   it('filters and sorts category entries', async () => {
     const f = TestBed.createComponent(Rankings);

@@ -83,7 +83,7 @@
         <option>Begonnen</option>
         <option>Abgeschlossen</option></select
       ><select aria-label="Sortierung" [ngModel]="sort()" (ngModelChange)="sort.set($event)">
-        <option value="priority">Hinzugefügt</option>
+      <option value="created_at">Hinzugefügt</option>
         <option value="rating">Bewertung</option>
         <option value="name">Name</option></select
       ><button aria-label="Sortierreihenfolge">↓</button>
