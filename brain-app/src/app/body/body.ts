@@ -14,6 +14,8 @@ export class Body {
   readonly weightChange=computed(()=>this.latest()&&this.oldest()?this.round(this.latest()!.weight_kg-this.oldest()!.weight_kg):null);
   readonly weightProgress=computed(()=>this.progress(this.oldest()?.weight_kg,this.latest()?.weight_kg,this.goal().goal_weight_kg));
   readonly visibleMeasurements=computed(()=>this.measurements().slice(0,12).reverse());
+  readonly sortDirection=signal<'asc'|'desc'>('desc');
+  readonly sortedMeasurements=computed(()=>[...this.measurements()].sort((a,b)=>this.sortDirection()==='desc'?b.measurement_date.localeCompare(a.measurement_date):a.measurement_date.localeCompare(b.measurement_date)));
   constructor(){void this.reload()}
   async reload(){this.loading.set(true);this.error.set('');try{const data=await this.service.load();this.measurements.set(data.measurements);this.goal.set(data.goal);this.history.set(data.history);this.milestones.set(data.milestones);this.preferences.set(data.preferences)}catch(error){this.error.set(this.message(error))}finally{this.loading.set(false)}}
   newMeasurement(){this.editingId.set(null);this.measurementDraft.set({weight_kg:this.latest()?.weight_kg??0,body_fat_percent:null,measurement_date:this.localDate(new Date())});this.editor.set('measurement')}
@@ -31,7 +33,20 @@ export class Body {
   async removeMilestone(){const id=this.editingId();if(!id||!confirm('Meilenstein löschen?'))return;await this.run(async()=>{await this.service.deleteMilestone(id);this.editor.set(null);await this.reload()})}
   openSettings(){this.preferenceDraft.set({...this.preferences()});this.editor.set('settings')}
   async saveSettings(){await this.run(async()=>{await this.service.savePreferences(this.preferenceDraft());this.preferences.set(this.preferenceDraft());this.editor.set(null)})}
-  barHeight(value:number){const values=this.visibleMeasurements().map(x=>x.weight_kg);const min=Math.min(...values),max=Math.max(...values);return max===min?50:15+((value-min)/(max-min))*75}
+  chartPoints(key:'weight_kg'|'body_fat_percent'){
+    const items=[...this.measurements()].reverse();const values=items.map(x=>x[key]).filter((x):x is number=>x!==null);if(!values.length)return '';
+    const min=Math.min(...values),max=Math.max(...values),range=max-min||1;
+    return items.map((item,index)=>{const value=item[key];if(value===null)return null;const x=45+(index/Math.max(1,items.length-1))*610;const y=20+(1-(value-min)/range)*205;return `${this.round(x)},${this.round(y)}`}).filter(Boolean).join(' ');
+  }
+  chartLabels(){const items=[...this.measurements()].reverse();const step=Math.max(1,Math.ceil(items.length/9));return items.map((item,index)=>({item,index})).filter(x=>x.index%step===0||x.index===items.length-1)}
+  chartX(index:number){const length=this.measurements().length;return 45+(index/Math.max(1,length-1))*610}
+  weightRange(){const values=this.measurements().map(x=>x.weight_kg);return values.length?{min:this.round(Math.min(...values)),max:this.round(Math.max(...values))}:{min:0,max:0}}
+  fatRange(){const values=this.measurements().map(x=>x.body_fat_percent).filter((x):x is number=>x!==null);return values.length?{min:this.round(Math.min(...values)),max:this.round(Math.max(...values))}:{min:0,max:0}}
+  fatY(value:number){const range=this.fatRange();return 20+(1-(value-range.min)/((range.max-range.min)||1))*205}
+  bmi(weight:number){const height=this.preferences().body_height_cm;if(!height)return null;return this.round(weight/((height/100)**2))}
+  phaseDelta(item:BodyMilestone,key:'weight_kg'|'body_fat_percent'){
+    const chronological=[...this.measurements()].reverse();const start=chronological.find(x=>x.measurement_date>=item.milestone_date&&x[key]!==null);const end=[...chronological].reverse().find(x=>(!item.end_milestone_date||x.measurement_date<=item.end_milestone_date)&&x[key]!==null);if(!start||!end||start[key]===null||end[key]===null)return null;return this.round(Number(end[key])-Number(start[key]));
+  }
   progress(start:number|undefined,current:number|undefined,target:number|null|undefined){if(start==null||current==null||target==null||start===target)return null;return Math.max(0,Math.min(100,Math.round(((start-current)/(start-target))*100)))}
   round(value:number){return Math.round((value+Number.EPSILON)*10)/10}
   private async run(action:()=>Promise<void>){this.saving.set(true);this.error.set('');try{await action()}catch(error){this.error.set(this.message(error))}finally{this.saving.set(false)}}
