@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "angular",
+  "buildCommand": "npm run build && npm run verify:production",
+  "outputDirectory": "dist/brain-app/browser",
+  "rewrites": [{ "source": "/((?!.*\\.).*)", "destination": "/index.html" }],
+  "headers": [
+    {
+      "source": "/ngsw-worker.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/(.*\\.(?:js|css|png|svg|woff2))",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    }
+  ]
+}
