@@ -14,7 +14,8 @@ test('shows the complete module grid and working modules', async ({ page }) => {
     '/greasing-the-groove',
   );
   await expect(page.getByRole('link', { name: /Ernährung/ })).toHaveAttribute('href', '/nutrition');
-  await expect(page.locator('.module.unavailable')).toHaveCount(15);
+  await expect(page.getByRole('link', { name: /Rezepte/ })).toHaveAttribute('href', '/recipes');
+  await expect(page.locator('.module.unavailable')).toHaveCount(14);
 });
 
 test('navigates to Greasing the Groove and back to the dashboard', async ({ page }) => {

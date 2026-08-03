@@ -365,3 +365,41 @@ input {
     grid-column: 2;
   }
 }
+
+// Structured recipe editor; global to keep the route's component style bundle lean.
+.recipe-editor { width:min(38rem,100%);margin:0 auto;padding:0;background:transparent!important }
+.recipe-editor label { color:#f8fafc;font-size:.82rem }
+.recipe-editor input,.recipe-editor textarea { border-color:#536177;background:#354154 }
+.rating-editor { padding:0;border:0 }
+.rating-editor legend { margin-bottom:.45rem;font-size:.82rem }
+.rating-editor div { display:flex }
+.rating-editor button { padding:0;border:0;color:#566276;background:transparent;font-size:1.2rem }
+.rating-editor button.active { color:#ffbd00 }
+.image-preview { width:5.7rem;height:8rem;border-radius:.45rem;object-fit:cover }
+.favourite-editor { display:flex;align-items:center;gap:.7rem;width:fit-content;padding:0;border:0;background:transparent }
+.favourite-editor span { display:grid;width:2.5rem;height:2.5rem;place-items:center;border:2px solid #536177;border-radius:.55rem;color:#718096 }
+.favourite-editor.active span { border-color:#ff9200;color:#ff9200 }
+.check-row { display:flex!important;align-items:center;gap:.65rem }
+.check-row input { width:auto }
+.editor-fields { display:grid;grid-template-columns:1fr 1fr;gap:1rem }
+.structured-editor { display:grid;gap:.5rem }
+.structured-editor h2 { margin:.4rem 0 0;font-size:.82rem;font-weight:400 }
+.ingredient-group { overflow:hidden;border:1px solid #536177;border-radius:.45rem;background:#354154 }
+.group-title,.item-input,.editor-item { display:flex;align-items:center }
+.group-title input,.item-input input { flex:1;border:0;border-radius:0;background:transparent }
+.group-title button,.item-input button,.editor-item button { border:0;color:#9cadc3;background:transparent }
+.editor-item { min-height:2.3rem;padding-left:.75rem }
+.editor-item span { flex:1 }
+.editor-item.step { border:1px solid #536177;border-radius:.45rem;background:#354154 }
+.editor-item.step b { margin-right:.8rem;color:#8290a5;font-weight:400 }
+.editor-item.step { cursor:grab;transition:border-color .15s,opacity .15s,transform .15s }
+.editor-item.step:active { cursor:grabbing }
+.editor-item.step.dragging { border-color:#ffbd00;opacity:.45;transform:scale(.99) }
+.editor-item.step:focus-visible { outline:2px solid #ffbd00;outline-offset:2px }
+.drag-handle { user-select:none }
+.item-input { border-top:1px solid #46556b }
+.structured-editor > .item-input { overflow:hidden;border:1px solid #536177;border-radius:.45rem;background:#354154 }
+.add-group { width:fit-content;padding:.25rem 0;border:0;color:#9cadc3;background:transparent }
+.macro-fields { display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem }
+.editor-delete { margin:1rem auto 0;padding:.5rem;border:0;color:#ff334c;background:transparent }
+@media(max-width:600px){.macro-fields,.editor-fields{grid-template-columns:1fr}.recipe-editor{padding-inline:.5rem}}

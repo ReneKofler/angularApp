@@ -25,6 +25,6 @@ export async function signIn(page: Page): Promise<void> {
   await page.getByLabel('E-Mail').fill(email);
   await page.getByLabel('Passwort').fill(password);
   await page.getByRole('button', { name: 'Anmelden' }).click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/(?:dashboard)?$/);
   await expect(page.getByText('BrainApp', { exact: true })).toBeVisible();
 }

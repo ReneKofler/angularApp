@@ -1,0 +1,189 @@
+<div class="recipes-page">
+  <header>
+    @if (selected() || editing()) {
+      <button class="back" type="button" aria-label="Zur Rezeptliste" (click)="closeDetail()">‹</button>
+    } @else {
+      <a routerLink="/" aria-label="Zurück">‹</a>
+    }
+    <h1>{{ selected()?.name || (editing() ? (selected() ? 'Rezept bearbeiten' : 'Rezept erstellen') : 'Rezepte') }}</h1>
+    @if (!selected() && !editing()) {
+      <button class="add" type="button" (click)="newRecipe()">+ Rezept</button>
+    } @else if (selected() && !editing()) {
+      <div class="detail-actions">
+        <button type="button" class="cook" [class.active]="cookingMode()" (click)="toggleCookingMode()">Kochmodus</button>
+        <button type="button" class="icon-button" aria-label="Rezept drucken" (click)="print()">▣</button>
+        <button type="button" class="icon-button" aria-label="Rezept bearbeiten" (click)="edit(selected()!)">✎</button>
+      </div>
+    } @else if (editing()) {
+      <button class="add" type="button" [disabled]="saving()" (click)="save()">Rezept speichern</button>
+    }
+  </header>
+
+  <main>
+    @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+
+    @if (!selected() && !editing()) {
+      <input
+        class="search"
+        type="search"
+        aria-label="Rezepte suchen"
+        placeholder="Rezepte durchsuchen..."
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)"
+      />
+
+      <section class="grid" aria-label="Rezeptliste">
+        @for (recipe of filtered(); track recipe.id) {
+          <article
+            (click)="open(recipe)"
+            (keydown.enter)="open(recipe)"
+            (keydown.space)="open(recipe); $event.preventDefault()"
+            tabindex="0"
+          >
+            <div class="image">
+              @if (recipe.image_url) {
+                <img [src]="recipe.image_url" [alt]="recipe.name" (error)="imageFailed($event)" />
+              }
+              <span aria-hidden="true">🍳</span>
+            </div>
+            <div class="card-body">
+              <div class="card-title">
+                <h2>{{ recipe.name }}</h2>
+                <button
+                  type="button"
+                  class="star"
+                  [class.active]="recipe.is_favourite"
+                  [attr.aria-label]="recipe.is_favourite ? 'Favorit entfernen' : 'Als Favorit markieren'"
+                  (click)="favourite(recipe, $event)"
+                >★</button>
+              </div>
+
+              <div class="rating" [attr.aria-label]="'Bewertung: ' + (recipe.rating || 0) + ' von 5'">
+                @for (star of ratingStars; track star) {
+                  <span [class.filled]="star <= (recipe.rating || 0)">★</span>
+                }
+                @if (recipe.meal_prep) { <span class="meal-prep">Meal Prep</span> }
+              </div>
+
+              <div class="meta">
+                <span>{{ recipe.prep_time ? recipe.prep_time + ' min' : 'Keine Zeitangabe' }}</span>
+                <span>{{ recipe.servings || 1 }} Portionen</span>
+                <span class="nutrition">
+                  @if (recipe.calories !== null) { {{ recipe.calories }} kcal }
+                  @if (recipe.salt !== null) { <span>{{ recipe.salt }}g Salz</span> }
+                </span>
+              </div>
+            </div>
+          </article>
+        } @empty {
+          @if (!loading()) { <p class="empty">Keine passenden Rezepte.</p> }
+        }
+      </section>
+    } @else if (editing()) {
+      <form class="recipe-editor" (ngSubmit)="save()">
+        <label>Name *<input required [ngModel]="draft().name" (ngModelChange)="update('name',$event)" name="name" /></label>
+        <fieldset class="rating-editor"><legend>Bewertung</legend><div>@for (star of ratingStars; track star) {<button type="button" [class.active]="star <= (draft().rating || 0)" (click)="setRating(star)" [attr.aria-label]="star + ' von 10 Sternen'">★</button>}</div></fieldset>
+        <label>Bild-URL<input type="url" [ngModel]="draft().image_url" (ngModelChange)="update('image_url',$event||null)" name="image_url" /></label>
+        @if (draft().image_url) { <img class="image-preview" [src]="draft().image_url!" alt="Bildvorschau" (error)="imageFailed($event)" /> }
+        <button type="button" class="favourite-editor" [class.active]="draft().is_favourite" (click)="update('is_favourite',!draft().is_favourite)"><span>★</span> Als Favorit markieren</button>
+        <label class="check-row"><input type="checkbox" [ngModel]="draft().meal_prep" (ngModelChange)="update('meal_prep',$event)" name="meal_prep" /> Meal Prep</label>
+        <div class="editor-fields"><label>Portionen<input type="number" min="1" [ngModel]="draft().servings" (ngModelChange)="numeric('servings',$event)" name="servings" /></label><label>Zubereitungszeit (min)<input type="number" min="0" [ngModel]="draft().prep_time" (ngModelChange)="numeric('prep_time',$event)" name="prep_time" /></label></div>
+
+        <section class="structured-editor"><h2>Zutaten</h2>
+          @for (group of ingredientGroups(); track $index; let groupIndex = $index) {
+            <div class="ingredient-group">
+              <div class="group-title"><input aria-label="Zutatengruppe" placeholder="Gruppe (z.B. Sauce, Marinade...)" [ngModel]="group.name" (ngModelChange)="updateGroupName(groupIndex,$event)" [name]="'group-'+groupIndex" />@if(ingredientGroups().length > 1){<button type="button" aria-label="Gruppe entfernen" (click)="removeIngredientGroup(groupIndex)">×</button>}</div>
+              @for (ingredient of group.items; track $index; let itemIndex = $index) {<div class="editor-item"><span>{{ ingredient }}</span><button type="button" aria-label="Zutat entfernen" (click)="removeIngredient(groupIndex,itemIndex)">×</button></div>}
+              <div class="item-input"><input placeholder="Zutat eingeben..." [ngModel]="group.pending" (ngModelChange)="updatePendingIngredient(groupIndex,$event)" (keydown.enter)="$event.preventDefault(); addIngredient(groupIndex)" [name]="'ingredient-'+groupIndex" /><button type="button" aria-label="Zutat hinzufügen" (click)="addIngredient(groupIndex)">+</button></div>
+            </div>
+          }
+          <button class="add-group" type="button" (click)="addIngredientGroup()">＋ Gruppe hinzufügen</button>
+        </section>
+
+        <section class="structured-editor"><h2>Zubereitung</h2>
+          @for (step of preparationSteps(); track $index; let stepIndex = $index) {
+            <div class="editor-item step" draggable="true" tabindex="0"
+              [class.dragging]="draggedStep() === stepIndex"
+              [attr.aria-label]="'Schritt ' + (stepIndex + 1) + ': ' + step + '. Mit Alt und Pfeiltasten verschieben.'"
+              (dragstart)="startStepDrag(stepIndex,$event)" (dragend)="draggedStep.set(null)"
+              (dragover)="$event.preventDefault()" (drop)="dropStep(stepIndex,$event)"
+              (keydown)="handleStepKey(stepIndex,$event)">
+              <b class="drag-handle" aria-hidden="true">☰&nbsp; {{ stepIndex + 1 }}.</b><span>{{ step }}</span><button type="button" aria-label="Schritt entfernen" (click)="removePreparationStep(stepIndex)">×</button>
+            </div>
+          }
+          <div class="item-input"><input placeholder="Schritt eingeben..." [ngModel]="pendingStep()" (ngModelChange)="pendingStep.set($event)" (keydown.enter)="$event.preventDefault(); addPreparationStep()" name="pendingStep" /><button type="button" aria-label="Schritt hinzufügen" (click)="addPreparationStep()">+</button></div>
+        </section>
+
+        <section class="structured-editor"><h2>Makronährstoffe</h2><div class="macro-fields">
+          @for (item of [{key:'calories',label:'Kalorien (kcal)'},{key:'protein',label:'Protein (g)'},{key:'carbs',label:'Kohlenhydrate (g)'},{key:'fat',label:'Fett (g)'},{key:'fiber',label:'Ballaststoffe (g)'},{key:'salt',label:'Salz (g)'}]; track item.key) {<label>{{item.label}}<input type="number" min="0" step="0.1" [placeholder]="item.key==='salt'?'z.B. 1.2':''" [ngModel]="$any(draft())[item.key]" (ngModelChange)="numeric($any(item.key),$event)" [name]="item.key" /></label>}
+        </div></section>
+        <label>Tipps<textarea placeholder="Tipps, Variationen, Hinweise..." [ngModel]="draft().tips" (ngModelChange)="update('tips',$event||null)" name="tips"></textarea></label>
+        @if(selected()){<button type="button" class="editor-delete" (click)="remove()">Löschen</button>}
+      </form>
+    } @else if (selected(); as recipe) {
+      <section class="detail">
+        <div class="hero">@if(recipe.image_url){<img [src]="recipe.image_url" [alt]="recipe.name" (error)="imageFailed($event)" />}<span>🍳</span></div>
+        <div class="detail-content">
+          <div class="detail-rating">
+            <span class="rating">
+              @for (star of ratingStars; track star) { <span [class.filled]="star <= (recipe.rating || 0)">★</span> }
+            </span>
+            <span>{{ recipe.rating || 0 }}/10</span>
+          </div>
+          <div class="detail-meta"><span>◷&nbsp; {{ recipe.prep_time || '–' }} min</span><span>♧&nbsp; {{ recipe.servings || 1 }} Portionen</span></div>
+
+          <section class="macro-card">
+            <h2>Makronährstoffe <button type="button" class="add-to-nutrition" aria-label="Zum Ernährungsplan hinzufügen" (click)="openMealDialog(recipe)">🍴</button></h2>
+            <div class="macros">
+              <div><strong>{{ recipe.calories ?? '–' }}</strong><small>kcal</small></div>
+              <div><strong>{{ recipe.protein ?? '–' }}g</strong><small>Protein (g)</small></div>
+              <div><strong>{{ recipe.carbs ?? '–' }}g</strong><small>Kohlenhydrate (g)</small></div>
+              <div><strong>{{ recipe.fat ?? '–' }}g</strong><small>Fett (g)</small></div>
+              <div><strong>{{ recipe.fiber ?? '–' }}g</strong><small>Ballaststoffe (g)</small></div>
+            </div>
+          </section>
+
+          <section class="ingredient-card">
+            <h2>Zutaten <span>{{ checkedIngredients().size }}/{{ listItems(recipe.ingredients).length }}</span></h2>
+            @for (ingredient of listItems(recipe.ingredients); track $index) {
+              <label [class.done]="checkedIngredients().has($index)">
+                <input type="checkbox" [checked]="checkedIngredients().has($index)" (change)="toggleChecked('ingredient', $index)" />
+                {{ ingredient }}
+              </label>
+            }
+          </section>
+
+          <section class="preparation-card">
+            <h2>Zubereitung <span>{{ checkedSteps().size }}/{{ listItems(recipe.preparation).length }}</span></h2>
+            @for (step of listItems(recipe.preparation); track $index) {
+              <button type="button" [class.done]="checkedSteps().has($index)" (click)="toggleChecked('step', $index)">
+                <b>{{ $index + 1 }}</b><span>{{ step }}</span>
+              </button>
+            }
+          </section>
+          @if(recipe.tips){<section class="tips"><h2>Tipps</h2><p class="multiline">{{recipe.tips}}</p></section>}
+        </div>
+      </section>
+    }
+  </main>
+
+  @if (mealDialog()) {
+    <div class="dialog-backdrop" (click)="mealDialog.set(false)">
+      <form class="meal-dialog" (click)="$event.stopPropagation()" (ngSubmit)="addMeal()">
+        <h2>Mahlzeit zum Ernährungsplan hinzufügen</h2>
+        <label>Name der Mahlzeit<input required [ngModel]="mealName()" (ngModelChange)="mealName.set($event)" name="mealName" /></label>
+        <label>Datum<input required type="date" [ngModel]="mealDate()" (ngModelChange)="mealDate.set($event)" name="mealDate" /></label>
+        <label>Verwendete Prozent<input type="number" min="0" step="1" [ngModel]="mealPercentage()" (ngModelChange)="setMealPercentage($event)" name="mealPercentage" /></label>
+        <div class="meal-fields">
+          <label>Kalorien (kcal)<input type="number" min="0" step="0.1" [ngModel]="mealNutrients().kcal" (ngModelChange)="setMealNutrient('kcal',$event)" name="mealKcal" /></label>
+          <label>Protein (g)<input type="number" min="0" step="0.1" [ngModel]="mealNutrients().protein_g" (ngModelChange)="setMealNutrient('protein_g',$event)" name="mealProtein" /></label>
+          <label>Fett (g)<input type="number" min="0" step="0.1" [ngModel]="mealNutrients().fat_g" (ngModelChange)="setMealNutrient('fat_g',$event)" name="mealFat" /></label>
+          <label>Kohlenhydrate (g)<input type="number" min="0" step="0.1" [ngModel]="mealNutrients().carbs_g" (ngModelChange)="setMealNutrient('carbs_g',$event)" name="mealCarbs" /></label>
+          <label>Ballaststoffe (g)<input type="number" min="0" step="0.1" [ngModel]="mealNutrients().fiber_g" (ngModelChange)="setMealNutrient('fiber_g',$event)" name="mealFiber" /></label>
+          <label>Salz (g)<input type="number" min="0" step="0.1" [ngModel]="mealNutrients().salt_g" (ngModelChange)="setMealNutrient('salt_g',$event)" name="mealSalt" /></label>
+        </div>
+        <div class="meal-dialog-actions"><button type="button" (click)="mealDialog.set(false)">Abbrechen</button><button class="confirm" [disabled]="saving()">Mahlzeit hinzufügen</button></div>
+      </form>
+    </div>
+  }
+</div>
