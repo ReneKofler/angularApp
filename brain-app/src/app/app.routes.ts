@@ -79,6 +79,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./linedance/linedance').then((m) => m.Linedance),
   },
+  {
+    path: 'flag-football',
+    canActivate: [authGuard],
+    loadComponent: () => import('./flag-football/flag-football').then((m) => m.FlagFootball),
+  },
   { path: 'apps/body', redirectTo: 'body' },
   {
     path: '',

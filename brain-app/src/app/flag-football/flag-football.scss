@@ -1,0 +1,336 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #0d1727;
+  color: #fff;
+}
+:host > header {
+  height: 58px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #1e2a3b;
+}
+:host > header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+button {
+  padding: 9px 13px;
+  border: 1px solid #526077;
+  border-radius: 7px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+.primary {
+  background: #9228e5;
+  border-color: #9228e5;
+}
+.danger {
+  color: #ff596b;
+}
+nav {
+  display: flex;
+  background: #1e2a3b;
+}
+nav button {
+  flex: 1;
+  border: 0;
+  border-radius: 0;
+  padding: 15px;
+  color: #9fb0c7;
+  border-bottom: 2px solid transparent;
+}
+nav .active {
+  color: #b13cff;
+  border-bottom-color: #b13cff;
+}
+main {
+  width: min(1000px, calc(100% - 32px));
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.error {
+  grid-column: 1/-1;
+  padding: 12px;
+  background: #4c1d2a;
+}
+.editor,
+.list,
+.playbook {
+  display: grid;
+  align-self: start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #1e2a3b;
+}
+.editor {
+  grid-column: 1/-1;
+  width: min(800px, 100%);
+  box-sizing: border-box;
+  justify-self: center;
+}
+.cards {
+  grid-column: 1/-1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.route-library {
+  grid-column: 1/-1;
+  display: grid;
+  gap: 12px;
+}
+.route-library h2 {
+  margin: 0;
+}
+.empty-routes {
+  grid-column: 1/-1;
+  text-align: center;
+  color: #8194ad;
+  padding: 35px;
+  background: #1e2a3b;
+  border-radius: 10px;
+}
+.cards article {
+  display: grid;
+  gap: 7px;
+  padding: 0 12px 12px;
+  border-radius: 10px;
+  background: #1e2a3b;
+  overflow: hidden;
+}
+.cards svg,
+.cards .mini-field {
+  width: calc(100% + 24px);
+  margin-left: -12px;
+  height: 260px;
+  background: #155c31;
+}
+.route-preview {
+  width: 120px;
+  height: 156px;
+  justify-self: center;
+}
+.segment {
+  display: grid;
+  grid-template-columns: auto 1fr 45px auto;
+  gap: 8px;
+  align-items: center;
+}
+.add-segment {
+  border-style: dashed;
+}
+.placement {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.placement > span {
+  width: calc(100% - 45px);
+}
+.placement > b {
+  margin-left: auto;
+}
+.placement .selected {
+  background: #f1b51c;
+}
+.hint {
+  color: #8194ad;
+  font-size: 12px;
+}
+.yard,
+.los {
+  position: absolute;
+  left: 10px;
+  color: #a7c6b0;
+  font-weight: bold;
+}
+.y20 {
+  top: 3%;
+}
+.y15 {
+  top: 20%;
+}
+.y10 {
+  top: 38%;
+}
+.y5 {
+  top: 56%;
+}
+.los {
+  top: 73%;
+}
+.field:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 75%;
+  border-top: 2px dashed #b9d5c2;
+}
+.switch {
+  display: flex !important;
+  grid-template-columns: 70px auto !important;
+  align-items: center;
+}
+.switch input {
+  width: 44px;
+}
+.playbook .empty {
+  text-align: center;
+  padding: 70px;
+  color: #8194ad;
+}
+.playbook .empty b {
+  font-size: 42px;
+}
+.route-cards polyline {
+  fill: none;
+  stroke: #b13cff;
+  stroke-width: 2;
+}
+.route-cards {
+  grid-template-columns: repeat(auto-fill, 272px);
+  justify-content: start;
+}
+.route-cards article {
+  grid-template-columns: 1fr 1fr;
+  box-sizing: border-box;
+  width: 272px;
+}
+.route-cards svg {
+  grid-column: 1 / -1;
+  width: 200px;
+  height: 260px;
+}
+.route-cards strong,
+.route-cards b,
+.route-cards small,
+.route-cards span {
+  grid-column: 1 / -1;
+}
+.route-cards button {
+  width: 100%;
+}
+.route-cards small {
+  color: #b13cff;
+}
+.play-cards article {
+  grid-template-columns: 1fr auto auto;
+}
+.play-cards .mini-field,
+.play-cards strong,
+.play-cards small {
+  grid-column: 1/-1;
+}
+.editor h2,
+.list h2,
+.playbook h2 {
+  margin: 0;
+}
+.editor label {
+  display: grid;
+  gap: 5px;
+}
+input,
+select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #526077;
+  border-radius: 7px;
+  background: #354154;
+  color: #fff;
+}
+.field,
+.mini-field {
+  position: relative;
+  height: 330px;
+  border: 2px solid #45647b;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #16733d 49%, #fff4 50%, #16733d 51%);
+}
+.player {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  background: #9228e5;
+}
+.mini-field {
+  height: 150px;
+}
+.mini-field i {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  background: #9228e5;
+  border-radius: 50%;
+  padding: 4px;
+  font-style: normal;
+}
+.list article {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #3d4b60;
+  border-radius: 8px;
+}
+.list small {
+  color: #9fb0c7;
+}
+svg {
+  height: 330px;
+  background: #16733d;
+  border-radius: 10px;
+}
+polyline {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 3;
+}
+.playbook {
+  grid-column: 1/-1;
+}
+.playbook article {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #3d4b60;
+  border-radius: 8px;
+}
+@media (max-width: 700px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+  .playbook {
+    grid-column: 1;
+  }
+  .playbook article {
+    grid-template-columns: 1fr auto;
+  }
+  .field,
+  svg {
+    height: 260px;
+  }
+  .cards {
+    grid-template-columns: 1fr;
+  }
+  .route-cards {
+    grid-template-columns: 272px;
+  }
+  .editor {
+    width: 100%;
+  }
+}

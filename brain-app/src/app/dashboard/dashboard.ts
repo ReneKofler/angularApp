@@ -169,6 +169,7 @@ export class Dashboard {
       name: 'Flag Football',
       description: 'Plays & Routes planen',
       color: '#9228e5',
+      route: '/flag-football',
     },
     {
       id: '18',
