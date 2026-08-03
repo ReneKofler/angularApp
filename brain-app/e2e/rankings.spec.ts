@@ -45,6 +45,9 @@ test.beforeEach(async ({ page }) => {
 });
 test('opens a category, filters rankings and opens its editor', async ({ page }) => {
   await page.goto('/rankings');
+  expect(
+    await page.evaluate(() => getComputedStyle(document.documentElement).backgroundColor),
+  ).toBe('rgb(13, 23, 39)');
   const categoryTile = page.getByRole('button', { name: 'Filme öffnen' });
   await expect(categoryTile).toBeVisible();
   await expect(categoryTile).toHaveCSS('background-image', /linear-gradient/);
