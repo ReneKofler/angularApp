@@ -114,11 +114,11 @@ export class Habits {
   }
   async save(): Promise<void> {
     if (!this.name().trim()) {
-      this.error.set('Habit name is required.');
+      this.error.set('Der Name ist erforderlich.');
       return;
     }
     if (this.endDate() && this.endDate() < this.startDate()) {
-      this.error.set('End date must be on or after the start date.');
+      this.error.set('Das Enddatum darf nicht vor dem Startdatum liegen.');
       return;
     }
     const existing = this.habits().find((h) => h.id === this.editingId());
@@ -200,7 +200,7 @@ export class Habits {
     }
   }
   async remove(habit: Habit): Promise<void> {
-    if (!confirm(`Delete “${habit.name}” and its check history? This cannot be undone.`)) return;
+    if (!confirm(`„${habit.name}“ und den gesamten Verlauf löschen?`)) return;
     try {
       await this.service.deleteHabit(habit.id);
       await this.reload();
@@ -239,6 +239,6 @@ export class Habits {
     };
   }
   private message(error: unknown): string {
-    return error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+    return error instanceof Error ? error.message : 'Die Aktion konnte nicht ausgeführt werden.';
   }
 }

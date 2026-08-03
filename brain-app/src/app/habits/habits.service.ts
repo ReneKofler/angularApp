@@ -109,15 +109,13 @@ export class HabitsService {
           .update({ checked, sport_metric_value: metric })
           .eq('id', existing.data.id)
           .eq('user_id', userId)
-      : await client
-          .from('habit_checks')
-          .insert({
-            habit_id: habitId,
-            user_id: userId,
-            check_date: date,
-            checked,
-            sport_metric_value: metric,
-          });
+      : await client.from('habit_checks').insert({
+          habit_id: habitId,
+          user_id: userId,
+          check_date: date,
+          checked,
+          sport_metric_value: metric,
+        });
     if (result.error) throw result.error;
   }
 

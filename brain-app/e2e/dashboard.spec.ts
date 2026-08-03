@@ -10,6 +10,10 @@ test('shows the complete module grid and working modules', async ({ page }) => {
     '/workouts',
   );
   await expect(page.getByRole('link', { name: /CrossFit/ })).toHaveAttribute('href', '/crossfit');
+  await expect(page.getByRole('link', { name: /Habit Tracking/ })).toHaveAttribute(
+    'href',
+    '/habits',
+  );
   await expect(page.getByRole('link', { name: /Notizen/ })).toHaveAttribute('href', '/notes');
   await expect(page.getByRole('link', { name: /^💪 Übungen / })).toHaveAttribute(
     'href',
@@ -40,7 +44,7 @@ test('shows the complete module grid and working modules', async ({ page }) => {
     'href',
     '/flag-football',
   );
-  await expect(page.locator('.module.unavailable')).toHaveCount(6);
+  await expect(page.locator('.module.unavailable')).toHaveCount(5);
 });
 
 test('opens dashboard settings with reorder, visibility, and color controls', async ({ page }) => {
