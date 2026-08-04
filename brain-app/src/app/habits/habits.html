@@ -1,0 +1,225 @@
+<header class="page-header">
+  <a routerLink="/" aria-label="Zurück">‹</a>
+  <h1>Habit Tracking</h1>
+  <button class="primary" type="button" (click)="editorOpen() ? editorOpen.set(false) : newHabit()">
+    {{ editorOpen() ? 'Abbrechen' : '+ Habit' }}
+  </button>
+</header>
+
+@if (error()) {
+  <p class="error" role="alert">{{ error() }}</p>
+}
+
+@if (editorOpen()) {
+  <form class="editor" (ngSubmit)="save()">
+    <h2>{{ editingId() ? 'Habit bearbeiten' : 'Neues Habit' }}</h2>
+    <label
+      >Name *<input
+        aria-label="Name der Gewohnheit"
+        [ngModel]="name()"
+        (ngModelChange)="name.set($event)"
+        name="name"
+        required
+    /></label>
+    <label
+      >Beschreibung<textarea
+        rows="3"
+        [ngModel]="description()"
+        (ngModelChange)="description.set($event)"
+        name="description"
+      ></textarea>
+    </label>
+    <div class="grid">
+      <label
+        >Farbe<input
+          type="color"
+          [ngModel]="color()"
+          (ngModelChange)="color.set($event)"
+          name="color"
+      /></label>
+      <label
+        >Startdatum<input
+          type="date"
+          required
+          [ngModel]="startDate()"
+          (ngModelChange)="startDate.set($event)"
+          name="start"
+      /></label>
+      <label
+        >Enddatum (optional)<input
+          type="date"
+          [ngModel]="endDate()"
+          (ngModelChange)="endDate.set($event)"
+          name="end"
+      /></label>
+      <label
+        >Workout-Verknüpfung<input
+          placeholder="z.B. Biking"
+          [ngModel]="workoutType()"
+          (ngModelChange)="workoutType.set($event)"
+          name="workout"
+      /></label>
+      <label
+        >Sportart<input
+          placeholder="z.B. Radfahren"
+          [ngModel]="sportType()"
+          (ngModelChange)="sportType.set($event)"
+          name="sport"
+      /></label>
+      <label
+        >Messwert<input
+          placeholder="z.B. km"
+          [ngModel]="metricName()"
+          (ngModelChange)="metricName.set($event)"
+          name="metric"
+      /></label>
+    </div>
+    <label
+      >Trainingsplan<select [ngModel]="planId()" (ngModelChange)="planId.set($event)" name="plan">
+        <option value="">Kein Plan</option>
+        @for (plan of plans(); track plan.id) {
+          <option [value]="plan.id">{{ plan.name }}</option>
+        }
+      </select></label
+    >
+    <div class="editor-actions">
+      <button type="button" (click)="editorOpen.set(false)">Abbrechen</button
+      ><button class="primary" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Speichern…' : 'Speichern' }}
+      </button>
+    </div>
+  </form>
+}
+
+@if (loading()) {
+  <section class="empty">Habits werden geladen…</section>
+} @else {
+  <section class="overview" aria-label="Habit Übersicht">
+    <div class="overview-grid">
+      <div></div>
+      <div class="overview-days">
+        @for (date of overviewDates(); track date) {
+          <span>{{ weekday(date) }} {{ day(date) }}</span>
+        }
+      </div>
+      <div></div>
+      @for (habit of habits(); track habit.id) {
+        <div class="overview-name">
+          <i [style.background]="habit.color"></i><span>{{ habit.name }}</span>
+        </div>
+        <div class="overview-checks">
+          @for (date of overviewDates(); track date) {
+            <button
+              [class.checked]="checkFor(habit, date)?.checked"
+              [style.--accent]="habit.color"
+              [disabled]="!activeOn(habit, date) || isFuture(date)"
+              (click)="toggleFor(habit, date)"
+              [attr.aria-label]="habit.name + ' am ' + date"
+            >
+              {{ checkFor(habit, date)?.checked ? '✓' : '' }}
+            </button>
+          }
+        </div>
+        <div class="overview-total" [style.color]="habit.color">
+          <b>{{ total(habit) }}/{{ monthProgress(habit).possible || '–' }}</b>
+          @if (habit.sport_metric_name && metricTotal(habit)) {
+            <small>{{ metricTotal(habit) }} {{ habit.sport_metric_name }}</small>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <main class="page">
+    @if (!habits().length) {
+      <section class="empty">
+        <h2>Noch keine Habits</h2>
+        <p>Lege dein erstes Habit an.</p>
+      </section>
+    }
+    <section class="habit-list">
+      @for (habit of habits(); track habit.id) {
+        <article
+          [style.--accent]="habit.color"
+          draggable="true"
+          (dragstart)="startDrag(habit)"
+          (dragover)="$event.preventDefault()"
+          (drop)="dropOn(habit)"
+        >
+          <div class="habit-row">
+            <span class="drag" aria-label="Zum Sortieren ziehen">⠿</span><i class="dot"></i>
+            <div class="habit-title">
+              <h2>{{ habit.name }}</h2>
+              @if (habit.description) {
+                <p>{{ habit.description }}</p>
+              }
+              @if (habit.linked_workout_type) {
+                <span class="tag">🏃 {{ habit.linked_workout_type }}</span>
+              }
+            </div>
+            <span class="total"
+              >{{ total(habit) }}/{{ monthProgress(habit).possible || '–' }}
+              @if (habit.sport_metric_name && metricTotal(habit)) {
+                · {{ metricTotal(habit) }} {{ habit.sport_metric_name }}
+              }
+            </span>
+            <button
+              class="icon"
+              [attr.aria-label]="habit.collapsed ? 'Details anzeigen' : 'Details ausblenden'"
+              (click)="collapse(habit)"
+            >
+              {{ habit.collapsed ? '⌄' : '⌃' }}
+            </button>
+            <button class="icon" aria-label="Habit bearbeiten" (click)="edit(habit)">✎</button>
+          </div>
+          @if (!habit.collapsed) {
+            <div class="calendar">
+              <div class="month-nav">
+                <button aria-label="Vorheriger Monat" (click)="changeMonth(-1)">‹</button
+                ><strong>{{ monthLabel() }}</strong
+                ><button aria-label="Nächster Monat" (click)="changeMonth(1)">›</button>
+              </div>
+              <div class="weekdays">
+                @for (name of ['M', 'D', 'M', 'D', 'F', 'S', 'S']; track $index) {
+                  <span>{{ name }}</span>
+                }
+              </div>
+              <div class="days">
+                @for (date of calendarDays(); track $index) {
+                  @if (date) {
+                    <button
+                      [class.checked]="checkFor(habit, date)?.checked"
+                      [class.selected]="date === selectedDate()"
+                      [disabled]="!activeOn(habit, date) || isFuture(date)"
+                      (click)="selectedDate.set(date); toggleFor(habit, date)"
+                    >
+                      {{ day(date) }}
+                    </button>
+                  } @else {
+                    <span></span>
+                  }
+                }
+              </div>
+              @if (habit.sport_metric_name && activeOn(habit, selectedDate())) {
+                <label class="metric"
+                  >{{ habit.sport_metric_name
+                  }}<input
+                    type="number"
+                    step="any"
+                    [value]="checkFor(habit)?.sport_metric_value ?? ''"
+                    (change)="setMetric(habit, $any($event.target).value)"
+                /></label>
+              }
+              <div class="progress">
+                <span [style.width.%]="monthProgress(habit).percent"></span>
+              </div>
+              <small
+                >{{ monthProgress(habit).complete }}/{{ monthProgress(habit).possible }} Tage</small
+              >
+            </div>
+          }
+        </article>
+      }
+    </section>
+  </main>
+}

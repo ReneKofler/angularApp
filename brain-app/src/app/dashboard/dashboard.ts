@@ -48,6 +48,7 @@ export class Dashboard {
       name: 'Habit Tracking',
       description: 'Gewohnheiten aufbauen',
       color: '#08ad4b',
+      route: '/habits',
     },
     {
       id: '3',
