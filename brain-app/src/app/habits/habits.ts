@@ -42,6 +42,8 @@ export class Habits {
   readonly streaks = signal<HabitStreak[]>([]);
   readonly plans = signal<TrainingPlan[]>([]);
   readonly selectedDate = signal(localDate());
+  readonly visibleMonth = signal(localDate().slice(0, 7));
+  readonly draggedId = signal<string | null>(null);
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly error = signal('');
@@ -56,12 +58,14 @@ export class Habits {
   readonly sportType = signal('');
   readonly metricName = signal('');
   readonly planId = signal('');
-  readonly activeHabits = computed(() =>
-    this.habits().filter(
-      (h) =>
-        h.start_date <= this.selectedDate() && (!h.end_date || h.end_date >= this.selectedDate()),
-    ),
-  );
+  readonly overviewDates = computed(() => {
+    const end = new Date(`${this.selectedDate()}T12:00:00`);
+    return [-2, -1, 0].map((offset) => {
+      const date = new Date(end);
+      date.setDate(end.getDate() + offset);
+      return localDate(date);
+    });
+  });
 
   constructor() {
     void this.reload();
@@ -147,17 +151,18 @@ export class Habits {
       this.saving.set(false);
     }
   }
-  checkFor(habit: Habit): HabitCheck | undefined {
-    return this.checks().find(
-      (c) => c.habit_id === habit.id && c.check_date === this.selectedDate(),
-    );
+  checkFor(habit: Habit, date = this.selectedDate()): HabitCheck | undefined {
+    return this.checks().find((c) => c.habit_id === habit.id && c.check_date === date);
   }
   async toggle(habit: Habit): Promise<void> {
-    const check = this.checkFor(habit);
+    await this.toggleFor(habit, this.selectedDate());
+  }
+  async toggleFor(habit: Habit, date: string): Promise<void> {
+    const check = this.checkFor(habit, date);
     try {
       await this.service.setCheck(
         habit.id,
-        this.selectedDate(),
+        date,
         !check?.checked,
         check?.sport_metric_value ?? null,
       );
@@ -213,6 +218,69 @@ export class Habits {
   }
   total(habit: Habit): number {
     return this.streaks().find((s) => s.habit_id === habit.id)?.total_checks ?? 0;
+  }
+  activeOn(habit: Habit, date: string): boolean {
+    return habit.start_date <= date && (!habit.end_date || habit.end_date >= date);
+  }
+  isFuture(date: string): boolean {
+    return date > localDate();
+  }
+  weekday(date: string): string {
+    return new Intl.DateTimeFormat('de-DE', { weekday: 'short' })
+      .format(new Date(`${date}T12:00:00`))
+      .replace('.', '')
+      .toUpperCase();
+  }
+  day(date: string): number {
+    return Number(date.slice(-2));
+  }
+  monthLabel(): string {
+    return new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(
+      new Date(`${this.visibleMonth()}-01T12:00:00`),
+    );
+  }
+  changeMonth(offset: number): void {
+    const date = new Date(`${this.visibleMonth()}-01T12:00:00`);
+    date.setMonth(date.getMonth() + offset);
+    this.visibleMonth.set(localDate(date).slice(0, 7));
+  }
+  calendarDays(): (string | null)[] {
+    const first = new Date(`${this.visibleMonth()}-01T12:00:00`);
+    const mondayOffset = (first.getDay() + 6) % 7;
+    const days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+    return [
+      ...Array<null>(mondayOffset).fill(null),
+      ...Array.from(
+        { length: days },
+        (_, index) => `${this.visibleMonth()}-${String(index + 1).padStart(2, '0')}`,
+      ),
+    ];
+  }
+  monthProgress(habit: Habit): { complete: number; possible: number; percent: number } {
+    const dates = this.calendarDays().filter((date): date is string => !!date);
+    const eligible = dates.filter((date) => this.activeOn(habit, date) && !this.isFuture(date));
+    const complete = eligible.filter((date) => this.checkFor(habit, date)?.checked).length;
+    return {
+      complete,
+      possible: eligible.length,
+      percent: eligible.length ? (complete / eligible.length) * 100 : 0,
+    };
+  }
+  metricTotal(habit: Habit): number {
+    return this.checks()
+      .filter((check) => check.habit_id === habit.id)
+      .reduce((sum, check) => sum + (check.sport_metric_value ?? 0), 0);
+  }
+  startDrag(habit: Habit): void {
+    this.draggedId.set(habit.id);
+  }
+  async dropOn(target: Habit): Promise<void> {
+    const source = this.habits().find((habit) => habit.id === this.draggedId());
+    this.draggedId.set(null);
+    if (!source || source.id === target.id) return;
+    const sourceIndex = this.habits().findIndex((habit) => habit.id === source.id);
+    const targetIndex = this.habits().findIndex((habit) => habit.id === target.id);
+    await this.move(source, targetIndex > sourceIndex ? 1 : -1);
   }
   private async update(habit: Habit, changes: Partial<HabitDraft>): Promise<void> {
     try {

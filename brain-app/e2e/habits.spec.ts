@@ -141,38 +141,47 @@ test.beforeEach(async ({ page }) => {
   await mockHabits(page);
 });
 
-test('keeps checks, streaks, metrics and date ranges correct across dates', async ({ page }) => {
+test('shows the overview and monthly calendar with correct checks, metrics and date ranges', async ({
+  page,
+}) => {
   await page.goto('/habits');
-  await expect(page.getByRole('heading', { name: 'Wasser trinken' })).toBeVisible();
-  await expect(page.getByText('Zukünftige Gewohnheit')).toBeHidden();
-  await expect(page.getByText('2 Tage in Folge')).toBeVisible();
-  await page.getByRole('button', { name: 'Vorheriger Tag' }).click();
-  await expect(page.getByText('1 Tag in Folge')).toBeVisible();
-  await page.getByRole('button', { name: 'Gewohnheit abwählen' }).click();
-  await page.getByRole('button', { name: 'Nächster Tag' }).click();
-  await expect(page.getByText('1 Tag in Folge')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Habit Tracking' })).toBeVisible();
+  await expect(page.getByLabel('Habit Übersicht')).toContainText('Wasser trinken');
+  await expect(page.getByLabel('Habit Übersicht')).toContainText('Zukünftige Gewohnheit');
+  await expect(page.getByLabel('Wasser trinken am 2026-08-02')).toHaveClass(/checked/);
+  await expect(page.getByLabel('Zukünftige Gewohnheit am 2026-08-03')).toBeDisabled();
+  await expect(page.getByText('August 2026').first()).toBeVisible();
+  const water = page.locator('article').filter({ hasText: 'Wasser trinken' });
+  await expect(water.getByRole('button', { name: '2', exact: true })).toHaveClass(/checked/);
+  await water.getByRole('button', { name: '2', exact: true }).click();
+  await expect
+    .poll(() => checks.find((check) => check.check_date === '2026-08-02')?.checked)
+    .toBe(false);
+  await water.getByRole('button', { name: '3', exact: true }).click();
   await page.getByLabel('Distanz (km)').fill('7.5');
   await page.getByLabel('Distanz (km)').press('Tab');
   await expect
     .poll(() => checks.find((check) => check.check_date === '2026-08-03')?.sport_metric_value)
     .toBe(7.5);
-  await page.getByRole('button', { name: 'Nächster Tag' }).click();
-  await expect(page.getByText('Zukünftige Gewohnheit')).toBeVisible();
-  await expect(page.getByText('Wasser trinken')).toBeHidden();
+  await expect(water.getByRole('button', { name: '4', exact: true })).toBeDisabled();
 });
 
-test('opens the inline editor and exposes ordering, collapse and links', async ({ page }) => {
+test('opens the inline editor and supports collapse, edit and drag ordering', async ({ page }) => {
   await page.goto('/habits');
-  await expect(page.getByText('Workout: Laufen')).toBeVisible();
-  await expect(page.getByText('Trainingsplan verknüpft')).toBeVisible();
-  await page.getByRole('button', { name: '+ Gewohnheit' }).click();
-  await expect(page.getByRole('heading', { name: 'Neue Gewohnheit' })).toBeVisible();
+  const water = page.locator('article').filter({ hasText: 'Wasser trinken' });
+  const meditation = page.locator('article').filter({ hasText: 'Meditieren' });
+  await expect(water.getByText('Laufen')).toBeVisible();
+  await page.getByRole('button', { name: '+ Habit' }).click();
+  await expect(page.getByRole('heading', { name: 'Neues Habit' })).toBeVisible();
   await expect(page.locator('.editor')).toBeInViewport();
   await page.getByRole('button', { name: 'Details ausblenden' }).first().click();
-  await expect(page.getByText('Workout: Laufen')).toBeHidden();
-  await page.getByRole('button', { name: 'Nach unten' }).first().click();
+  await expect(water.getByText('August 2026')).toBeHidden();
   await page.getByRole('button', { name: 'Details anzeigen' }).click();
-  await page.getByRole('button', { name: 'Bearbeiten' }).first().click();
-  await expect(page.getByRole('heading', { name: 'Gewohnheit bearbeiten' })).toBeVisible();
+  await water.getByRole('button', { name: 'Habit bearbeiten' }).click();
+  await expect(page.getByRole('heading', { name: 'Habit bearbeiten' })).toBeVisible();
   await expect(page.getByLabel('Name der Gewohnheit')).toHaveValue('Wasser trinken');
+  await page.getByRole('button', { name: 'Abbrechen' }).last().click();
+  await water.dispatchEvent('dragstart');
+  await meditation.dispatchEvent('drop');
+  await expect.poll(() => habitRows.find((habit) => habit.id === 'habit-1')?.position).toBe(1);
 });
